@@ -1,0 +1,53 @@
+name: Deploy to VPS
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npx vite build
+
+      - name: Deploy to VPS
+        uses: easingthemes/ssh-deploy@v5
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          ARGS: "-avz --delete"
+          SOURCE: "dist/"
+          REMOTE_HOST: "178.105.155.211"
+          REMOTE_USER: "root"
+          TARGET: "/root/magusme/dist"
+
+      - name: Copy to web root
+        uses: easingthemes/ssh-deploy@v5
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          SOURCE: "dist/"
+          REMOTE_HOST: "178.105.155.211"
+          REMOTE_USER: "root"
+          TARGET: "/var/www/magusme"
+
+      - name: Restart server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: "178.105.155.211"
+          username: "root"
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /root/magusme
+            rsync -a --delete dist/ /var/www/magusme/
+            pm2 restart ecosystem.config.cjs --update-env
+            echo "✅ Deployed at $(date)"
