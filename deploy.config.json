@@ -1,0 +1,28 @@
+{
+  "project": "MagusMe",
+  "vps": {
+    "host": "178.105.155.211",
+    "user": "root",
+    "path": "/root/magusme"
+  },
+  "build": {
+    "frontend": true,
+    "build_command": "npx vite build",
+    "dist_dir": "dist"
+  },
+  "deploy": {
+    "include": [
+      "dist/",
+      "server/",
+      "src/server/",
+      "src/shared/",
+      "src/api/",
+      "ecosystem.config.cjs",
+      "package.json",
+      "tsconfig.json"
+    ],
+    "exclude": ["node_modules", ".data", ".env", "*.log"],
+    "restart_command": "pm2 restart ecosystem.config.cjs",
+    "health_endpoint": "/api/health"
+  }
+}

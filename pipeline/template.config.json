@@ -1,0 +1,26 @@
+{
+  "project": "YourProjectName",
+  "vps": {
+    "host": "YOUR_VPS_IP",
+    "user": "root",
+    "path": "/root/your-project"
+  },
+  "build": {
+    "frontend": true,
+    "build_command": "npm run build",
+    "dist_dir": "dist"
+  },
+  "deploy": {
+    "include": [
+      "dist/",
+      "server/",
+      "src/",
+      "ecosystem.config.cjs",
+      "package.json",
+      "tsconfig.json"
+    ],
+    "exclude": ["node_modules", ".data", ".env", "*.log"],
+    "restart_command": "pm2 restart ecosystem.config.cjs",
+    "health_endpoint": "/api/health"
+  }
+}
