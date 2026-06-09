@@ -8,6 +8,7 @@ import { CreatePage } from "./pages/CreatePage";
 import { DailyToolsPage } from "./pages/DailyToolsPage";
 import { SpellDetailPage } from "./pages/SpellDetailPage";
 import { SituationAnalysisPage } from "./pages/SituationAnalysisPage";
+import { HumanMapPage } from "./pages/HumanMapPage";
 import { ArcanaPage } from "./pages/ArcanaPage";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { TermsPage } from "./pages/TermsPage";
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/learn/:spellId" element={<SpellDetailPage />} />
             <Route path="/create" element={<CreatePage />} />
             <Route path="/reading" element={<SituationAnalysisPage />} />
+            <Route path="/human-map" element={<HumanMapPage />} />
             <Route path="/tools" element={<DailyToolsPage />} />
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/terms" element={<TermsPage />} />

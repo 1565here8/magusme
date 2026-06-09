@@ -217,12 +217,6 @@ CREATE INDEX IF NOT EXISTS idx_social_messages_conv ON social_messages(conversat
 CREATE INDEX IF NOT EXISTS idx_social_friendships_users ON social_friendships(requester_id, addressee_id);
 CREATE INDEX IF NOT EXISTS idx_social_profiles_handle ON social_profiles(handle);
 
--- Scanner/AI enrichment columns
-ALTER TABLE arcana_entries ADD COLUMN danger_level INTEGER DEFAULT 0;
-ALTER TABLE arcana_entries ADD COLUMN difficulty INTEGER DEFAULT 0;
-ALTER TABLE arcana_entries ADD COLUMN ai_verified INTEGER DEFAULT 0;
-ALTER TABLE arcana_entries ADD COLUMN ai_verified_at TEXT DEFAULT '';
-
 -- Reviews table
 CREATE TABLE IF NOT EXISTS arcana_reviews (
   id TEXT PRIMARY KEY,

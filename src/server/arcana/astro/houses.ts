@@ -10,8 +10,8 @@ export type HouseCusp = {
   sign: SignPosition;
 };
 
-export function calcAscendant(time: Astronomy.AstroTime, lat: number, lon: number): number {
-  const gstHours = Astronomy.SiderealTime(time);
+export function calcAscendant(time: AstroTime, lat: number, lon: number): number {
+  const gstHours = SiderealTime(time);
   let lstHours = gstHours + lon / 15;
   lstHours = ((lstHours % 24) + 24) % 24;
   const lstRad = (lstHours * 15 * Math.PI) / 180;
