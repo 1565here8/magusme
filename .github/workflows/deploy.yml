@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-main:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,80 +21,22 @@ jobs:
       - name: Build frontend
         run: npx vite build
 
-      - name: Deploy to Main Server
+      - name: Deploy to VPS
         uses: easingthemes/ssh-deploy@v5
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: "-avz --delete"
           SOURCE: "dist/"
-          REMOTE_HOST: "178.105.155.211"
-          REMOTE_USER: "root"
-          TARGET: "/root/magusme/dist"
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          TARGET: "/opt/magusme/dist"
 
-      - name: Copy to web root (Main)
-        uses: easingthemes/ssh-deploy@v5
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
-          SOURCE: "dist/"
-          REMOTE_HOST: "178.105.155.211"
-          REMOTE_USER: "root"
-          TARGET: "/var/www/magusme"
-
-      - name: Restart Main Server
+      - name: Source deploy config and restart
         uses: appleboy/ssh-action@v1
         with:
-          host: "178.105.155.211"
-          username: "root"
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/magusme
-            rsync -a --delete dist/ /var/www/magusme/
-            pm2 restart ecosystem.config.cjs --update-env
-            echo "✅ Main server deployed at $(date)"
-
-  deploy-live:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npx vite build
-
-      - name: Deploy to Live Server
-        uses: easingthemes/ssh-deploy@v5
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
-          ARGS: "-avz --delete"
-          SOURCE: "dist/"
-          REMOTE_HOST: "178.105.155.211"
-          REMOTE_USER: "root"
-          TARGET: "/root/magusme-live/dist"
-
-      - name: Copy to web root (Live)
-        uses: easingthemes/ssh-deploy@v5
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
-          SOURCE: "dist/"
-          REMOTE_HOST: "178.105.155.211"
-          REMOTE_USER: "root"
-          TARGET: "/var/www/magusme"
-
-      - name: Restart Live Server
-        uses: appleboy/ssh-action@v1
-        with:
-          host: "178.105.155.211"
-          username: "root"
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd /root/magusme-live
-            rsync -a --delete dist/ /var/www/magusme/
-            pm2 restart ecosystem.config.cjs --update-env
-            echo "✅ Live server deployed at $(date)"
+            cd /opt/magusme && pm2 restart magusme --update-env
+            echo "✅ Deployed at $(date)"
