@@ -117,7 +117,7 @@ Compare readings across traditions, blend systems, AI-assisted pattern recogniti
 - **Unique UI needs**: Rune glyphs (Unicode or SVG), runestone visual style, scatter cloth animation, Yggdrasil diagram
 - **Target**: **Custom page** — this deserves full treatment
 
-### 8. I Ching 🔲 (SEMI-STARTED — has custom route but generic page)
+### 8. I Ching ✅ (DONE — custom page with coin toss, 64 hexagrams, changing lines, secondary hexagram)
 - **Research**: 64 hexagrams from King Wen arrangements, 8 trigrams bagua. Two primary casting methods plus variants.
 - **Authentic methods**:
   - **Yarrow stalk method (50 stalks)**: Complex, meditative,~15 min per hexagram. 1 stalk set aside (observer), remaining 49 divided and counted 3 times per line. Probabilities: 6 (1/16), 7 (5/16), 8 (7/16), 9 (3/16). Favors yin (yin: 8/16=50%, yang: 8/16=50% but static: 75%).
@@ -613,7 +613,7 @@ Compare readings across traditions, blend systems, AI-assisted pattern recogniti
 ## Implementation Priority
 
 ### Tier 1 (Do these first — culturally rich, visually unique, high impact)
-1. **I Ching** — Custom hexagram generation, coin/stalk animation, 64 hexagram data
+1. **I Ching** ✅ — Custom hexagram generation, coin toss, 64 hexagram data, changing lines, secondary hexagram
 2. **Elder Futhark Runes** — Custom rune casting, Aett visualization, scatter animation
 3. **Lenormand** — Grand Tableau grid, house system, significator, pair reading
 4. **Geomancy** — Shield chart, 16 figures, dot generation
@@ -672,4 +672,4 @@ Document findings in `src/shared/research/{systemId}.md` before coding.
 ---
 
 *Last updated: 2026-06-14*
-*Next system target: I Ching (Tier 1, highest impact)*
+*Next system target: Elder Futhark Runes (Tier 1, rune casting with Yggdrasil layout)*

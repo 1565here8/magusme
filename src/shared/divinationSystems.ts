@@ -120,7 +120,7 @@ export const DIVINATION_SYSTEMS: DivinationSystemDef[] = [
     route: "/consult/iching",
     category: "Cleromancy & Sortilege",
     mode: "generic_llm",
-    description: "Hexagram from coins or yarrow stalk method — ancient Chinese wisdom",
+    description: "Three-coin casting with full hexagram data, changing lines, and secondary hexagram transformation",
     tradition: "Chinese Zhou Yi",
     generic: false,
   },
