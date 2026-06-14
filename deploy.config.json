@@ -1,12 +1,12 @@
 {
   "project": "MagusMe",
   "vps": {
-    "host": "178.105.155.211",
+    "host": "${VPS_HOST}",
     "user": "root",
-    "path": "/root/magusme"
+    "path": "/opt/magusme"
   },
   "live": {
-    "host": "178.105.155.211",
+    "host": "${VPS_HOST}",
     "user": "root",
     "path": "/root/magusme-live"
   },

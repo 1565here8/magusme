@@ -13,6 +13,9 @@ deploy*.sh
 deploy*.ps1
 *.pem
 
+# VPS config (not committed)
+.vps-config.json
+
 # Build outputs
 dist/
 build/

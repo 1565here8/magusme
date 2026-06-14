@@ -1,0 +1,8 @@
+{
+  "vps": {
+    "host": "YOUR_VPS_IP_HERE",
+    "user": "root",
+    "path": "/opt/magusme",
+    "sshKey": "~/.ssh/magusme-vps"
+  }
+}

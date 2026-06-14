@@ -21,17 +21,23 @@ fail() { echo -e "${RED}❌ $1${NC}"; exit 1; }
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 CONFIG="$PROJECT_DIR/deploy.config.json"
+VPS_CONFIG="$PROJECT_DIR/.vps-config.json"
 
 [ -f "$CONFIG" ] || fail "deploy.config.json not found in $PROJECT_DIR"
+[ -f "$VPS_CONFIG" ] || fail ".vps-config.json not found in $PROJECT_DIR (create from .vps-config.json.example)"
 
 read_config() {
   jq -r "$1" "$CONFIG" 2>/dev/null || fail "Failed to read config key: $1"
 }
+read_vps() {
+  jq -r "$1" "$VPS_CONFIG" 2>/dev/null || fail "Failed to read VPS config key: $1"
+}
 
 PROJECT=$(read_config '.project')
-VPS_HOST=$(read_config '.vps.host')
-VPS_USER=$(read_config '.vps.user')
-VPS_PATH=$(read_config '.vps.path')
+VPS_HOST=$(read_vps '.vps.host')
+VPS_USER=$(read_vps '.vps.user')
+VPS_PATH=$(read_vps '.vps.path')
+SSH_KEY=$(read_vps '.vps.sshKey')
 VPS="$VPS_USER@$VPS_HOST"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_PATH="${VPS_PATH}.bak.$TIMESTAMP"
@@ -57,28 +63,30 @@ upload() {
   COPYFILE_DISABLE=1 tar czf "$ARCHIVE" $INCLUDE 2>/dev/null
   ok "Archive: $(du -h "$ARCHIVE" | cut -f1)"
   
+  local SSH_OPTS="-o ConnectTimeout=30 -i ${SSH_KEY/#\~/$HOME}"
+  
   # Upload
   log "Uploading to $VPS..."
-  scp -o ConnectTimeout=30 "$ARCHIVE" "$VPS:$ARCHIVE" 2>&1 | tail -1
+  scp $SSH_OPTS "$ARCHIVE" "$VPS:$ARCHIVE" 2>&1 | tail -1
   ok "Archive uploaded"
   
   # Backup current deployment
   log "Backing up current deployment..."
-  ssh -o ConnectTimeout=15 "$VPS" "
+  ssh $SSH_OPTS -o ConnectTimeout=15 "$VPS" "
     [ -d '$VPS_PATH/dist' ] && mv '$VPS_PATH' '$BACKUP_PATH' 2>/dev/null; mkdir -p '$VPS_PATH'
   " 2>&1 | tail -1
   ok "Backup saved to $BACKUP_PATH"
   
   # Extract
   log "Extracting on VPS..."
-  ssh -o ConnectTimeout=30 "$VPS" "
+  ssh $SSH_OPTS -o ConnectTimeout=30 "$VPS" "
     cd '$VPS_PATH' && tar xzf '$ARCHIVE' && rm -f '$ARCHIVE'
     chmod -R 755 . 2>/dev/null || true
   " 2>&1 | tail -1
   ok "Files deployed"
   
   # Fix permissions for www-data
-  ssh -o ConnectTimeout=15 "$VPS" "
+  ssh $SSH_OPTS -o ConnectTimeout=15 "$VPS" "
     if [ -d /var/www/${PROJECT,,} ]; then
       cp -r '$VPS_PATH/dist/'* /var/www/${PROJECT,,}/ 2>/dev/null || true
       chown -R www-data:www-data /var/www/${PROJECT,,}/ 2>/dev/null || true
@@ -89,7 +97,7 @@ upload() {
 restart_server() {
   local CMD=$(read_config '.deploy.restart_command')
   log "Restarting server..."
-  ssh -o ConnectTimeout=30 "$VPS" "cd '$VPS_PATH' && npm install --production 2>&1 | tail -2 && $CMD 2>&1 | head -5" 2>&1
+  ssh $SSH_OPTS "cd '$VPS_PATH' && npm install --production 2>&1 | tail -2 && $CMD 2>&1 | head -5" 2>&1
   ok "Server restarted"
 }
 
@@ -109,7 +117,7 @@ health_check() {
 
 rollback() {
   log "Rolling back to previous version..."
-  ssh -o ConnectTimeout=15 "$VPS" "
+  ssh $SSH_OPTS -o ConnectTimeout=15 "$VPS" "
     BACKUP=\$(ls -d ${VPS_PATH}.bak.* 2>/dev/null | sort | tail -1)
     if [ -n \"\$BACKUP\" ]; then
       rm -rf '$VPS_PATH'
@@ -166,7 +174,7 @@ cmd_watch() {
 cmd_status() {
   log "$PROJECT — VPS Status"
   echo ""
-  ssh -o ConnectTimeout=10 "$VPS" "
+  ssh $SSH_OPTS -o ConnectTimeout=10 "$VPS" "
     echo '📦 PM2:'
     pm2 status 2>/dev/null | grep -E 'magusme|online|name' | head -5
     echo ''

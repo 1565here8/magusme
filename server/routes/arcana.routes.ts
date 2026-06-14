@@ -941,8 +941,6 @@ export function registerArcanaRoutes(app: Express) {
 
     "/api/arcana/divination/stream",
 
-    requireAuth,
-
     asyncHandler(async (req, res) => {
 
       const parsed = DivinationStreamBody.safeParse(req.body);
@@ -985,7 +983,7 @@ export function registerArcanaRoutes(app: Express) {
 
       const controller = new AbortController();
 
-      req.on("close", () => controller.abort());
+      res.on("close", () => controller.abort());
 
       res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
 
@@ -1045,8 +1043,6 @@ export function registerArcanaRoutes(app: Express) {
 
     "/api/arcana/readings/:type/stream",
 
-    requireAuth,
-
     asyncHandler(async (req, res) => {
 
       const type = req.params.type as ReadingType;
@@ -1089,7 +1085,7 @@ export function registerArcanaRoutes(app: Express) {
 
       const controller = new AbortController();
 
-      req.on("close", () => controller.abort());
+      res.on("close", () => controller.abort());
 
       res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
 
