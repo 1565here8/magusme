@@ -23,6 +23,7 @@ import { GENERIC_SYSTEMS, SPECIALIZED_SYSTEMS } from "../shared/divinationSystem
 import { GenericDivinationPage } from "./pages/GenericDivinationPage";
 import { IChingPage } from "./pages/IChingPage";
 import AstroWatchPage from "./pages/AstroWatchPage";
+import { TarotPage } from "./pages/TarotPage";
 
 export default function App() {
   return (
@@ -46,7 +47,7 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
 
             {/* Specialized divination routes — custom pages */}
-            <Route path="/consult/tarot" element={<ArcanaPage />} />
+            <Route path="/consult/tarot" element={<TarotPage />} />
             <Route path="/consult/runes" element={<RuneConsultPage />} />
             <Route path="/consult/astrology" element={<AstrologyConsultPage />} />
             <Route path="/consult/iching" element={<IChingPage />} />
@@ -56,7 +57,7 @@ export default function App() {
             {GENERIC_SYSTEMS.map((sys) => (
               <Route
                 key={sys.id}
-                path={sys.route.replace("/consult/", "/consult/")}
+                path={sys.route}
                 element={<GenericDivinationPage systemId={sys.id} />}
               />
             ))}

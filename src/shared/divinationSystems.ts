@@ -40,9 +40,9 @@ export const DIVINATION_SYSTEMS: DivinationSystemDef[] = [
     icon: "Sparkles",
     route: "/consult/tarot",
     category: "Cartomancy",
-    mode: "tarot",
-    description: "78-card Rider-Waite deck — full spreads with AI interpretation",
-    tradition: "Hermetic tarot",
+    mode: "generic_llm",
+    description: "35 decks across RWS, Thoth, and Marseille traditions — full traditional spreads",
+    tradition: "Rider-Waite / Thoth / Marseille",
     generic: false,
   },
   {
