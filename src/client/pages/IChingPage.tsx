@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Sparkles, Book, Coins, ScrollText, Info, ChevronDown, ChevronUp, Asterisk, TriangleAlert, ArrowRightLeft, Layers, Compass, Lightbulb, BookOpenText, CircleHelp, Binary, Braces } from "lucide-react";
+import { ArrowLeft, Book, Coins, ScrollText, ChevronDown, ChevronUp, Asterisk, TriangleAlert, ArrowRightLeft, Layers, Compass, Lightbulb, BookOpenText, CircleHelp, Binary, Braces } from "lucide-react";
 import { SeoHead } from "../components/SeoHead";
 import {
   HEXAGRAMS, TRIGRAMS, tossCoins, hexagramByNumber, hexagramByBinary,
