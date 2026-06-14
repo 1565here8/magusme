@@ -1,350 +1,512 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Loader2, Sparkles, Scroll, RotateCcw, Shield } from "lucide-react";
+import { ArrowLeft, Sparkles, Scroll, Book, Eye, Crosshair, RotateCcw, Shuffle } from "lucide-react";
 import { SeoHead } from "../components/SeoHead";
-import { ELDER_FUTHARK, getRandomRune, type RuneDef } from "../../shared/elderFuthark";
 import {
-  fetchDivinations,
-  type DivinationMethod,
-} from "../api/merlianReadingsClient";
-import { streamDivination } from "../api/merlianReadingsClient";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import {
-  MerlianPersonalProfilePanel,
-  useMerlianPersonalProfile,
-  profileToApiPayload,
-} from "../components/merlian/MerlianPersonalProfilePanel";
+  ELDER_FUTHARK, getRandomRune, getRuneById,
+  type RuneDef, type SpreadType,
+  SPREAD_DEFS,
+} from "../../shared/elderFuthark";
 
-type CastRune = { rune: RuneDef; reversed: boolean; id: number };
+const BLOOD = "#8b0000";
+const ICE = "#4a90d9";
+const GOLD = "#c8a45c";
+const STONE = "#4a4a4a";
+const BG = "#0a0a0a";
 
-function RuneCard({ cast, dim }: { cast: CastRune; dim?: boolean }) {
-  const { rune, reversed } = cast;
+/* ─── Rune Stone Card ─── */
+function RuneStone({ rune, reversed, position, dim }: {
+  rune: RuneDef; reversed: boolean; position?: string; dim?: boolean;
+}) {
   return (
-    <div
-      className={`group relative overflow-hidden rounded-xl border p-4 transition-all duration-300 ${
-        reversed
-          ? "border-red-900/30 bg-red-950/15"
-          : "border-amber-700/30 bg-amber-950/15"
-      } ${dim ? "opacity-30" : ""}`}
+    <div className={`group relative overflow-hidden rounded-lg border-2 p-4 transition-all duration-300 ${
+      reversed
+        ? "border-red-900/40 bg-red-950/10"
+        : "border-amber-900/30 bg-amber-950/10"
+    } ${dim ? "opacity-30" : ""}`}
+      style={{
+        boxShadow: reversed
+          ? "inset 0 0 30px rgba(139,0,0,0.1)"
+          : "inset 0 0 30px rgba(200,164,92,0.05)",
+      }}
     >
-      <div className="mb-2 text-right text-[10px] uppercase tracking-wider text-zinc-600">
-        Cast #{cast.id}
-      </div>
-      <div className={`text-center text-5xl ${reversed ? "rotate-180 text-red-300" : "text-amber-200"}`}>
+      {/* Rune glyph */}
+      <div className={`text-center text-5xl font-bold tracking-tighter ${
+        reversed ? "rotate-180 text-red-300/80" : "text-amber-200/90"
+      }`}>
         {rune.glyph}
       </div>
-      <h3 className="mt-2 text-center font-serif text-lg font-bold text-white">
+
+      {/* Name */}
+      <h3 className="mt-2 text-center font-serif text-base font-bold text-white/90">
         {rune.name}
       </h3>
-      <p className="text-center text-xs text-zinc-500">{rune.letter}</p>
-      <p className="mt-2 text-center text-xs leading-relaxed text-zinc-400">
-        {reversed ? rune.reversedMeaning : rune.meaning}
-      </p>
-      {reversed && (
-        <span className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-md bg-red-900/30 px-2 py-0.5 text-[10px] text-red-400">
-          <Shield className="h-3 w-3" />
-          Merkstave (reversed)
-        </span>
+
+      {/* Position */}
+      {position && (
+        <p className="mt-1 text-center text-[9px] uppercase tracking-[0.15em] text-amber-500/60">
+          {position}
+        </p>
       )}
+
+      {/* Reversed badge */}
+      {reversed && (
+        <div className="mt-2 flex items-center justify-center gap-1.5 rounded border border-red-900/30 bg-red-950/20 px-2 py-0.5">
+          <span className="text-[8px] text-red-400/70">Merkstave</span>
+        </div>
+      )}
+
+      {/* Element + Aett tag */}
       <div className="mt-2 flex flex-wrap justify-center gap-1">
-        {rune.keywords.slice(0, 3).map((kw) => (
-          <span
-            key={kw}
-            className="rounded-md bg-white/[0.04] px-1.5 py-0.5 text-[9px] text-zinc-500"
-          >
-            {kw}
-          </span>
-        ))}
+        <span className="rounded border border-white/[0.04] px-1.5 py-0.5 text-[7px] text-zinc-600">
+          {rune.aettName}
+        </span>
+        <span className="rounded border border-white/[0.04] px-1.5 py-0.5 text-[7px] text-zinc-600">
+          {rune.element}
+        </span>
       </div>
     </div>
   );
 }
 
-export default function RuneConsultPage() {
-  const [catalog, setCatalog] = useState<DivinationMethod | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [castRunes, setCastRunes] = useState<CastRune[]>([]);
-  const [question, setQuestion] = useState("");
-  const [reading, setReading] = useState("");
-  const [streaming, setStreaming] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { profile, saveProfile, expanded, setExpanded, hasPersonalization } =
-    useMerlianPersonalProfile();
+/* ─── Cast result entry ─── */
+interface CastEntry {
+  rune: RuneDef;
+  reversed: boolean;
+  id: number;
+}
 
-  useEffect(() => {
-    fetchDivinations()
-      .then((data) => {
-        const match = data.catalog.find(
-          (m) => m.id === "rune" || m.id === "runes" || m.id.startsWith("rune_")
-        );
-        setCatalog(match ?? null);
-      })
-      .catch(() => null)
-      .finally(() => setLoading(false));
-  }, []);
+/* ─── Spread type selector ─── */
+const SPREAD_OPTIONS: { key: SpreadType; icon: typeof Scroll; label: string; desc: string }[] = [
+  { key: "odin", icon: Eye, label: "Odin's Rune", desc: "Single focus" },
+  { key: "three_norns", icon: Scroll, label: "Three Norns", desc: "Past · Present · Future" },
+  { key: "five_cross", icon: Crosshair, label: "Five-Rune Cross", desc: "Full situation map" },
+  { key: "free_cast", icon: Shuffle, label: "Free Cast", desc: "1-9 runes, no structure" },
+];
 
-  const castRune = useCallback(() => {
-    if (castRunes.length >= 5) return;
-    const { rune, reversed } = getRandomRune();
-    setCastRunes((prev) => [
-      ...prev,
-      { rune, reversed, id: prev.length + 1 },
-    ]);
-  }, [castRunes.length]);
+/* ─── Rune Detail Panel ─── */
+function RuneDetail({ rune, reversed }: { rune: RuneDef; reversed: boolean }) {
+  const aettName = rune.aett === 1 ? "Freyr's Ætt" : rune.aett === 2 ? "Hagal's Ætt" : "Tyr's Ætt";
+  return (
+    <div className="space-y-4">
+      <div className="text-center">
+        <div className={`inline-block text-6xl ${reversed ? "rotate-180 text-red-300/70" : "text-amber-200/80"}`}>
+          {rune.glyph}
+        </div>
+        <h2 className="mt-3 font-serif text-2xl font-bold text-white">{rune.name}</h2>
+        <p className="text-xs text-zinc-500">{rune.letter} · {aettName} · {rune.element}{rune.tree ? ` · ${rune.tree}` : ""}</p>
+        {rune.deity && <p className="text-[9px] text-zinc-600">Associated with {rune.deity}</p>}
+      </div>
 
-  const castAll = useCallback(() => {
-    const needed = 5 - castRunes.length;
-    const newRunes: CastRune[] = [];
-    for (let i = 0; i < needed; i++) {
-      const { rune, reversed } = getRandomRune();
-      newRunes.push({ rune, reversed, id: castRunes.length + i + 1 });
-    }
-    setCastRunes((prev) => [...prev, ...newRunes]);
-  }, [castRunes.length]);
+      <div className={`rounded-xl border p-5 ${reversed ? "border-red-900/20 bg-red-950/10" : "border-amber-900/20 bg-amber-950/10"}`}>
+        <h3 className="mb-2 text-[9px] uppercase tracking-[0.25em] text-zinc-500">
+          {reversed ? "Merkstave (Reversed) Meaning" : "Upright Meaning"}
+        </h3>
+        <p className="text-sm leading-relaxed text-zinc-300">
+          {reversed ? rune.reversedDetail : rune.detail}
+        </p>
+      </div>
 
-  const clearRunes = useCallback(() => {
-    setCastRunes([]);
-    setReading("");
-    setError(null);
-  }, []);
+      <div className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-4">
+        <h3 className="mb-2 text-[9px] uppercase tracking-[0.25em] text-zinc-500">Keywords</h3>
+        <div className="flex flex-wrap gap-1.5">
+          {rune.keywords.map(kw => (
+            <span key={kw} className="rounded border border-white/[0.04] bg-white/[0.02] px-2 py-0.5 text-[10px] text-zinc-400">
+              {kw}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  const getReading = useCallback(async () => {
-    if (!catalog || castRunes.length === 0) return;
-    setStreaming(true);
-    setError(null);
-    setReading("");
+/* ─── Browse all runes ─── */
+function RuneBrowser() {
+  const [filter, setFilter] = useState("");
+  const [detail, setDetail] = useState<RuneDef | null>(null);
+  const [reversed, setReversed] = useState(false);
 
-    const runeSummary = castRunes
-      .map(
-        (c) =>
-          `${c.rune.name} (${c.rune.glyph}) — ${c.reversed ? "Merkstave (reversed): " : ""}${c.reversed ? c.rune.reversedMeaning : c.rune.meaning}`
-      )
-      .join("\n");
+  const filtered = useMemo(() => {
+    return filter
+      ? ELDER_FUTHARK.filter(r =>
+          r.name.toLowerCase().includes(filter.toLowerCase()) ||
+          r.letter.toLowerCase().includes(filter.toLowerCase()) ||
+          r.keywords.some(k => k.includes(filter.toLowerCase())) ||
+          r.element.toLowerCase().includes(filter.toLowerCase()) ||
+          r.aettName.toLowerCase().includes(filter.toLowerCase())
+        )
+      : ELDER_FUTHARK;
+  }, [filter]);
 
-    const fullQuestion =
-      `Rune cast (${castRunes.length} runes):\n${runeSummary}\n\n` +
-      `Question: ${question || "General guidance"}\n\n` +
-      "Interpret this rune casting. For each rune explain its meaning in this context, the significance of its position, and how it relates to the other runes. Give practical guidance.";
-
-    try {
-      await streamDivination(
-        {
-          divinationId: catalog.id,
-          question: fullQuestion,
-          ...profileToApiPayload(profile),
-        },
-        (chunk) => setReading((prev) => prev + chunk),
-      );
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Reading failed. Try again.",
-      );
-    } finally {
-      setStreaming(false);
-    }
-  }, [catalog, castRunes, question, profile]);
+  if (detail) {
+    return (
+      <div className="mx-auto max-w-xl px-5 pb-16">
+        <button
+          onClick={() => setDetail(null)}
+          className="mb-4 inline-flex items-center gap-1.5 text-[10px] text-zinc-500 transition hover:text-zinc-300"
+        >
+          ← Back to all runes
+        </button>
+        <RuneDetail rune={detail} reversed={reversed} />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen">
-      <SeoHead title="Rune Casting · Elder Futhark" description="Cast the Elder Futhark runes with AI-powered interpretation. Full rune spreads, merkstave analysis, and Norse magical correspondences." path="/consult/runes" />
-      {/* Header */}
-      <section className="relative border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-900/10 via-purple-900/5 to-transparent" />
-        <div className="relative mx-auto max-w-6xl px-5 py-12 md:px-8 md:py-16">
-          <Link
-            to="/consult"
-            className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-zinc-300"
+    <div className="mx-auto max-w-5xl px-5 pb-16">
+      <div className="mb-6">
+        <input
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          placeholder="Search runes by name, letter, keyword, or element..."
+          className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-amber-500/30 focus:bg-white/[0.04]"
+        />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {filtered.map((rune) => (
+          <button
+            key={rune.id}
+            onClick={() => { setDetail(rune); setReversed(false); }}
+            className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-4 text-left transition hover:border-amber-500/20 hover:bg-white/[0.03]"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to all divination methods
-          </Link>
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-1.5 text-sm text-amber-300">
-              <Scroll className="h-3.5 w-3.5" />
-              Elder Futhark · Germanic Tradition
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-mono text-zinc-600">#{rune.id}</span>
+              <span className="text-[8px] text-zinc-600">{rune.letter}</span>
             </div>
-            <h1 className="font-serif text-3xl font-bold text-white md:text-4xl">
-              Rune Consultation
-            </h1>
-            <p className="mx-auto mt-3 max-w-xl text-sm text-zinc-400">
-              Cast the ancient runes for guidance, wisdom, and insight. Click to draw runes one by one or cast all at once.
+            <div className="my-2 text-center text-4xl text-amber-200/60 transition group-hover:text-amber-200/80">
+              {rune.glyph}
+            </div>
+            <h4 className="text-center text-sm font-semibold text-white/80">{rune.name}</h4>
+            <p className="mt-1 text-center text-[9px] text-zinc-500">{rune.aettName} · {rune.element}</p>
+            <p className="mt-1.5 text-[10px] leading-relaxed text-zinc-600 line-clamp-2">
+              {rune.meaning}
             </p>
+          </button>
+        ))}
+      </div>
+      {filtered.length === 0 && (
+        <p className="py-12 text-center text-xs text-zinc-600">No runes match your search.</p>
+      )}
+    </div>
+  );
+}
+
+/* ─── Main Page ─── */
+export default function RuneConsultPage() {
+  const [view, setView] = useState<"cast" | "read" | "browse">("cast");
+  const [spreadType, setSpreadType] = useState<SpreadType>("odin");
+  const [freeCastCount, setFreeCastCount] = useState(3);
+  const [question, setQuestion] = useState("");
+  const [castRunes, setCastRunes] = useState<CastEntry[]>([]);
+
+  const spread = SPREAD_DEFS[spreadType];
+  const spreadPositions = spread.positions;
+
+  const doCast = useCallback(() => {
+    const count = spreadType === "free_cast" ? freeCastCount : spread.count;
+    const results: CastEntry[] = [];
+    for (let i = 0; i < count; i++) {
+      const r = getRandomRune();
+      results.push({ ...r, id: i + 1 });
+    }
+    setCastRunes(results);
+    setView("read");
+  }, [spreadType, freeCastCount, spread.count]);
+
+  const reset = useCallback(() => {
+    setCastRunes([]);
+    setQuestion("");
+    setView("cast");
+  }, []);
+
+  const totalRunes = spreadType === "free_cast" ? freeCastCount : spread.count;
+
+  return (
+    <div className="min-h-screen" style={{ background: `linear-gradient(180deg, ${BG}, #050505)` }}>
+      <SeoHead
+        title="Elder Futhark Rune Casting · Norse Oracle"
+        description="Cast the Elder Futhark runes with multiple spread types. Norse divination with full rune meanings, Merkstave analysis, and authentic Germanic tradition."
+        path="/consult/runes"
+      />
+
+      {/* Keyframes */}
+      <style>{`
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes runeGlow { 0%,100% { text-shadow: 0 0 10px rgba(200,164,92,0.2); } 50% { text-shadow: 0 0 25px rgba(200,164,92,0.5); } }
+        @keyframes runeDrop { from { opacity: 0; transform: translateY(-30px) rotate(-10deg); } to { opacity: 1; transform: translateY(0) rotate(0); } }
+        @keyframes bloodPulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+      `}</style>
+
+      {/* Header */}
+      <div className="border-b border-white/[0.03]">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+          <Link to="/consult" className="inline-flex items-center gap-1.5 text-xs text-zinc-600 transition hover:text-zinc-400">
+            <ArrowLeft className="h-3.5 w-3.5" />
+            All methods
+          </Link>
+          <span className="text-xs text-zinc-700">Elder Futhark</span>
+        </div>
+      </div>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-white/[0.03]">
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `radial-gradient(circle at 30% 20%, ${BLOOD} 0%, transparent 50%), radial-gradient(circle at 70% 80%, ${ICE} 0%, transparent 50%)`,
+        }} />
+        <div className="relative mx-auto max-w-3xl px-5 py-10 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-1.5 text-xs text-amber-400/80">
+            <Scroll className="h-3.5 w-3.5" />
+            ᚠᚢᚦᚨᚱᚲ · Elder Futhark
+          </div>
+          <h1 className="font-serif text-3xl font-bold text-white md:text-4xl">
+            {view === "cast" && "Rune Casting"}
+            {view === "read" && "The Runes Speak"}
+            {view === "browse" && "All 24 Runes"}
+          </h1>
+          {view === "cast" && (
+            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-zinc-500">
+              The runes were revealed to Odin when he hung nine days on Yggdrasil, pierced by his own spear. 
+              Cast them for the wisdom of the All-Father — each rune a key to the hidden patterns of fate.
+            </p>
+          )}
+
+          {/* Nav */}
+          <div className="mt-6 flex items-center justify-center gap-3">
+            {view !== "cast" && (
+              <button onClick={reset}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] px-4 py-1.5 text-[10px] text-zinc-500 transition hover:border-white/20 hover:text-zinc-300"
+              >
+                <RotateCcw className="h-3 w-3" />
+                New Cast
+              </button>
+            )}
+            <button onClick={() => setView(view === "browse" ? "cast" : "browse")}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-[10px] uppercase tracking-wider transition ${
+                view === "browse"
+                  ? "border-amber-500/30 bg-amber-500/10 text-amber-400/80"
+                  : "border-white/[0.06] text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+              }`}
+            >
+              <Book className="h-3 w-3" />
+              {view === "browse" ? "Back" : "Browse 24"}
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="mx-auto max-w-6xl px-5 py-8 md:px-8">
-        {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-amber-400" />
-          </div>
-        ) : (
-          <div className="grid gap-8 lg:grid-cols-5">
-            {/* Left: Rune Cast Area */}
-            <div className="space-y-6 lg:col-span-3">
-              {/* Question Input */}
-              <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-300">
-                  Your Question <span className="text-zinc-500">(optional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  placeholder="e.g., What do I need to know about my path?"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-amber-500/40 focus:bg-white/[0.05]"
-                  disabled={streaming}
-                />
-              </div>
-
-              {/* Rune Cast Buttons */}
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={castRune}
-                  disabled={castRunes.length >= 5 || streaming}
-                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 px-5 py-3 text-sm font-bold text-white transition hover:from-amber-500 hover:to-orange-500 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <Scroll className="h-4 w-4" />
-                  {castRunes.length >= 5 ? "Complete" : "Cast a Rune"}
-                </button>
-                <button
-                  onClick={castAll}
-                  disabled={castRunes.length >= 5 || streaming}
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-zinc-300 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Cast All (5)
-                </button>
-                <button
-                  onClick={clearRunes}
-                  disabled={castRunes.length === 0 || streaming}
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-zinc-500 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  Clear
-                </button>
-              </div>
-
-              {/* Cast Runes Display */}
-              {castRunes.length > 0 && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-white">
-                      Your Rune Cast ({castRunes.length})
-                    </h3>
-                    <span className="text-xs text-zinc-500">
-                      Cast in order — first rune sets the theme
-                    </span>
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
-                    {castRunes.map((cast, i) => (
-                      <RuneCard key={cast.id} cast={cast} dim={streaming && i !== castRunes.length - 1} />
-                    ))}
-                  </div>
-
-                  {/* Get Reading Button */}
-                  <button
-                    onClick={getReading}
-                    disabled={streaming || castRunes.length === 0}
-                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-amber-600 px-6 py-3 text-sm font-bold text-white transition hover:from-purple-500 hover:to-amber-500 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {streaming ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Consulting the Runes...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4" />
-                        Get Rune Reading
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-
-              {/* Reading Result */}
-              {error && (
-                <div className="rounded-xl border border-red-900/30 bg-red-950/20 p-4">
-                  <p className="text-sm text-red-400">{error}</p>
-                </div>
-              )}
-              {reading && (
-                <div className="rounded-xl border border-purple-500/20 bg-gradient-to-br from-purple-900/10 to-amber-900/10 p-6">
-                  <h3 className="mb-4 font-serif text-lg font-bold text-white">
-                    The Runes Speak
-                  </h3>
-                  <div className="prose prose-invert prose-sm max-w-none">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {reading}
-                    </ReactMarkdown>
-                  </div>
-                </div>
-              )}
+      {/* Cast View */}
+      {view === "cast" && (
+        <section className="mx-auto max-w-3xl px-5 py-12">
+          <div className="mx-auto max-w-lg space-y-8">
+            {/* Question */}
+            <div>
+              <label className="mb-2 block text-[9px] uppercase tracking-[0.25em] text-zinc-600">
+                Your Question (optional)
+              </label>
+              <input
+                value={question}
+                onChange={e => setQuestion(e.target.value)}
+                placeholder="What do you seek to understand?"
+                className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-amber-500/30 focus:bg-white/[0.04]"
+              />
             </div>
 
-            {/* Right: Info Sidebar */}
-            <div className="space-y-4 lg:col-span-2">
-              <MerlianPersonalProfilePanel
-                profile={profile}
-                expanded={expanded}
-                onToggle={() => setExpanded((v) => !v)}
-                onChange={saveProfile}
-                hasPersonalization={hasPersonalization}
-              />
-
-              {/* How to Cast */}
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
-                <h3 className="mb-3 text-sm font-medium text-white">
-                  How to Cast
-                </h3>
-                <ol className="space-y-2 text-xs text-zinc-400">
-                  <li className="flex gap-2">
-                    <span className="shrink-0 font-bold text-amber-400">1.</span>
-                    <span>Formulate your question in mind</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="shrink-0 font-bold text-amber-400">2.</span>
-                    <span>Click "Cast a Rune" to draw runes one by one, or "Cast All" for a full 5-rune spread</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="shrink-0 font-bold text-amber-400">3.</span>
-                    <span>Each rune can be upright or merkstave (reversed)</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="shrink-0 font-bold text-amber-400">4.</span>
-                    <span>First rune sets the overall theme, subsequent runes add detail</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="shrink-0 font-bold text-amber-400">5.</span>
-                    <span>Click "Get Rune Reading" for an AI interpretation</span>
-                  </li>
-                </ol>
+            {/* Spread type */}
+            <div>
+              <label className="mb-3 block text-[9px] uppercase tracking-[0.25em] text-zinc-600">
+                Casting Method
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {SPREAD_OPTIONS.map(({ key, icon: Icon, label, desc }) => (
+                  <button
+                    key={key}
+                    onClick={() => setSpreadType(key)}
+                    className={`rounded-xl border p-3 text-left transition ${
+                      spreadType === key
+                        ? "border-amber-500/30 bg-amber-500/10"
+                        : "border-white/[0.04] bg-white/[0.015] hover:border-white/10"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Icon className={`h-3.5 w-3.5 ${spreadType === key ? "text-amber-400" : "text-zinc-600"}`} />
+                      <span className={`text-xs font-medium ${spreadType === key ? "text-amber-300" : "text-zinc-400"}`}>
+                        {label}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[9px] text-zinc-600">{desc}</p>
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Elder Futhark Quick Reference */}
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
-                <h3 className="mb-3 text-sm font-medium text-white">
-                  Elder Futhark — 24 Runes
-                </h3>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {ELDER_FUTHARK.map((rune) => (
-                    <div
-                      key={rune.id}
-                      className="rounded-lg bg-white/[0.03] px-2 py-1.5 text-center transition hover:bg-amber-500/10"
+            {/* Spread description */}
+            <div className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-4">
+              <p className="text-[10px] leading-relaxed text-zinc-500">{spread.description}</p>
+            </div>
+
+            {/* Free cast count */}
+            {spreadType === "free_cast" && (
+              <div className="flex items-center gap-3">
+                <label className="text-[9px] uppercase tracking-[0.15em] text-zinc-600">Number of runes</label>
+                <div className="flex gap-1">
+                  {[1, 3, 5, 7, 9].map(n => (
+                    <button
+                      key={n}
+                      onClick={() => setFreeCastCount(n)}
+                      className={`h-8 w-8 rounded-lg border text-xs transition ${
+                        freeCastCount === n
+                          ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                          : "border-white/[0.04] bg-white/[0.015] text-zinc-500 hover:border-white/10"
+                      }`}
                     >
-                      <div className="text-lg">{rune.glyph}</div>
-                      <div className="text-[9px] text-zinc-500">{rune.name}</div>
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Position preview */}
+            {spreadPositions.length > 0 && (
+              <div className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-4">
+                <h3 className="mb-3 text-[9px] uppercase tracking-[0.25em] text-zinc-600">
+                  Position Meanings
+                </h3>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {spreadPositions.map((pos, i) => (
+                    <div key={i} className="rounded-lg bg-white/[0.02] p-2.5">
+                      <span className="text-[10px] font-bold text-amber-400/80">{pos.name}</span>
+                      <p className="mt-0.5 text-[8px] text-zinc-600">{pos.subtitle}</p>
+                      <p className="mt-1 text-[8px] leading-relaxed text-zinc-500">{pos.desc}</p>
                     </div>
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Cast button */}
+            <div className="text-center">
+              <button onClick={doCast}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-700 to-red-800 px-8 py-4 text-sm font-bold text-white transition hover:from-amber-600 hover:to-red-700"
+              >
+                <Sparkles className="h-4 w-4" />
+                Cast {totalRunes} Rune{totalRunes > 1 ? "s" : ""}
+              </button>
             </div>
           </div>
-        )}
-      </section>
+        </section>
+      )}
+
+      {/* Read View */}
+      {view === "read" && (
+        <section className="mx-auto max-w-6xl px-5 py-8">
+          {question && (
+            <div className="mb-8 text-center">
+              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-700">Asked</p>
+              <p className="mt-1 text-sm italic text-zinc-500">&ldquo;{question}&rdquo;</p>
+            </div>
+          )}
+
+          {/* Runestone display */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {castRunes.map((cast, i) => (
+              <div key={cast.id} style={{ animation: `runeDrop 0.4s ease-out ${i * 0.12}s both` }}>
+                <RuneStone
+                  rune={cast.rune}
+                  reversed={cast.reversed}
+                  position={spreadPositions[i]?.name}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Position interpretations */}
+          <div className="mt-10 mx-auto max-w-3xl space-y-6">
+            {castRunes.map((cast, i) => {
+              const pos = spreadPositions[i];
+              return (
+                <div key={cast.id} className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-5"
+                  style={{ animation: `fadeSlideIn 0.5s ease-out ${i * 0.15 + 0.3}s both` }}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className={`text-3xl ${cast.reversed ? "rotate-180 text-red-300/50" : "text-amber-200/50"}`}>
+                      {cast.rune.glyph}
+                    </span>
+                    {pos && (
+                      <div>
+                        <h3 className="text-sm font-bold text-white">{pos.name}</h3>
+                        <p className="text-[9px] text-zinc-600">{pos.subtitle}</p>
+                      </div>
+                    )}
+                    {!pos && (
+                      <div>
+                        <h3 className="text-sm font-bold text-white">{cast.rune.name}</h3>
+                        <p className="text-[9px] text-zinc-600">Rune #{cast.id}</p>
+                      </div>
+                    )}
+                    {cast.reversed && (
+                      <span className="ml-auto rounded border border-red-900/30 bg-red-950/20 px-2 py-0.5 text-[8px] text-red-400/70">
+                        Merkstave
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs leading-relaxed text-zinc-300">
+                    {cast.reversed ? cast.rune.reversedDetail : cast.rune.detail}
+                  </p>
+
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {cast.rune.keywords.map(kw => (
+                      <span key={kw} className="rounded border border-white/[0.03] bg-white/[0.02] px-1.5 py-0.5 text-[8px] text-zinc-600">
+                        {kw}
+                      </span>
+                    ))}
+                    <span className="rounded border border-white/[0.03] bg-white/[0.02] px-1.5 py-0.5 text-[8px] text-zinc-600">
+                      {cast.rune.element}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Three Norns spread guidance */}
+          {spreadType === "three_norns" && (
+            <div className="mx-auto mt-8 max-w-lg text-center">
+              <div className="rounded-xl border border-amber-500/10 bg-amber-500/[0.03] p-4">
+                <p className="text-[9px] uppercase tracking-[0.15em] text-zinc-600">The Norns Weave</p>
+                <p className="mt-2 text-[10px] leading-relaxed text-zinc-500">
+                  Urd shapes the past from the well of memory. Verdandi weaves the present thread by thread. 
+                  Skuld cuts the cloth at its appointed length — but the pattern is not fixed until the moment passes.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Five-Rune Cross visualization hint */}
+          {spreadType === "five_cross" && (
+            <div className="mx-auto mt-8 max-w-xs">
+              <div className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-5">
+                <p className="text-center text-[9px] uppercase tracking-[0.15em] text-zinc-600">The Cross</p>
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[8px] text-zinc-600">
+                  <div />
+                  <div><span className="text-amber-400/60">Above</span><br />Aspiration</div>
+                  <div />
+                  <div><span className="text-amber-400/60">Left</span><br />Brings</div>
+                  <div><span className="text-amber-400/60">Center</span><br />Heart</div>
+                  <div><span className="text-amber-400/60">Right</span><br />Challenge</div>
+                  <div />
+                  <div><span className="text-amber-400/60">Below</span><br />Foundation</div>
+                  <div />
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Browse View */}
+      {view === "browse" && <RuneBrowser />}
     </div>
   );
 }

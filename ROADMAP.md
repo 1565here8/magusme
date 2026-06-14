@@ -98,24 +98,19 @@ Compare readings across traditions, blend systems, AI-assisted pattern recogniti
 
 ## Cleromancy & Sortilege (7 systems)
 
-### 7. Elder Futhark Runes 🔲 (SEMI-STARTED — generic page, no custom)
+### 7. Elder Futhark Runes ✅ (DONE — custom page with 4 spreads, 24-rune data, Norse aesthetic)
 - **Research**: 24-rune Germanic/Norse alphabet, divided into 3 Aetts (Freyr's: Fehu-Wunjo, Heimdall's: Hagalaz-Sowilo, Tyr's: Tiwaz-Othala). Historical basis in Tacitus' *Germania* (98 CE) — "cut a branch from a nut-bearing tree, slice into strips, mark with signs, throw onto white cloth, pick up three."
 - **Authentic techniques**:
   - **Single rune (Odin's Rune)**: Quick guidance
   - **Three Norns spread**: Urd (past/root cause), Verdandi (present/agency), Skuld (probable outcome/consequence)
-  - **Five-rune cross**: Situation, Challenge, Past, Future, Outcome/Advice
-  - **Nine-rune scatter**: Cast all runes onto cloth, read those face-up in clusters
-  - **Runic Odin's Spread (9 positions)**: Life path deep dive
-  - **Nine Worlds layout**: Map to Yggdrasil cosmology
-  - **Free cast**: Random throw, read clusters and proximities
-- **Rune aspects**: Each rune has upright and reversed/murkstave meanings (though controversial — some traditions don't reverse). Blank "Wyrd" rune is modern invention.
+  - **Five-rune cross**: East (brings), South (aspiration), West (challenge), North (foundation), Center (heart)
+  - **Free cast**: 1-9 runes, no structure — pure oracle
+  - **Nine Worlds layout** (future): Map to Yggdrasil cosmology
+  - **Rune scatter** (future): Random throw, read clusters and proximities
+- **Rune aspects**: Each rune has upright and reversed/merkstave meanings with full detail text (element, color, tree, deity, aett)
 - **Elder vs Younger vs Anglo-Saxon**: Three Futhark variants. Elder (24, 2nd-8th C, Germanic), Younger (16, 9th-11th C, Norse — Viking age), Anglo-Saxon/Futhorc (28-33, 5th-11th C, England)
-- **Implementation phases**:
-  - **Phase 1**: 24 Elder Futhark rune data with upright/reversed meanings, Aett groupings, 3 spreads (single/three/five)
-  - **Phase 2**: Younger Futhark and Anglo-Saxon as selectable traditions, rune scatter animation, cluster interpretation
-  - **Phase 3**: Nine Worlds layout with Yggdrasil visualization, free cast mode
-- **Unique UI needs**: Rune glyphs (Unicode or SVG), runestone visual style, scatter cloth animation, Yggdrasil diagram
-- **Target**: **Custom page** — this deserves full treatment
+- **Implemented**: ✅ Custom Norse-themed page (dark stone aesthetic, blood red/ice blue/amber gold palette), ✅ 4 spread types (Odin's Rune, Three Norns, Five-Rune Cross, Free Cast), ✅ 24 runes with full data (upright + reversed detail texts, element, color, aett, tree, deity, keywords), ✅ Position-based interpretation, ✅ Browse all 24 runes with search/filter, ✅ RuneStone card component with carved angular look
+- **Next**: Younger Futhark and Anglo-Saxon as selectable traditions, Nine Worlds Yggdrasil layout, rune scatter cloth animation, bind rune generator
 
 ### 8. I Ching ✅ (DONE — custom page with coin toss, 64 hexagrams, changing lines, secondary hexagram)
 - **Research**: 64 hexagrams from King Wen arrangements, 8 trigrams bagua. Two primary casting methods plus variants.
@@ -614,7 +609,7 @@ Compare readings across traditions, blend systems, AI-assisted pattern recogniti
 
 ### Tier 1 (Do these first — culturally rich, visually unique, high impact)
 1. **I Ching** ✅ — Custom hexagram generation, coin toss, 64 hexagram data, changing lines, secondary hexagram
-2. **Elder Futhark Runes** — Custom rune casting, Aett visualization, scatter animation
+2. **Elder Futhark Runes** ✅ — Custom page with 4 spreads, 24-rune full data, Norse aesthetic
 3. **Lenormand** — Grand Tableau grid, house system, significator, pair reading
 4. **Geomancy** — Shield chart, 16 figures, dot generation
 5. **Coffee Cup Reading** — Cup interior rendering, ground patterns, Turkish aesthetic
@@ -672,4 +667,4 @@ Document findings in `src/shared/research/{systemId}.md` before coding.
 ---
 
 *Last updated: 2026-06-14*
-*Next system target: Elder Futhark Runes (Tier 1, rune casting with Yggdrasil layout)*
+*Next system target: Lenormand (Tier 1, Grand Tableau with house system)*

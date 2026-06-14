@@ -109,7 +109,7 @@ export const DIVINATION_SYSTEMS: DivinationSystemDef[] = [
     route: "/consult/runes",
     category: "Cleromancy & Sortilege",
     mode: "rune",
-    description: "Norse rune cast with magical correspondence",
+    description: "Norse rune divination — Odin's Rune, Three Norns, Five-Rune Cross, and Free Cast with full merkstave analysis",
     tradition: "Germanic",
     generic: false,
   },
