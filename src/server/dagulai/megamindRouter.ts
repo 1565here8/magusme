@@ -1,5 +1,5 @@
-import type { OllamaChatOptions } from "../../../api/ollamaChat";
-import { ollamaChatComplete, ollamaChatStream } from "../../../api/ollamaChat";
+import type { OllamaChatOptions } from "../../api/ollamaChat";
+import { ollamaChatComplete, ollamaChatStream } from "../../api/ollamaChat";
 import { geminiChatComplete, geminiChatStream, type ChatMessage } from "./geminiChat";
 import { groqChatComplete, groqChatStream } from "./groqChat";
 import { xaiChatComplete, xaiChatStream } from "./xaiChat";
@@ -24,7 +24,7 @@ export type DagulaiLlmRequest = OllamaChatOptions & {
 };
 
 function toMessages(options: OllamaChatOptions): ChatMessage[] {
-  return options.messages.map((m) => ({
+  return options.messages.map((m: any) => ({
     role: m.role,
     content: m.content,
   }));

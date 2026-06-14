@@ -14,4 +14,15 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'utils': ['clsx', 'tailwind-merge', 'uuid'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 });

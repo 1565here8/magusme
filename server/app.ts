@@ -12,7 +12,13 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { registerAuthRoutes } from "./routes/auth.routes";
 import { registerAdminRoutes, registerHealthRoutes } from "./routes/health.routes";
 import { registerArcanaRoutes } from "./routes/arcana.routes";
+import { registerPaymentRoutes } from "./routes/payments.routes";
+import { registerSpellsRoutes } from "./routes/spells.routes";
+import { registerSitemapRoutes } from "./routes/sitemap.routes";
+import { registerInferenceRoutes } from "./routes/inference.routes";
+import { registerReadingRoutes } from "./routes/reading.routes";
 import { initArcanaModule } from "../src/server/arcana/init";
+import { initSpellsModule } from "../src/server/spells/init";
 
 function configureTrustProxy(app: Express) {
   const shouldTrust =
@@ -27,6 +33,7 @@ function configureTrustProxy(app: Express) {
 export async function createApp(): Promise<Express> {
   await initDatabase();
   await initArcanaModule();
+  await initSpellsModule();
 
   const app = express();
   configureTrustProxy(app);
@@ -54,6 +61,11 @@ export async function createApp(): Promise<Express> {
   registerAuthRoutes(app);
   registerAdminRoutes(app);
   registerArcanaRoutes(app);
+  registerPaymentRoutes(app);
+  registerSpellsRoutes(app);
+  registerInferenceRoutes(app);
+  registerReadingRoutes(app);
+  registerSitemapRoutes(app);
   app.use("/api", notFoundHandler);
 
   const distDir = path.resolve(process.cwd(), "dist");

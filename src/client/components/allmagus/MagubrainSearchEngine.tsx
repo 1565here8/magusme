@@ -4,13 +4,16 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { bootstrapSession } from "../../api/apiClient";
+import { ALLMAGUS_NAME, ALLMAGUS_TAGLINE } from "../../allmagusBrand";
 import {
   createSearchBtcpayCheckout,
+  createPaymentCheckout,
+  fetchPaymentHealth,
   fetchSearchQuota,
   streamMagubrainSearch,
+  type PaymentHealth,
   type SearchQuotaStatus,
 } from "../../api/arcanaClient";
-import { ALLMAGUS_NAME, ALLMAGUS_TAGLINE } from "../../allmagusBrand";
 
 export function MagubrainSearchEngine() {
   const [query, setQuery] = useState("");
@@ -20,12 +23,14 @@ export function MagubrainSearchEngine() {
   const [quota, setQuota] = useState<SearchQuotaStatus | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [paidSinglePending, setPaidSinglePending] = useState(false);
+  const [paymentInfo, setPaymentInfo] = useState<PaymentHealth | null>(null);
 
   useEffect(() => {
     bootstrapSession()
       .then(() => setSessionReady(true))
       .catch(() => setSessionReady(false));
     fetchSearchQuota().then(setQuota).catch(() => null);
+    fetchPaymentHealth().then(setPaymentInfo).catch(() => null);
 
     const params = new URLSearchParams(window.location.search);
     if (params.get("searchPaid") === "1") {
@@ -65,6 +70,13 @@ export function MagubrainSearchEngine() {
   async function buy(kind: "single" | "monthly") {
     setError(null);
     try {
+      if (paymentInfo?.payramConfigured) {
+        const res = await createPaymentCheckout(kind);
+        if (res.checkoutUrl) {
+          window.location.href = res.checkoutUrl;
+          return;
+        }
+      }
       const res = await createSearchBtcpayCheckout(kind);
       if (res.checkoutUrl) {
         window.location.href = res.checkoutUrl;
@@ -127,7 +139,7 @@ export function MagubrainSearchEngine() {
               ? `${quota.monthlyRemaining} / ${quota.monthlyLimit} monthly searches left`
               : quota.singleCreditsRemaining > 0
                 ? `${quota.singleCreditsRemaining} prepaid search${quota.singleCreditsRemaining === 1 ? "" : "es"} ready`
-                : "Free tier used — pay with Bitcoin or go monthly"}
+                : "Free tier used — pay with Crypto or go monthly"}
           {quota.monthlyActive && quota.monthlyExpiresAt
             ? ` · monthly until ${new Date(quota.monthlyExpiresAt).toLocaleDateString()}`
             : null}
@@ -139,10 +151,10 @@ export function MagubrainSearchEngine() {
           <p className="text-sm text-[color:var(--text-secondary)]">{error}</p>
           <div className="mt-4 flex flex-wrap justify-center gap-3">
             <button type="button" className="btn-premium text-sm" onClick={() => void buy("single")}>
-              {quota.btcpayConfigured !== false ? "Pay with Bitcoin" : "Pay"} {quota.payPerSearchLabel} — one search
+              {paymentInfo?.payramConfigured ? "Pay with Crypto" : quota.btcpayConfigured !== false ? "Pay with Bitcoin" : "Pay"} {quota.payPerSearchLabel} — one search
             </button>
             <button type="button" className="btn-secondary text-sm" onClick={() => void buy("monthly")}>
-              {quota.btcpayConfigured !== false ? "Pay with Bitcoin — " : ""}
+              {paymentInfo?.payramConfigured ? "Pay with Crypto — " : quota.btcpayConfigured !== false ? "Pay with Bitcoin — " : ""}
               {quota.monthlyPriceLabel}/mo · {quota.monthlyLimit} searches
             </button>
           </div>

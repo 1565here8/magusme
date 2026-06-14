@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { Sparkles, Moon, Star, Scroll, Brain, BookOpen, Shield,
   AlertTriangle, ChevronRight, Loader2, User, Map, Sun, Heart, Eye,
   Camera, Upload, ChevronLeft, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { SeoHead } from "../components/SeoHead";
 
 const CHINESE_ANIMALS = ["Rat","Ox","Tiger","Rabbit","Dragon","Snake","Horse","Goat","Monkey","Rooster","Dog","Pig"];
 const CHINESE_ELEMENTS = ["Wood","Fire","Earth","Metal","Water"];
@@ -119,7 +120,7 @@ export function HumanMapPage() {
     setAnalyzing("Western Astrology"); await sleep(600);
     let western = null;
     try {
-      const r = await fetch("https://magusme.com/api/arcana/astro/natal", {
+      const r = await fetch("/api/arcana/astro/natal", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body:JSON.stringify({birthDate, birthTime:birthTime||"12:00", lat:40.7, lon:-74, label:location||"Unknown"})
       });
@@ -212,6 +213,7 @@ export function HumanMapPage() {
 
   return (
     <div className="min-h-screen">
+      <SeoHead title="Human Map · Complete Esoteric Profile" description="Your complete esoteric profile — Chinese zodiac, Aztec sign, numerology, astrological chart, tarot card, palmistry, and face reading from your name and birth date." path="/human-map" />
       <div className="mx-auto max-w-4xl px-5 py-8 md:px-8">
 
         {step === "input" && (

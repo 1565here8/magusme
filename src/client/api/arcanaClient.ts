@@ -284,6 +284,36 @@ export async function purchaseSearchAccess(kind: "single" | "monthly") {
   return res.json();
 }
 
+export type PaymentHealth = {
+  payramConfigured: boolean;
+  currency: string;
+  products: Array<{ id: string; label: string; priceCents: number }>;
+};
+
+export async function fetchPaymentHealth(signal?: AbortSignal): Promise<PaymentHealth> {
+  const res = await fetch("/api/payments/health", { ...credentials, signal });
+  if (!res.ok) throw new Error("Could not load payment info.");
+  return res.json();
+}
+
+export async function createPaymentCheckout(kind: "single" | "monthly", email?: string) {
+  await ensureCsrfToken();
+  const res = await fetch("/api/payments/create-checkout", {
+    method: "POST",
+    headers: mutationHeaders(),
+    ...credentials,
+    body: JSON.stringify({ product: kind === "monthly" ? "search_monthly" : "search_single", email }),
+  });
+  const body = (await res.json().catch(() => ({}))) as {
+    error?: string;
+    checkoutUrl?: string;
+    referenceId?: string;
+    amountInUSD?: number;
+  };
+  if (!res.ok) throw new Error(body.error ?? "Checkout failed.");
+  return body;
+}
+
 export async function streamMagubrainSearch(
   query: string,
   onChunk: (text: string) => void,

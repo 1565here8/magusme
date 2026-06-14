@@ -129,8 +129,10 @@ export function Ecliptic(vec: [number, number, number, number]): { elon: number;
 
 export function Illumination(body: string, time: AstroTime) {
   if (body === "Moon") {
-    const sunLon = eclipticLongitude(...GeoVector("Sun", time, true));
-    const moonLon = eclipticLongitude(...GeoVector("Moon", time, true));
+    const [sx, sy] = GeoVector("Sun", time, true);
+    const [mx, my] = GeoVector("Moon", time, true);
+    const sunLon = eclipticLongitude(sx, sy);
+    const moonLon = eclipticLongitude(mx, my);
     const angle = ((moonLon - sunLon) % 360 + 360) % 360;
     return { phase_angle: angle, fraction: (1 - Math.cos(angle * Math.PI / 180)) / 2 };
   }

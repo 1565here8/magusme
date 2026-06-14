@@ -31,12 +31,12 @@ export function planetPositionsAt(time: AstroTime, lat: number, lon: number): Pl
     const astroBody = bodyMap[body] as (typeof Body)[keyof typeof Body];
     const geo = GeoVector(astroBody, time, true);
     const ecl = Ecliptic(geo);
-    const house = houseForLongitude(ecl.elon, lat, lon, time);
+    const house = houseForLongitude(ecl.elon, 0);
     results.push({
       body,
       longitude: ecl.elon,
       latitude: ecl.elat,
-      distance: geo[2],
+      distance: geo[3],
       sign: longitudeToSign(ecl.elon),
       house,
       retrograde: false,

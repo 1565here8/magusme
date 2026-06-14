@@ -1,25 +1,13 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, BookOpen, Star, Shield, AlertTriangle, Clock, Share2, Bookmark, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, BookOpen, Star, Shield, AlertTriangle, Clock, Share2, Bookmark, Sparkles, Loader2, Send, MessageSquare } from "lucide-react";
+import { fetchSpellBySlug, fetchSpellReviews, submitSpellReview, type SpellDetail, type SpellReview } from "../api/spellsClient";
+import { SeoHead } from "../components/SeoHead";
 
-const SPELL_DATA: Record<string, {
-  title: string; tradition: string; category: string; rating: number; reviews: number;
-  difficulty: string; danger: string; source: string; element: string; timing: string;
-  counter: string; tags: string[]; warning?: string; purpose: string;
-  materials: string[]; steps: string[]; variations: string[];
+const RICH_SPELLS: Record<string, {
+  materials: string[]; steps: string[]; variations: string[]; purpose: string;
 }> = {
   "mirror-shield-charm": {
-    title: "Mirror Shield Charm",
-    tradition: "Wiccan",
-    category: "Protection",
-    rating: 4.8, reviews: 142,
-    difficulty: "Beginner (1/10)",
-    danger: "None (0/10)",
-    source: "Cunningham's Encyclopedia of Magical Herbs (1985, Llewellyn)",
-    element: "Air, Spirit",
-    timing: "Mercury Hour, Waxing Moon",
-    counter: "Reflect Release",
-    tags: ["Beginner-friendly", "No materials", "Fast results"],
     purpose: "Creates an energetic mirror that reflects negative intentions, curses, or harmful energy back to their source.",
     materials: ["Mirror (any size)", "White candle (optional)", "Salt (optional, for circle)", "Your visualization ability"],
     steps: [
@@ -41,18 +29,6 @@ const SPELL_DATA: Record<string, {
     ],
   },
   "binding-of-the-hexer": {
-    title: "Binding of the Hexer",
-    tradition: "Hoodoo",
-    category: "Protection",
-    rating: 4.2, reviews: 89,
-    difficulty: "Medium (5/10)",
-    danger: "Moderate (6/10)",
-    source: "Hyatt Collection (Verified, 1970s)",
-    element: "Fire",
-    timing: "Mars Hour, Full Moon",
-    counter: "Unbinding Ritual",
-    tags: ["Requires focus", "Experienced only"],
-    warning: "8% of practitioners report backlash if intent is impure. Only cast if truly hexed, not for revenge.",
     purpose: "Binds the hands of someone hexing you. Prevents them from continuing harmful magical work.",
     materials: ["Black candle", "Red string or cord", "Photo or name of the hexer (optional)", "Salt water", "Small cloth bag"],
     steps: [
@@ -72,17 +48,71 @@ const SPELL_DATA: Record<string, {
   },
 };
 
+function parseRichSpell(slug: string): typeof RICH_SPELLS[string] | undefined {
+  return RICH_SPELLS[slug];
+}
+
+function formatDifficulty(level: number): string {
+  if (level <= 2) return "Beginner";
+  if (level <= 4) return "Easy";
+  if (level <= 6) return "Medium";
+  if (level <= 8) return "Hard";
+  return "Extreme";
+}
+
+function formatDanger(level: number): string {
+  if (level === 0) return "None";
+  if (level <= 2) return "Low";
+  if (level <= 4) return "Moderate";
+  if (level <= 6) return "High";
+  return "Extreme";
+}
+
 export function SpellDetailPage() {
   const { spellId } = useParams();
-  const spell = spellId ? SPELL_DATA[spellId.toLowerCase()] : null;
+  const navigate = useNavigate();
+  const [spell, setSpell] = useState<SpellDetail | null>(null);
+  const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
+  const [reviews, setReviews] = useState<SpellReview[]>([]);
+  const [reviewTotal, setReviewTotal] = useState(0);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewBody, setReviewBody] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+
+  useEffect(() => {
+    if (!spellId) return;
+    fetchSpellReviews(spellId.toLowerCase()).then((r) => {
+      setReviews(r.reviews);
+      setReviewTotal(r.total);
+    }).catch(() => null);
+  }, [spellId]);
+
+  useEffect(() => {
+    if (!spellId) return;
+    const controller = new AbortController();
+    fetchSpellBySlug(spellId.toLowerCase(), controller.signal)
+      .then(setSpell)
+      .catch(() => null)
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [spellId]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+      </div>
+    );
+  }
 
   if (!spell) {
     return (
       <div className="mx-auto max-w-4xl px-5 py-20 text-center md:px-8">
         <div className="mb-4 text-6xl">🔮</div>
         <h1 className="mb-4 font-serif text-2xl font-bold text-white">Spell Not Found</h1>
-        <p className="mb-8 text-zinc-400">This spell hasn't been loaded yet.</p>
+        <p className="mb-8 text-zinc-400">This spell hasn't been loaded into the grimoire yet.</p>
         <Link to="/learn" className="rounded-full bg-purple-600 px-6 py-3 text-sm font-medium text-white">
           Browse the Grimoire
         </Link>
@@ -90,9 +120,20 @@ export function SpellDetailPage() {
     );
   }
 
+  const hardcodedRich = spellId ? parseRichSpell(spellId.toLowerCase()) : undefined;
+  const rich = (() => {
+    if (hardcodedRich) return hardcodedRich;
+    if (spell?.full_text) {
+      try { return JSON.parse(spell.full_text) as { purpose: string; materials: string[]; steps: string[]; variations: string[] }; } catch { return null; }
+    }
+    return null;
+  })();
+  const tags: string[] = spell.tags ?? [];
+
   return (
     <div className="min-h-screen">
       <div className="mx-auto max-w-4xl px-5 py-8 md:px-8">
+        {spell && <SeoHead title={spell.title} description={spell.summary ?? "View spell details from the grimoire."} path={`/learn/${spellId}`} />}
         <Link to="/learn" className="mb-6 flex items-center gap-2 text-sm text-zinc-400 hover:text-white">
           <ArrowLeft className="h-4 w-4" /> Back to Grimoire
         </Link>
@@ -110,30 +151,26 @@ export function SpellDetailPage() {
               <span className="flex items-center gap-1 text-amber-400">
                 <Star className="h-4 w-4 fill-amber-400" /> {spell.rating}
               </span>
-              <span className="text-zinc-500">({spell.reviews} reviews)</span>
+              <span className="text-zinc-500">({spell.review_count} reviews)</span>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setSaved(!saved)}
-              className={`rounded-full border p-2.5 transition ${saved ? "border-purple-500/40 bg-purple-500/10 text-purple-400" : "border-white/10 text-zinc-500 hover:text-white"}`}
-            >
-              <Bookmark className={`h-4 w-4 ${saved ? "fill-purple-400" : ""}`} />
-            </button>
-            <button className="rounded-full border border-white/10 p-2.5 text-zinc-500 transition hover:text-white">
-              <Share2 className="h-4 w-4" />
-            </button>
-          </div>
+          {tags.length > 0 && (
+            <div className="hidden flex-wrap gap-1.5 md:flex">
+              {tags.slice(0, 3).map((t) => (
+                <span key={t} className="rounded-full bg-white/5 px-2.5 py-1 text-[10px] text-zinc-400">{t}</span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="mb-8 grid grid-cols-2 gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-5 md:grid-cols-4">
           {[
-            { label: "Difficulty", value: spell.difficulty },
-            { label: "Danger Level", value: spell.danger, warn: spell.danger !== "None (0/10)" },
-            { label: "Elements", value: spell.element },
-            { label: "Timing", value: spell.timing },
-            { label: "Source", value: spell.source, wide: true },
-            { label: "Counter-Spell", value: spell.counter },
+            { label: "Difficulty", value: spell.difficulty ? `${spell.difficulty} (${spell.difficulty_level}/10)` : `${formatDifficulty(spell.difficulty_level)} (${spell.difficulty_level}/10)` },
+            { label: "Danger Level", value: spell.danger ? `${spell.danger} (${spell.danger_level}/10)` : `${formatDanger(spell.danger_level)} (${spell.danger_level}/10)`, warn: spell.danger_level >= 5 },
+            { label: "Elements", value: spell.element ?? "—" },
+            { label: "Timing", value: spell.timing ?? "Any" },
+            { label: "Source", value: spell.source ?? "Traditional", wide: true },
+            { label: "Counter-Spell", value: spell.counter_spell ?? "—" },
           ].map((item) => (
             <div key={item.label} className={item.wide ? "col-span-2" : ""}>
               <div className="text-xs text-zinc-500">{item.label}</div>
@@ -154,69 +191,133 @@ export function SpellDetailPage() {
           </div>
         )}
 
-        <section className="mb-8">
-          <h2 className="mb-3 font-serif text-xl font-bold text-white">Purpose</h2>
-          <p className="text-sm leading-relaxed text-zinc-400">{spell.purpose}</p>
-        </section>
+        {rich ? (
+          <>
+            <section className="mb-8">
+              <h2 className="mb-3 font-serif text-xl font-bold text-white">Purpose</h2>
+              <p className="text-sm leading-relaxed text-zinc-400">{rich.purpose}</p>
+            </section>
 
-        <section className="mb-8">
-          <h2 className="mb-3 font-serif text-xl font-bold text-white">Materials Needed</h2>
-          <ul className="space-y-2">
-            {spell.materials.map((m) => (
-              <li key={m} className="flex items-center gap-2 text-sm text-zinc-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-purple-400" />
-                {m}
-              </li>
-            ))}
-          </ul>
-        </section>
+            <section className="mb-8">
+              <h2 className="mb-3 font-serif text-xl font-bold text-white">Materials Needed</h2>
+              <ul className="space-y-2">
+                {rich.materials.map((m) => (
+                  <li key={m} className="flex items-center gap-2 text-sm text-zinc-300">
+                    <span className="h-1.5 w-1.5 rounded-full bg-purple-400" />
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </section>
 
-        <section className="mb-8">
-          <h2 className="mb-3 font-serif text-xl font-bold text-white">Step-by-Step Instructions</h2>
-          <div className="space-y-4">
-            {spell.steps.map((step, i) => (
-              <div key={i} className="flex gap-4">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-purple-500/15 text-sm font-bold text-purple-300">
-                  {i + 1}
+            <section className="mb-8">
+              <h2 className="mb-3 font-serif text-xl font-bold text-white">Step-by-Step Instructions</h2>
+              <div className="space-y-4">
+                {rich.steps.map((step, i) => (
+                  <div key={i} className="flex gap-4">
+                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-purple-500/15 text-sm font-bold text-purple-300">
+                      {i + 1}
+                    </div>
+                    <p className="pt-1 text-sm leading-relaxed text-zinc-300">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {rich.variations.length > 0 && (
+              <section className="mb-8">
+                <h2 className="mb-3 font-serif text-xl font-bold text-white">Variations</h2>
+                <div className="space-y-3">
+                  {rich.variations.map((v, i) => (
+                    <div key={i} className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                      <div className="mb-1 text-xs font-medium text-purple-300">Variation {i + 1}</div>
+                      <p className="text-sm text-zinc-400">{v}</p>
+                    </div>
+                  ))}
                 </div>
-                <p className="pt-1 text-sm leading-relaxed text-zinc-300">{step}</p>
+              </section>
+            )}
+
+            <section className="mb-8 rounded-xl border border-amber-500/10 bg-amber-500/[0.02] p-5">
+              <div className="mb-2 flex items-center gap-2">
+                <Shield className="h-4 w-4 text-amber-400" />
+                <span className="text-sm font-medium text-amber-300">Karmic & Safety Assessment</span>
               </div>
-            ))}
-          </div>
-        </section>
+              <p className="text-sm leading-relaxed text-zinc-400">
+                This spell is rated {formatDanger(spell.danger_level)} ({spell.danger_level}/10).
+                Ethical magic. Many traditions teach "what you send returns threefold."
+              </p>
+            </section>
+          </>
+        ) : spell.full_text && !spell.full_text.startsWith("{") ? (
+          <section className="mb-8">
+            <h2 className="mb-3 font-serif text-xl font-bold text-white">Instructions</h2>
+            <div className="prose prose-invert prose-sm max-w-none text-zinc-300 leading-relaxed whitespace-pre-wrap">
+              {spell.full_text}
+            </div>
+          </section>
+        ) : (
+          <>
+            <section className="mb-8">
+              <h2 className="mb-3 font-serif text-xl font-bold text-white">Overview</h2>
+              <p className="text-sm leading-relaxed text-zinc-400">{spell.summary ?? "No description available."}</p>
+            </section>
 
-        <section className="mb-8">
-          <h2 className="mb-3 font-serif text-xl font-bold text-white">Variations</h2>
-          <div className="space-y-3">
-            {spell.variations.map((v, i) => (
-              <div key={i} className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-                <div className="mb-1 text-xs font-medium text-purple-300">Variation {i + 1}</div>
-                <p className="text-sm text-zinc-400">{v}</p>
+            <section className="mb-8 rounded-xl border border-white/10 bg-white/[0.02] p-5">
+              <h2 className="mb-3 font-serif text-lg font-bold text-white">Spell Details</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <div className="text-xs text-zinc-500">Difficulty</div>
+                  <div className="text-sm text-zinc-300">{spell.difficulty ?? formatDifficulty(spell.difficulty_level)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-zinc-500">Danger Level</div>
+                  <div className="text-sm text-zinc-300">{spell.danger ?? formatDanger(spell.danger_level)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-zinc-500">Element</div>
+                  <div className="text-sm text-zinc-300">{spell.element ?? "—"}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-zinc-500">Timing</div>
+                  <div className="text-sm text-zinc-300">{spell.timing ?? "Any"}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-zinc-500">Source</div>
+                  <div className="text-sm text-zinc-300">{spell.source ?? "Traditional"}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-zinc-500">Counter-Spell</div>
+                  <div className="text-sm text-zinc-300">{spell.counter_spell ?? "—"}</div>
+                </div>
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
 
-        <section className="mb-8 rounded-xl border border-amber-500/10 bg-amber-500/[0.02] p-5">
-          <div className="mb-2 flex items-center gap-2">
-            <Shield className="h-4 w-4 text-amber-400" />
-            <span className="text-sm font-medium text-amber-300">Karmic & Safety Assessment</span>
-          </div>
-          <p className="text-sm leading-relaxed text-zinc-400">
-            This spell is rated {spell.danger}. It causes no harm — it only returns what was sent.
-            Ethical magic. Many traditions teach "what you send returns threefold."
-            Safe for all practitioners regardless of alignment.
-          </p>
-        </section>
+            {spell.tags && spell.tags.length > 0 && (
+              <section className="mb-8">
+                <h2 className="mb-3 font-serif text-lg font-bold text-white">Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {spell.tags.map((tag: string) => (
+                    <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-400">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
 
-        <section className="mb-8">
-          <h2 className="mb-3 font-serif text-xl font-bold text-white">Historical Context</h2>
-          <p className="text-sm leading-relaxed text-zinc-400">
-            Mirror magic appears in Chinese Taoist tradition (1000+ years), European folk magic (medieval),
-            Mediterranean evil eye wards (ancient Greek/Roman), and modern Wicca (popularized by Scott Cunningham, 1985).
-            This is ancient wisdom from multiple independent traditions, not new age invention.
-          </p>
-        </section>
+            <section className="mb-8 rounded-xl border border-amber-500/10 bg-amber-500/[0.02] p-5">
+              <div className="mb-2 flex items-center gap-2">
+                <Shield className="h-4 w-4 text-amber-400" />
+                <span className="text-sm font-medium text-amber-300">Karmic & Safety Assessment</span>
+              </div>
+              <p className="text-sm leading-relaxed text-zinc-400">
+                This spell is rated {formatDanger(spell.danger_level)} ({spell.danger_level}/10).
+                Ethical magic. Many traditions teach "what you send returns threefold."
+              </p>
+            </section>
+          </>
+        )}
 
         <section className="mb-8 rounded-xl border border-emerald-500/10 bg-emerald-500/[0.02] p-5">
           <div className="mb-2 flex items-center gap-2">
@@ -224,8 +325,7 @@ export function SpellDetailPage() {
             <span className="text-sm font-medium text-emerald-300">Source Verified</span>
           </div>
           <p className="text-xs text-zinc-400">
-            {spell.source} — PRIMARY SOURCE scanned and verified.
-            Page references available. Community verified by 5,000+ practitioners.
+            {spell.source ?? "Traditional"} — Community verified by {spell.review_count}+ practitioners.
           </p>
         </section>
 
@@ -233,11 +333,97 @@ export function SpellDetailPage() {
           <Link to="/learn" className="rounded-full border border-white/10 px-8 py-3 text-sm text-zinc-400 transition hover:border-white/20">
             Browse More Spells
           </Link>
-          <button className="rounded-full bg-purple-600 px-8 py-3 text-sm font-medium text-white transition hover:bg-purple-500">
+          <button
+            onClick={() => navigate("/reading")}
+            className="rounded-full bg-purple-600 px-8 py-3 text-sm font-medium text-white transition hover:bg-purple-500"
+          >
             <Sparkles className="mr-2 inline h-4 w-4" />
             Consult the Oracle
           </button>
         </div>
+
+        {/* Reviews section */}
+        <section className="mt-12 border-t border-white/10 pt-8">
+          <h2 className="mb-6 font-serif text-xl font-bold text-white flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-purple-400" />
+            Reviews ({reviewTotal})
+          </h2>
+
+          {/* Review form */}
+          <div className="mb-8 rounded-xl border border-white/10 bg-white/[0.02] p-5">
+            <h3 className="mb-4 text-sm font-medium text-zinc-300">Leave a Review</h3>
+            <div className="mb-3 flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setReviewRating(star)}
+                  className="transition hover:scale-110"
+                >
+                  <Star className={`h-5 w-5 ${star <= reviewRating ? "fill-amber-400 text-amber-400" : "text-zinc-600"}`} />
+                </button>
+              ))}
+              {reviewRating > 0 && <span className="ml-2 text-xs text-zinc-500">{reviewRating}/5</span>}
+            </div>
+            <textarea
+              value={reviewBody}
+              onChange={(e) => setReviewBody(e.target.value)}
+              placeholder="Share your experience with this spell..."
+              rows={3}
+              className="w-full rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm text-zinc-300 placeholder-zinc-600 outline-none focus:border-purple-500/40"
+            />
+            {reviewError && <p className="mt-1 text-xs text-red-400">{reviewError}</p>}
+            <button
+              onClick={async () => {
+                if (!spellId) return;
+                setReviewError("");
+                if (reviewRating === 0) { setReviewError("Please select a rating."); return; }
+                if (reviewBody.trim().length < 10) { setReviewError("Review must be at least 10 characters."); return; }
+                setSubmittingReview(true);
+                try {
+                  const review = await submitSpellReview(spellId.toLowerCase(), reviewRating, reviewBody.trim());
+                  setReviews((prev) => [review, ...prev]);
+                  setReviewTotal((n) => n + 1);
+                  setReviewRating(0);
+                  setReviewBody("");
+                } catch (err) {
+                  setReviewError(err instanceof Error ? err.message : "Failed to submit review.");
+                } finally {
+                  setSubmittingReview(false);
+                }
+              }}
+              disabled={submittingReview}
+              className="mt-3 inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-purple-500 disabled:opacity-50"
+            >
+              <Send className="h-3.5 w-3.5" />
+              {submittingReview ? "Submitting..." : "Submit Review"}
+            </button>
+          </div>
+
+          {/* Review list */}
+          {reviews.length === 0 ? (
+            <p className="text-sm text-zinc-500">No reviews yet. Be the first to share your experience.</p>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map((review) => (
+                <div key={review.id} className="rounded-xl border border-white/5 bg-white/[0.01] p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star key={star} className={`h-3.5 w-3.5 ${star <= review.rating ? "fill-amber-400 text-amber-400" : "text-zinc-700"}`} />
+                        ))}
+                      </div>
+                      <span className="text-xs text-zinc-500">
+                        {new Date(review.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-sm leading-relaxed text-zinc-400">{review.body}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

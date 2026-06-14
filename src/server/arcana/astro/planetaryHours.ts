@@ -74,7 +74,7 @@ function buildSlots(
 }
 
 function findRiseSet(
-  observer: Observer,
+  observer: ReturnType<typeof Observer>,
   time: AstroTime,
 ): { sunrise: Date; sunset: Date; nextSunrise: Date } {
   const rise = SearchRiseSet(Body.Sun, observer, +1, time, 1);
@@ -97,7 +97,7 @@ export function planetaryHoursAt(
   lat: number,
   lon: number,
 ): PlanetaryHourState {
-  const observer = new Observer(lat, lon, 0);
+  const observer = Observer(lat, lon, 0);
   const time = MakeTime(date);
   const { sunrise, sunset, nextSunrise } = findRiseSet(observer, time);
 

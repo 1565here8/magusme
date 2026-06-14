@@ -22,6 +22,7 @@ import {
   resolveDivinationSpectrum,
   spectrumTierClass,
 } from "../../../shared/merlianSpectrum";
+import { cx } from "../../utils/classnames";
 import { KabbalahDangerGate } from "./KabbalahDangerGate";
 import { isKabbalahDivinationId } from "../../../shared/kabbalahDivinations";
 

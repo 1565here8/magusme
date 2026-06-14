@@ -72,7 +72,7 @@ function CardBack({ index, total }: { index: number; total: number }) {
 
 function CardFace({ card, reversed, index }: { card: TarotCard; reversed: boolean; index: number }) {
   const colors = SUIT_COLORS[card.suit] || SUIT_COLORS.Major;
-  const numberLabel = card.suit === "Major" ? `${card.number}` : ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Page", "Knight", "Queen", "King"][card.number - 1] || `${card.number}`;
+  const numberLabel = card.suit === "Major" ? `${card.number}` : card.name.split(" ")[0];
 
   return (
     <div

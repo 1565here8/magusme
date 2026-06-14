@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Activity, Database, Timer } from "lucide-react";
+import { SeoHead } from "../components/SeoHead";
 import { fetchAdminMetrics, fetchOpsMetrics, type AdminMetrics } from "../api/apiClient";
 
 export function AdminDashboardPage() {
@@ -25,6 +26,7 @@ export function AdminDashboardPage() {
 
   return (
     <div className="space-y-10">
+      <SeoHead title="Admin Dashboard" description="Server operations, metrics, and telemetry for the Merlian platform." path="/admin" />
       <div className="ambient-depth glass-panel glass-panel-lg">
         <div className="label-premium">Operations</div>
         <h1 className="heading-premium mt-3">Admin Dashboard</h1>

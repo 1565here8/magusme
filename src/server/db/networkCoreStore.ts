@@ -47,7 +47,13 @@ export class NetworkCoreStore {
 
   private async migrate() {
     for (const statement of SCHEMA.split(";").map((s) => s.trim()).filter(Boolean)) {
-      await this.driver.exec(statement);
+      try {
+        await this.driver.exec(statement);
+      } catch (err) {
+        const msg = String(err);
+        if (msg.includes("duplicate column name")) continue;
+        throw err;
+      }
     }
   }
 

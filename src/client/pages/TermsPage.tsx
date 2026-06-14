@@ -32,5 +32,5 @@ These terms describe the actual behavior of this software. Adapt with legal coun
 `;
 
 export function TermsPage() {
-  return <LegalPage title="Terms of Service" markdown={markdown} />;
+  return <LegalPage title="Terms of Service" markdown={markdown} path="/terms" description="Terms of service for Merlian — session token billing, usage policies, and disclaimers." />;
 }

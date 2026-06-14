@@ -1,9 +1,18 @@
 node_modules/
-dist/
+.dist/
 .data/
 .env
-.env.production
 *.log
-.DS_Store
+.env.production
+*.DS_Store
 .env.deploy
 magusme-vps
+
+# Deployment scripts
+deploy*.sh
+deploy*.ps1
+*.pem
+
+# Build outputs
+dist/
+build/

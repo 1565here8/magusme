@@ -21,6 +21,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <Link className="font-medium text-zinc-500 transition hover:text-zinc-300" to="/privacy">
               Privacy
             </Link>
+            <Link className="font-medium text-zinc-500 transition hover:text-zinc-300" to="/references">
+              References
+            </Link>
             <Link className="font-medium text-zinc-500 transition hover:text-zinc-300" to="/admin">
               Admin
             </Link>

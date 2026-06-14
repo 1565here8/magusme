@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Wand2, Brain, Sparkles, Heart, Sun, Moon, Star, BookOpen, Zap, Music, Eye, Shuffle, Feather, Droplets, Mountain, Cloud } from "lucide-react";
+import { SeoHead } from "../components/SeoHead";
 
 const METHODS = [
   {
@@ -65,6 +66,7 @@ const METHODS = [
 export function CreatePage() {
   return (
     <div className="min-h-screen">
+      <SeoHead title="Create & Manifest · 40+ Techniques" description="Explore sigil magic, affirmations, NLP, energy work, chakra balancing, and 40+ manifestation methods. Build your personal practice." path="/create" />
       {/* Header */}
       <section className="relative border-b border-white/5">
         <div className="absolute inset-0 bg-gradient-to-b from-amber-900/10 via-orange-900/5 to-transparent" />
@@ -102,9 +104,10 @@ export function CreatePage() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {group.items.map((item) => (
-                <div
+                <Link
                   key={item.name}
-                  className="group cursor-pointer rounded-xl border border-white/10 bg-white/[0.02] p-5 transition hover:border-amber-500/30 hover:bg-white/[0.04]"
+                  to={`/learn?q=${encodeURIComponent(item.name)}`}
+                  className="group block rounded-xl border border-white/10 bg-white/[0.02] p-5 transition hover:border-amber-500/30 hover:bg-white/[0.04]"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <h3 className="font-medium text-white">{item.name}</h3>
@@ -119,10 +122,10 @@ export function CreatePage() {
                     <span>⭐⭐⭐⭐⭐ {item.rating}</span>
                     <span>({item.users.toLocaleString()} users)</span>
                   </div>
-                  <div className="mt-3 text-xs font-medium text-amber-400 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="mt-3 text-xs font-medium text-amber-400 transition-opacity group-hover:opacity-100">
                     Start Practice →
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

@@ -231,4 +231,79 @@ CREATE TABLE IF NOT EXISTS arcana_reviews (
 );
 
 CREATE INDEX IF NOT EXISTS idx_arcana_reviews_entry ON arcana_reviews(entry_id, created_at DESC);
+
+-- Spell traditions
+CREATE TABLE IF NOT EXISTS spell_traditions (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  created_at TEXT NOT NULL
+);
+
+-- Spell sources
+CREATE TABLE IF NOT EXISTS spell_sources (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  author TEXT,
+  year TEXT,
+  institution TEXT,
+  url TEXT,
+  pdf_ref TEXT,
+  verified INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+
+-- Spell categories
+CREATE TABLE IF NOT EXISTS spell_categories (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+
+-- Spells
+CREATE TABLE IF NOT EXISTS spells (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  tradition_id TEXT REFERENCES spell_traditions(id),
+  source_id TEXT REFERENCES spell_sources(id),
+  category_id TEXT REFERENCES spell_categories(id),
+  rating REAL NOT NULL DEFAULT 0,
+  review_count INTEGER NOT NULL DEFAULT 0,
+  difficulty TEXT,
+  difficulty_level INTEGER DEFAULT 1,
+  danger TEXT,
+  danger_level INTEGER DEFAULT 0,
+  element TEXT,
+  timing TEXT,
+  counter_spell TEXT,
+  warning TEXT,
+  summary TEXT,
+  tags TEXT,
+  full_text TEXT,
+  reference_link TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  verified INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_spells_category ON spells(category_id);
+CREATE INDEX IF NOT EXISTS idx_spells_tradition ON spells(tradition_id);
+CREATE INDEX IF NOT EXISTS idx_spells_rating ON spells(rating DESC);
+CREATE INDEX IF NOT EXISTS idx_spells_created ON spells(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS spell_reviews (
+  id TEXT PRIMARY KEY,
+  spell_id TEXT NOT NULL REFERENCES spells(id),
+  user_id TEXT NOT NULL REFERENCES users(id),
+  rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_spell_reviews_spell ON spell_reviews(spell_id, created_at DESC);
 `;

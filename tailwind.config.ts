@@ -44,6 +44,15 @@ export default {
       borderRadius: {
         "4xl": "2rem",
       },
+      keyframes: {
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+      },
+      animation: {
+        shimmer: "shimmer 1.5s ease-in-out infinite",
+      },
       boxShadow: {
         "merlian-purple": "0 0 40px rgba(168, 85, 247, 0.15)",
         "merlian-red": "0 0 40px rgba(239, 68, 68, 0.12)",

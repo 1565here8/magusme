@@ -23,7 +23,7 @@ const PHASES: Array<{ max: number; name: string; emoji: string }> = [
 
 export function moonPhaseAt(time: AstroTime): MoonPhaseInfo {
   const illum = Illumination(Body.Moon, time);
-  const fraction = illum.phase_fraction;
+  const fraction = illum.fraction;
   const phase = PHASES.find((p) => fraction <= p.max) ?? PHASES[0]!;
   const waxing = fraction < 0.5;
   const ageDays = waxing ? fraction * 29.53 : (1 - fraction) * 29.53;

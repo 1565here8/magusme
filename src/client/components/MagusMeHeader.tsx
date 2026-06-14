@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { clsx } from "clsx";
-import { Sparkles, BookOpen, Wand2, Clock, Search, User, LogOut } from "lucide-react";
+import { Sparkles, BookOpen, Wand2, Clock, Menu, User, BookMarked, LayoutDashboard } from "lucide-react";
 import { LoginModal } from "./LoginModal";
 
 const NAV_ITEMS = [
@@ -10,12 +10,21 @@ const NAV_ITEMS = [
   { path: "/learn", label: "Learn", icon: BookOpen },
   { path: "/create", label: "Create", icon: Wand2 },
   { path: "/tools", label: "Tools", icon: Clock },
+  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/references", label: "References", icon: BookMarked },
 ];
 
 export function MagusMeHeader() {
   const { pathname } = useLocation();
   const [loginOpen, setLoginOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  function handleSignOut() {
+    fetch("/api/auth/logout", { method: "POST", credentials: "include" })
+      .catch(() => null)
+      .finally(() => setIsLoggedIn(false));
+  }
 
   return (
     <>
@@ -51,10 +60,21 @@ export function MagusMeHeader() {
             })}
             <div className="ml-2 flex items-center gap-2 border-l border-white/10 pl-4">
               {isLoggedIn ? (
-                <button className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-zinc-400 transition hover:border-white/20">
-                  <User className="h-4 w-4" />
-                  Profile
-                </button>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/human-map"
+                    className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-zinc-400 transition hover:border-white/20"
+                  >
+                    <User className="h-4 w-4" />
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="text-xs text-zinc-500 transition hover:text-zinc-300"
+                  >
+                    Sign Out
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={() => setLoginOpen(true)}
@@ -66,11 +86,68 @@ export function MagusMeHeader() {
             </div>
           </nav>
 
-          <button className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-zinc-400 md:hidden">
-            <Search className="h-4 w-4" />
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-zinc-400 transition hover:border-white/20 md:hidden"
+          >
+            <Menu className="h-4 w-4" />
             Menu
           </button>
         </div>
+
+        {mobileOpen && (
+          <div className="border-t border-white/10 bg-[#09090b] md:hidden">
+            <div className="space-y-1 px-5 py-4">
+              {NAV_ITEMS.map((item) => {
+                const isActive = item.exact
+                  ? pathname === item.path
+                  : pathname.startsWith(item.path) && item.path !== "/";
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileOpen(false)}
+                    className={clsx(
+                      "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition",
+                      isActive
+                        ? "bg-purple-500/20 text-purple-300"
+                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200",
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+              <hr className="border-white/10" />
+              {isLoggedIn ? (
+                <>
+                  <Link
+                    to="/human-map"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/5 hover:text-zinc-200"
+                  >
+                    <User className="h-4 w-4" />
+                    Profile
+                  </Link>
+                  <button
+                    onClick={() => { handleSignOut(); setMobileOpen(false); }}
+                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-500 transition hover:bg-white/5 hover:text-zinc-300"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => { setLoginOpen(true); setMobileOpen(false); }}
+                  className="flex w-full items-center gap-3 rounded-xl bg-purple-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-purple-500"
+                >
+                  Sign In
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />

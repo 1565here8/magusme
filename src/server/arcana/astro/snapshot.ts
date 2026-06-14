@@ -43,7 +43,7 @@ export function buildAstroSnapshot(args: {
   const time = MakeTime(date);
   const ascLon = calcAscendant(time, args.lat, args.lon);
   const mcLon = calcMidheaven(time, args.lon);
-  const planets = planetPositionsAt(time, ascLon);
+  const planets = planetPositionsAt(time, args.lat, args.lon);
   const moonPlanet = planets.find((p) => p.body === "Moon")!;
   const moonPhase = moonPhaseAt(time);
   const hours = planetaryHoursAt(date, args.lat, args.lon);

@@ -5,6 +5,11 @@
     "user": "root",
     "path": "/root/magusme"
   },
+  "live": {
+    "host": "178.105.155.211",
+    "user": "root",
+    "path": "/root/magusme-live"
+  },
   "build": {
     "frontend": true,
     "build_command": "npx vite build",
@@ -22,6 +27,22 @@
       "tsconfig.json"
     ],
     "exclude": ["node_modules", ".data", ".env", "*.log"],
+    "restart_command": "pm2 restart ecosystem.config.cjs",
+    "health_endpoint": "/api/health"
+  },
+  "live_deploy": {
+    "include": [
+      "dist/",
+      "server/",
+      "src/server/",
+      "src/shared/",
+      "src/api/",
+      "ecosystem.config.cjs",
+      "package.json",
+      "tsconfig.json",
+      ".env.magusme-split.example"
+    ],
+    "exclude": ["node_modules", ".data", ".env", "*.log", "*.md"],
     "restart_command": "pm2 restart ecosystem.config.cjs",
     "health_endpoint": "/api/health"
   }

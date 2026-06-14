@@ -138,7 +138,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               <Sparkles className="h-4 w-4 animate-spin" />
             ) : mode === "admin" ? (
               "Access Admin Panel"
-            ) : mode === "guest" ? (
+            ) : mode === "register" ? (
               "Continue as Guest"
             ) : (
               "Sign In"

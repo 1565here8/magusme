@@ -47,5 +47,5 @@ Contact your deployment operator for data export or deletion.
 `;
 
 export function PrivacyPage() {
-  return <LegalPage title="Privacy Policy" markdown={markdown} />;
+  return <LegalPage title="Privacy Policy" markdown={markdown} path="/privacy" description="Privacy policy for Merlian — data collection, encryption, retention, and user rights." />;
 }

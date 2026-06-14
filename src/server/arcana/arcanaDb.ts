@@ -440,7 +440,7 @@ export class ArcanaDb {
 
     if (updates.length === 0) return;
     values.push(id);
-    await this.driver.run(
+    await this.driver.exec(
       `UPDATE arcana_entries SET ${updates.join(", ")} WHERE id = ?`,
       values,
     );

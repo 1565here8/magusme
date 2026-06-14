@@ -1,0 +1,27 @@
+{
+    "project_gutenberg": [
+        "https://www.gutenberg.org/ebooks/19007",
+        "https://www.gutenberg.org/ebooks/15966",
+        "https://www.gutenberg.org/ebooks/3382",
+        "https://www.gutenberg.org/ebooks/43688",
+        "https://www.gutenberg.org/ebooks/39150",
+        "https://www.gutenberg.org/ebooks/6666",
+        "https://www.gutenberg.org/ebooks/59755",
+        "https://www.gutenberg.org/ebooks/12027",
+        "https://www.gutenberg.org/ebooks/26402",
+        "https://www.gutenberg.org/ebooks/38394",
+        "https://www.gutenberg.org/ebooks/20100",
+        "https://www.gutenberg.org/ebooks/16054",
+        "https://www.gutenberg.org/ebooks/45285",
+        "https://www.gutenberg.org/ebooks/29232"
+    ],
+    "internet_archive": [
+        "https://archive.org/details/lesserkeyofsolom00math",
+        "https://archive.org/details/grimoirehonorius0000unse",
+        "https://archive.org/details/keyofsolomon0000unse",
+        "https://archive.org/details/veritablekeyofso00unse",
+        "https://archive.org/details/bookofsorcerer00unse",
+        "https://archive.org/details/magicandrites00unse",
+        "https://archive.org/details/lippincottsmagaz00unse"
+    ]
+}

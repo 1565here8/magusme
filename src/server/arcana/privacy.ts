@@ -26,7 +26,7 @@ export type ArcanaPrivacyManifest = {
   privateCloud: boolean;
   dataSold: false;
   usedForModelTraining: false;
-  thirdPartyAiVendors: false;
+  thirdPartyAiVendors: boolean;
   minimalLogging: boolean;
   secureDefaults: boolean;
   streamingEnabled: boolean;

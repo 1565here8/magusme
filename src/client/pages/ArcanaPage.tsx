@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { SeoHead } from "../components/SeoHead";
 import {
  BookOpen,
  Eye,
@@ -33,6 +34,7 @@ import {
  type ArcanaStatus,
 } from "../api/arcanaClient";
 import { cx } from "../utils/classnames";
+import { TarotSpread } from "../components/merlian/TarotSpreadView";
 import { MerlianFreeReadings } from "../components/merlian/MerlianFreeReadings";
 import { KabbalahVault } from "../components/merlian/KabbalahVault";
 import {
@@ -187,8 +189,9 @@ export function ArcanaPage() {
  const [acceptedTerms, setAcceptedTerms] = useState(false);
  const [result, setResult] = useState<ArcanaConsultResult | null>(null);
  const [streamingText, setStreamingText] = useState("");
- const [error, setError] = useState<string | null>(null);
- const [purchaseLoading, setPurchaseLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [tarotMode, setTarotMode] = useState(false);
+  const [purchaseLoading, setPurchaseLoading] = useState<string | null>(null);
  const [selectedEntry, setSelectedEntry] = useState<ArcanaEntryDetail | null>(null);
  const [spellDetail, setSpellDetail] = useState<ArcanaSpellDetail | null>(null);
  const [planMarkdown, setPlanMarkdown] = useState<string | null>(null);
@@ -648,24 +651,43 @@ export function ArcanaPage() {
 
  return (
  <div className="arcana-page space-y-8">
+ <SeoHead title="Tarot Reading · Full Spread" description="AI-powered tarot reading with 13 decks. Full spreads, cross-system analysis, and personalized interpretations." path="/consult/tarot" />
  <ArcanaPrivacyShield privacy={status?.privacy ?? result?.privacy ?? null} />
 
  {disclaimer ? <ArcanaDisclaimerBanner disclaimer={disclaimer} /> : null}
 
- {onAllMagusSite ? (
- <div className="allmagus-page-with-dock">
- <div className="allmagus-main space-y-8">
- <MagubrainSearchEngine />
- {oracleOutput}
- </div>
- <ArcanaSideDock
- tabs={sideDockTabs}
- divinations={divinationsDock}
- oracle={oracleConsultPanel}
- kabbalah={kabbalahDock}
- />
- </div>
- ) : (
+  {onAllMagusSite ? (
+  <div className="allmagus-page-with-dock">
+  <div className="allmagus-main space-y-8">
+  {tarotMode ? (
+  <TarotSpread
+  onBack={() => setTarotMode(false)}
+  onReadingComplete={() => setTarotMode(false)}
+  />
+  ) : (
+  <>
+  <div className="flex justify-center">
+  <button
+  onClick={() => setTarotMode(true)}
+  className="btn-premium inline-flex items-center gap-2"
+  >
+  <Sparkles className="h-4 w-4" />
+  Tarot Spread
+  </button>
+  </div>
+  <MagubrainSearchEngine />
+  {oracleOutput}
+  </>
+  )}
+  </div>
+  <ArcanaSideDock
+  tabs={sideDockTabs}
+  divinations={divinationsDock}
+  oracle={oracleConsultPanel}
+  kabbalah={kabbalahDock}
+  />
+  </div>
+  ) : (
  <>
  <section className="arcana-hero ambient-depth glass-panel glass-panel-lg text-center">
  <div className="arcana-sigil mx-auto mb-6" aria-hidden="true">
@@ -700,77 +722,95 @@ export function ArcanaPage() {
  </>
  ) : null}
  </div>
- ) : null}
- </section>
+  ) : null}
+  </section>
 
- <MerlianFreeReadings />
- <KabbalahVault />
+  {tarotMode ? (
+  <TarotSpread
+  onBack={() => setTarotMode(false)}
+  onReadingComplete={() => setTarotMode(false)}
+  />
+  ) : (
+  <>
+  <div className="flex justify-center">
+  <button
+  onClick={() => setTarotMode(true)}
+  className="btn-premium inline-flex items-center gap-2"
+  >
+  <Sparkles className="h-4 w-4" />
+  Open Tarot Card Spread
+  </button>
+  </div>
+  <MerlianFreeReadings />
+  <KabbalahVault />
 
- <section className="glass-panel">
- <div className="flex items-start gap-4">
- <Sparkles className="icon-accent mt-1 h-5 w-5 shrink-0" strokeWidth={1.5} />
- <div className="flex-1">
- <h2 className="heading-premium">Consult the Oracle</h2>
- <p className="body-muted mt-2">
- Example:{" "}
- <em className="text-tertiary">
- &ldquo;I&apos;m about to get married and would like to cast a protection spell on my loved ones
- — what blessing or ward do the traditions recommend for our wedding and family?&rdquo;
- </em>{" "}
- You will receive a personalized natal-chart reading, a tarot spread, then spells matched to you from the corpus. {spellPrice} per unlock · {sourcePrice} source · {planPrice}{" "}
- plan.
- </p>
- <div className="mt-4">
- <MerlianPersonalProfilePanel
- profile={profile}
- expanded={expanded}
- onToggle={() => setExpanded((v) => !v)}
- onChange={saveProfile}
- hasPersonalization={hasPersonalization}
- />
- {!hasPersonalization ? (
- <p className="mt-2 text-xs text-tertiary">
- Add birth date &amp; name for full natal-chart spell matching. Tarot is drawn for every oracle question.
- </p>
- ) : null}
- </div>
- <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-inset)] p-3">
- <input
- type="checkbox"
- className="mt-1"
- checked={acceptedTerms}
- onChange={(e) => setAcceptedTerms(e.target.checked)}
- />
- <span className="text-sm text-secondary">
- {status?.pathAcknowledgment ??
- "I accept that all content is for academic research only and the system bears no responsibility for harm."}
- </span>
- </label>
- <form onSubmit={onConsult} className="mt-6 space-y-4">
- <textarea
- className="arcana-input w-full resize-none p-4 text-sm text-primary placeholder:text-tertiary focus:border-default focus:outline-none focus:ring-1 focus:ring-[#C9A962]/20"
- rows={4}
- placeholder={'e.g. "I\'m about to get married and want to cast a protection spell on my loved ones — what blessing do the traditions recommend for our wedding and family?"'}
- value={query}
- onChange={(e) => setQuery(e.target.value)}
- />
- <button
- type="submit"
- className="btn-premium inline-flex items-center gap-2"
- disabled={consulting || !query.trim() || !acceptedTerms}
- >
- {consulting ? (
- <Loader2 className="h-4 w-4 animate-spin" />
- ) : (
- <Moon className="h-4 w-4" />
- )}
- Seek Guidance
- </button>
- </form>
- {error ? <p className="mt-4 text-sm text-red-400/90">{error}</p> : null}
- </div>
- </div>
- </section>
+  <section className="glass-panel">
+  <div className="flex items-start gap-4">
+  <Sparkles className="icon-accent mt-1 h-5 w-5 shrink-0" strokeWidth={1.5} />
+  <div className="flex-1">
+  <h2 className="heading-premium">Consult the Oracle</h2>
+  <p className="body-muted mt-2">
+  Example:{" "}
+  <em className="text-tertiary">
+  &ldquo;I&apos;m about to get married and would like to cast a protection spell on my loved ones
+  — what blessing or ward do the traditions recommend for our wedding and family?&rdquo;
+  </em>{" "}
+  You will receive a personalized natal-chart reading, a tarot spread, then spells matched to you from the corpus. {spellPrice} per unlock · {sourcePrice} source · {planPrice}{" "}
+  plan.
+  </p>
+  <div className="mt-4">
+  <MerlianPersonalProfilePanel
+  profile={profile}
+  expanded={expanded}
+  onToggle={() => setExpanded((v) => !v)}
+  onChange={saveProfile}
+  hasPersonalization={hasPersonalization}
+  />
+  {!hasPersonalization ? (
+  <p className="mt-2 text-xs text-tertiary">
+  Add birth date &amp; name for full natal-chart spell matching. Tarot is drawn for every oracle question.
+  </p>
+  ) : null}
+  </div>
+  <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-inset)] p-3">
+  <input
+  type="checkbox"
+  className="mt-1"
+  checked={acceptedTerms}
+  onChange={(e) => setAcceptedTerms(e.target.checked)}
+  />
+  <span className="text-sm text-secondary">
+  {status?.pathAcknowledgment ??
+  "I accept that all content is for academic research only and the system bears no responsibility for harm."}
+  </span>
+  </label>
+  <form onSubmit={onConsult} className="mt-6 space-y-4">
+  <textarea
+  className="arcana-input w-full resize-none p-4 text-sm text-primary placeholder:text-tertiary focus:border-default focus:outline-none focus:ring-1 focus:ring-[#C9A962]/20"
+  rows={4}
+  placeholder={'e.g. "I\'m about to get married and want to cast a protection spell on my loved ones — what blessing do the traditions recommend for our wedding and family?"'}
+  value={query}
+  onChange={(e) => setQuery(e.target.value)}
+  />
+  <button
+  type="submit"
+  className="btn-premium inline-flex items-center gap-2"
+  disabled={consulting || !query.trim() || !acceptedTerms}
+  >
+  {consulting ? (
+  <Loader2 className="h-4 w-4 animate-spin" />
+  ) : (
+  <Moon className="h-4 w-4" />
+  )}
+  Seek Guidance
+  </button>
+  </form>
+  {error ? <p className="mt-4 text-sm text-red-400/90">{error}</p> : null}
+  </div>
+  </div>
+  </section>
+  </>
+  )}
 
  {oracleOutput}
  </>

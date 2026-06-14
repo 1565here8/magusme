@@ -1,12 +1,11 @@
 #!/bin/bash
 # MagusMe Deploy Script
-# Run from Git Bash (NOT PowerShell) on Windows
 # Usage: ./deploy.sh
 
 set -e
 
 VPS_IP="178.105.155.211"
-SSH_KEY="C:/Users/torah/.ssh/id_rsa"
+SSH_KEY="$HOME/.ssh/id_rsa"
 SSH_CMD="ssh -i $SSH_KEY root@$VPS_IP"
 SCP_CMD="scp -i $SSH_KEY"
 
@@ -50,10 +49,35 @@ echo "🔄 Restarting server on VPS..."
 $SSH_CMD "cd /root/magusme && npm install --production && npx tsc --noEmit 2>/dev/null; pm2 restart ecosystem.config.cjs || pm2 start ecosystem.config.cjs"
 echo ""
 
-# 5. Reload Nginx
-echo "🔄 Reloading Nginx..."
-$SSH_CMD "systemctl reload nginx || nginx -s reload"
-echo ""
+# 5. Configure Nginx
+echo "🔄 Configuring Nginx..."
+$SSH_CMD "
+cat > /etc/nginx/sites-available/magusme << 'EOF'
+server {
+    listen 80;
+    server_name magusme.com;
+
+    root /root/magusme/dist;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+
+    location /api {
+        proxy_pass http://localhost:3001;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+EOF
+
+ln -sf /etc/nginx/sites-available/magusme /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+"
+echo "✅ Nginx configured"
 
 echo "✅ Deploy complete!"
 echo "   Frontend: http://$VPS_IP"

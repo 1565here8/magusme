@@ -6,7 +6,7 @@ import { groqConfigured, dagulaiGroqModel } from "./groqChat";
 import { xaiConfigured, dagulaiXaiModel } from "./xaiChat";
 
 export { groqConfigured, xaiConfigured };
-import { ollamaChatComplete } from "../../../api/ollamaChat";
+import { ollamaChatComplete } from "../../api/ollamaChat";
 
 export type DagulaiInferenceLane = "cloud" | "corporate";
 

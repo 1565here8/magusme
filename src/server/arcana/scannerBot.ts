@@ -2,6 +2,10 @@ import { runArcanaIndexer, getArcanaIndexStatus } from "./indexer";
 import { getArcanaDb } from "./arcanaDb";
 import { getOllamaClient } from "./llm/ollamaClient";
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 const SCANNER_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const BOT_USER_AGENT = "MagusMe-Scanner/1.0 (Ollama-powered; magusme.com)";
 
@@ -41,7 +45,7 @@ async function runScanCycle() {
   }
 }
 
-async function enrichEntriesWithAI(
+export async function enrichEntriesWithAI(
   entries: Array<{ id: string; title: string; summary: string; tradition: string }>,
   ollama: ReturnType<typeof getOllamaClient>,
 ): Promise<number> {

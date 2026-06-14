@@ -26,18 +26,19 @@ function MetaBlock(props: { meta: ReadingMeta }) {
  </div>
  );
  }
- if (meta.type === "rune") {
- return (
- <div className="flex flex-wrap gap-3">
- {meta.runes.map((r) => (
- <div key={r.id} className="text-center">
- <div className="text-3xl">{r.glyph}</div>
- <div className="text-xs">{r.name}</div>
- </div>
- ))}
- </div>
- );
- }
+  if (meta.type === "rune") {
+  return (
+  <div className="flex flex-wrap gap-3">
+  {meta.runes.map((r) => (
+  <div key={r.id} className="text-center">
+  <div className="text-3xl">{r.glyph}</div>
+  <div className="text-xs font-medium text-primary">{r.name}</div>
+  <div className="text-[10px] text-tertiary">{r.merkstave ? "Merkstave (reversed)" : "Upright"}</div>
+  </div>
+  ))}
+  </div>
+  );
+  }
  if (meta.type === "numerology") {
  const p = meta.profile;
  return (
