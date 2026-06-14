@@ -1,4 +1,6 @@
 /* ─── Types ─── */
+import { getMeaning } from "./tarotCardData";
+
 export interface SpreadElement {
   glyph: string;
   title: string;
@@ -6,6 +8,8 @@ export interface SpreadElement {
   position: string;
   reversed?: boolean;
   polarity?: number;
+  keywords?: string;
+  symbolism?: string;
 }
 
 export interface ReadingResult {
@@ -762,67 +766,21 @@ const ALL_SPREADS: Record<string, SpreadDef[]> = {
 
 /* ─── Interpretation engine ─── */
 
-function rnd<T>(arr: readonly T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function lower(s: string): string {
-  return s.charAt(0).toLowerCase() + s.slice(1);
-}
-
-function cardRef(el: SpreadElement): string {
-  return el.reversed ? `${el.title} reversed` : el.title;
-}
-
-/* ── System preambles ── */
-function preamble(systemId: string): string {
-  const m: Record<string, string[]> = {
-    tarot: [
-      "The Tarot speaks through the Rider-Waite-Smith tradition. Seventy-eight cards, each one part of a complete symbolic language. Every suit has its own voice, every number its note, every face its presence.",
-      "I read this spread through the lens of the Western esoteric Tarot. The major arcana show archetypal forces. The minor arcana reveal the texture of daily life. The court cards reflect the people we become.",
-    ],
-    lenormand: [
-      "The Petit Lenormand speaks plainly. Thirty-six images, each one a clear statement. There is no mystery hidden in these cards. They show what is, not what might be.",
-      "Lenormand does not deal in archetypes. It answers in the language of daily life. Letters, journeys, meetings, burdens. Direct and unflinching.",
-    ],
-    rune: [
-      "The Elder Futhark has been cast. Twenty-four staves drawn from the well of Urd. Each one carries the voice of the old ones, and they do not soften the truth.",
-      "These runes have been marked and cast. They fall as they will. Each stave is a key to the web of wyrd that surrounds your question.",
-    ],
-  };
-  const def = [
-    "The cards have been drawn and read. What follows is their voice.",
-    "I read these cards as they fall, without forcing them into what we wish to hear. Let them speak.",
-  ];
-  return rnd(m[systemId] ?? def);
+/* ── Card display helper ── */
+function cardBlock(el: SpreadElement): string {
+  const lines: string[] = [];
+  lines.push(`${el.title}${el.reversed ? " (Reversed)" : ""}${el.keywords ? ` \u2014 Keywords: ${el.keywords}` : ""}`);
+  if (el.symbolism) lines.push(`  ${el.symbolism}`);
+  return lines.join("\n");
 }
 
 /* ── Single Card ── */
-function interpretSingle(el: SpreadElement, systemId: string): string {
-  const ref = cardRef(el);
-  const p = preamble(systemId);
-  const body = [
-    `${ref} steps forward. There is weight to this card appearing for you right now.`,
-    `${el.meaning}`,
-    el.reversed
-      ? rnd([
-          `Reversed, this card turns inward. Its gifts are not absent, but they ask you to go deeper to find them. The surface may show resistance, but underneath, the same energy waits to be claimed consciously. Look for where this theme is blocked by fear, by timing, or by a story you have outgrown.`,
-          `When ${ref} appears, its essence is present but its expression is hushed. Something is working below the surface, in the dark where roots grow. Trust that process. Movement is happening even when you cannot see it.`,
-        ])
-      : rnd([
-          `Upright and clear, this card moves through you without obstruction. Its energy is available to you, not just as an idea but as something you can work with, touch, and direct. The real question is whether you will meet it consciously.`,
-          `${ref} stands upright and the current flows freely. What this card describes is not a distant possibility. It is a living presence in your life right now. Act while the current is with you.`,
-        ]),
-    rnd([
-      `Let this card be your focus for now. Think of it less as a prediction and more as a lens. Look through it at whatever is in front of you.`,
-      `Carry this card with you through the day. It holds what you need to remember, not what you need to fear.`,
-    ]),
-  ].join(" ");
-  return `${p} ${body}`;
+function interpretSingle(el: SpreadElement, _systemId: string): string {
+  return [cardBlock(el), "", el.meaning].join("\n");
 }
 
 /* ── Yes/No Spread ── */
-function interpretYesNo(elements: SpreadElement[], systemId: string): { text: string; verdict: { answer: "Yes" | "No" | "Mixed" | "Unclear"; explanation: string } } {
+function interpretYesNo(elements: SpreadElement[], _systemId: string): { text: string; verdict: { answer: "Yes" | "No" | "Mixed" | "Unclear"; explanation: string } } {
   const [situation, challenge, direction] = elements;
   const totalPolarity = elements.reduce((sum, el) => sum + getCardPolarity(el.title, el.reversed ?? false), 0);
 
@@ -833,27 +791,25 @@ function interpretYesNo(elements: SpreadElement[], systemId: string): { text: st
   else answer = "Mixed";
 
   const explanation = totalPolarity >= 1.5
-    ? "The cards lean clearly toward yes. The positive energy outweighs the obstacles. The path is open, though that does not mean it will be easy."
+    ? "The cards lean clearly toward yes. The positive energy outweighs the obstacles."
     : totalPolarity <= -1.5
-    ? "The cards lean toward no. Not as a refusal, but as a redirection. The resistance you feel has meaning. It is telling you something about alignment and timing."
+    ? "The cards lean toward no. The resistance you feel is meaningful and should be taken seriously."
     : Math.abs(totalPolarity) < 0.5
-    ? "The cards are evenly balanced. The answer is not fixed. What tips the scale will be your choices, not external forces. The question itself may need to be reframed."
-    : "The cards show a mixed picture. There is both support and resistance here. The outcome will depend on which energy you feed. Neither yes nor no is sealed yet.";
+    ? "The cards are evenly balanced. The answer is not fixed. Your choices will determine the outcome."
+    : "The cards show a mixed picture. There is both support and resistance. The outcome depends on which energy you feed.";
 
-  const text = [
-    preamble(systemId),
-    "Your question calls for a clear answer, so we read the Yes/No spread. Three cards that reveal the shape of the situation, not just a binary.",
-    `${cardRef(situation)} sits in the current situation. ${situation.meaning} This tells us where you stand, the ground beneath your question.`,
-    `${cardRef(challenge)} crosses this as the challenge. ${challenge.meaning} This is the friction, the factor you cannot ignore.`,
-    `The direction ahead carries ${cardRef(direction)}. ${direction.meaning} This shows the current of events as they want to move.`,
-    `The polarity of these cards together points toward ${answer.toLowerCase()}. ${explanation}`,
-    rnd([
-      `More important than a simple yes or no is what these cards reveal about the nature of your question. The situation is alive and moving. You are part of what decides its shape.`,
-      `Let the verdict guide you, but let the cards beneath it teach you. The yes or no is only the surface. The three positions together tell the real story.`,
-    ]),
-  ].join(" ");
+  const parts: string[] = [];
+  parts.push("Yes / No Spread" + "\n" + "═══════════════" + "\n");
+  parts.push("Current Situation" + "\n" + cardBlock(situation) + "\n" + situation.meaning);
+  parts.push("");
+  parts.push("Challenge or Obstacle" + "\n" + cardBlock(challenge) + "\n" + challenge.meaning);
+  parts.push("");
+  parts.push("Likely Direction" + "\n" + cardBlock(direction) + "\n" + direction.meaning);
+  parts.push("");
+  parts.push(`Verdict: ${answer}`);
+  parts.push(explanation);
 
-  return { text, verdict: { answer, explanation } };
+  return { text: parts.join("\n"), verdict: { answer, explanation } };
 }
 
 /** Determine polarity for yes/no spreads */
@@ -870,105 +826,57 @@ function getCardPolarity(title: string, reversed: boolean): number {
 }
 
 /* ── Line Spread (3+ cards) ── */
-function interpretLine(elements: SpreadElement[], systemId: string): string {
-  const p = preamble(systemId);
-  const parts: string[] = [p];
-
-  elements.forEach((el, i) => {
-    const ref = cardRef(el);
-    const pos = el.position.toLowerCase();
-
-    if (i === 0) {
-      parts.push(`We begin in the ${pos}. ${ref} takes this position. ${el.meaning}.`);
-      parts.push(rnd([
-        `Pay attention to this card. It sets the tone for everything that follows.`,
-        `This first position matters. It is the seed the rest of the spread grows from.`,
-      ]));
-    } else if (i === elements.length - 1) {
-      parts.push(`And the final position, ${pos}, holds ${ref}. ${el.meaning}.`);
-      parts.push(rnd([
-        `This is where the thread arrives. Trace back from here to the first card and you will see the full arc of the story.`,
-        `The path leads here. Not as a fixed destination, but as the direction of travel. This is where the energy wants to go.`,
-      ]));
-    } else {
-      parts.push(`In the ${pos}, ${ref} appears. ${el.meaning}.`);
-      parts.push(rnd([
-        `Notice how this connects to what came before. The thread is still weaving.`,
-        `This card bridges what was and what is forming. It is the middle of the story. Nothing is resolved yet, but the direction is becoming visible.`,
-      ]));
-    }
-  });
-
-  const closing = elements.length <= 3
-    ? rnd([
-        `The arc is clear. From the first card to the last, a thread runs through. Read them not as separate statements but as one story in however many movements. The meaning lives in the movement itself.`,
-        `Trace the line. What begins as one energy becomes another, and then becomes the next. That transformation, from the first card to the last, is the real reading.`,
-      ])
-    : rnd([
-        `Each card adds a layer. The first sets the scene. The middle cards reveal the forces at work. The final card points toward what is emerging. The meaning lives in the space between them.`,
-        `Read as a sequence, these cards form a narrative. Not a random collection, but a coherent movement from one state to another. The middle cards are where the work happens. The last card shows what is being worked toward.`,
-      ]);
-
-  parts.push(closing);
-  return parts.join(" ");
+function interpretLine(elements: SpreadElement[], _systemId: string): string {
+  const parts: string[] = [];
+  const title = elements.length <= 4 ? `${elements.length}-Card Spread` : `${elements.length}-Card Line Spread`;
+  parts.push(title);
+  parts.push("═".repeat(title.length));
+  parts.push("");
+  for (const el of elements) {
+    parts.push(el.position);
+    parts.push(cardBlock(el));
+    parts.push(el.meaning);
+    parts.push("");
+  }
+  return parts.join("\n");
 }
 
 /* ── Horseshoe (7 cards) ── */
-function interpretHorseshoe(elements: SpreadElement[], systemId: string): string {
-  const [past, present, hidden, obstacles, external, advice, outcome] = elements;
-  const p = preamble(systemId);
-
-  const story = [
-    p,
-    "The Horseshoe spread traces a full arc around your question. Seven cards that move from what has been, through what is hidden, toward what is emerging. Let us walk this arc together.",
-    `It opens with ${cardRef(past)} in the past position. ${past.meaning}. This is the ground you walked to reach this moment. Not ancient history, but the recent shape of events that led here.`,
-    rnd([
-      `Let that settle before we move on. The past position holds more than memory, it holds the seed of the present.`,
-      `Feel the weight of that card. It is not just about what happened. It is about what is still moving because of what happened.`,
-    ]),
-    `This has carried into the present, where ${cardRef(present)} holds the stage. ${present.meaning}. Compare this card to the past position. Do they echo each other or contrast? That relationship tells you whether you are continuing a pattern or stepping into new ground.`,
-    `Beneath the surface, ${cardRef(hidden)} moves in the sphere of hidden influences. ${hidden.meaning}. What you cannot see directly still shapes what you can. This card asks you to trust your sense of something beneath the obvious. It is real, even if you cannot prove it.`,
-    `The obstacles before you are marked by ${cardRef(obstacles)}. ${obstacles.meaning}. This card is not here to discourage you. It is here to show you what must be met. Obstacles in the Horseshoe are teachers, not walls.`,
-    `Around you, ${cardRef(external)} shapes the wider field. ${external.meaning}. These are the forces and people that influence your situation from outside your direct control. You do not need to master them, but you must acknowledge them.`,
-    `The advice of these cards comes through ${cardRef(advice)}. ${advice.meaning}. This is the practical key, the actionable wisdom the spread offers. Let this card guide your next steps more than any other.`,
-    `Finally, the outcome taking shape is ${cardRef(outcome)}. ${outcome.meaning}. Read this card in light of the advice position. They are connected. The outcome is not separate from what you do now.`,
-  ];
-
-  const synthesis = rnd([
-    "The Horseshoe traces a complete arc. From the past, through the hidden and the difficult, to the advice that lights the way forward. The outcome is not sealed, it is a tendency, a direction. But the thread is clear and the advice is present. Work with it.",
-    "Read as a full arc, this spread tells a story with real movement. The past and present show where you have been. The hidden and obstacles reveal what is really at work. The external and advice offer navigation. The outcome points toward the shore, but you are the one steering.",
-  ]);
-
-  story.push(synthesis);
-  return story.join(" ");
+function interpretHorseshoe(elements: SpreadElement[], _systemId: string): string {
+  const parts: string[] = [];
+  parts.push("Horseshoe Spread");
+  parts.push("════════════════");
+  parts.push("");
+  const positions = ["Past", "Present", "Hidden Influences", "Obstacles", "External Influences", "Advice", "Outcome"];
+  for (let i = 0; i < elements.length && i < positions.length; i++) {
+    const el = elements[i];
+    parts.push(positions[i]);
+    parts.push(cardBlock(el));
+    parts.push(el.meaning);
+    parts.push("");
+  }
+  return parts.join("\n");
 }
 
 /* ── Celtic Cross (10 cards) ── */
-function interpretCelticCross(elements: SpreadElement[], systemId: string): string {
-  const [situation, challenge, foundation, recentPast, crown, nearFuture, attitude, external, hopes, outcome] = elements;
-  const p = preamble(systemId);
-
-  const parts = [
-    p,
-    "The Celtic Cross is the deepest map the Tarot offers. Ten cards that chart the seen and unseen forces around your question. Let us read them in layers.",
-    `At the heart of the matter sits ${cardRef(situation)}. ${situation.meaning}. This is the core energy. Everything else in the spread orbits this card. Before you read any other position, sit with this one. It names the center.`,
-    `Crossing this is ${cardRef(challenge)}, the energy that stands across your path. ${challenge.meaning}. Do not read this as a simple obstacle. The crossing card often carries the key to the whole spread. It is what must be integrated, not merely overcome.`,
-    `Beneath, as foundation, ${cardRef(foundation)} grounds the situation. ${foundation.meaning}. What lies below supports or undermines everything above it. This card speaks to roots, to what you may take for granted, to the ground that holds you.`,
-    `Behind you, ${cardRef(recentPast)} recedes from the near past. ${recentPast.meaning}. This card shows what has already begun to dissolve or complete itself. Do not cling to it. The movement away from this energy is part of the story.`,
-    `Above, ${cardRef(crown)} points to your conscious aspiration, what you believe you want. ${crown.meaning}. Compare this to the foundation card. Is there alignment or contradiction? The distance between what you stand on and what you reach for is where growth happens.`,
-    `Ahead, ${cardRef(nearFuture)} approaches in the near future. ${nearFuture.meaning}. This is not a fixed event but a tendency, a direction the current energy wants to move. Read it in the context of the past card. The thread from past to future shows the direction of flow.`,
-    `Now we turn to the right pillar of the cross. These four cards speak to how you meet the situation, what surrounds you, what you carry inside, and where it all tends.`,
-    `Your own attitude toward this situation is ${cardRef(attitude)}. ${attitude.meaning}. This card reveals your unconscious stance, not how you think you feel, but how you are actually meeting this moment. It might surprise you.`,
-    `Around you, ${cardRef(external)} represents the broader environment. ${external.meaning}. These are the forces and people that shape the field you move through. You do not control them, but you can respond to them with awareness.`,
-    `In the place of hopes and fears, ${cardRef(hopes)} reveals what your heart truly holds. ${hopes.meaning}. This card often cuts through denial. It shows what you actually want or actually fear, beneath the story you tell yourself about it.`,
-    `The outcome is ${cardRef(outcome)}. This is what is taking shape if the current energies hold their course. ${outcome.meaning}.`,
-    rnd([
-      "The Celtic Cross maps your terrain. Nothing here is set in stone. The cards point in a direction, but you are the one walking. The outcome position reveals what wants to happen, not what must happen.",
-      "Ten cards have spoken. The center cross names the core tension. The vertical staff shows the movement through time. The right pillar fills in the inner and outer landscape. Together they form a complete map of a living situation. Read it as a whole.",
-    ]),
+function interpretCelticCross(elements: SpreadElement[], _systemId: string): string {
+  const parts: string[] = [];
+  parts.push("Celtic Cross Spread");
+  parts.push("═════════════════════");
+  parts.push("");
+  const positions = [
+    "Present Situation", "Challenge", "Foundation", "Recent Past",
+    "Crown / Best Outcome", "Near Future", "Your Attitude",
+    "External Influences", "Hopes & Fears", "Final Outcome",
   ];
-
-  return parts.join(" ");
+  for (let i = 0; i < elements.length && i < positions.length; i++) {
+    const el = elements[i];
+    parts.push(positions[i]);
+    parts.push(cardBlock(el));
+    parts.push(el.meaning);
+    parts.push("");
+  }
+  return parts.join("\n");
 }
 
 /* ── Main dispatch ── */
@@ -1021,13 +929,16 @@ export function getTraditionalReading(
   const drawn = pickN(readings, spread.cardCount);
   const elements: SpreadElement[] = drawn.map((r, i) => {
     const rev = Math.random() > 0.75;
+    const cardInfo = systemId === "tarot" ? getMeaning(r[0], rev) : null;
     return {
       glyph,
       title: r[0],
-      meaning: r[1],
+      meaning: cardInfo ? cardInfo.meaning : r[1],
       position: spread.positions[i] ?? r[2],
       reversed: rev,
       polarity: getCardPolarity(r[0], rev),
+      keywords: cardInfo ? cardInfo.keywords : undefined,
+      symbolism: cardInfo ? cardInfo.symbolism : undefined,
     };
   });
 
@@ -1056,10 +967,15 @@ export function getTraditionalReading(
 export function getTraditionalDeck(systemId: string, deckId?: string): SpreadElement[] {
   const oracle = getResolvedOracle(systemId, deckId);
   if (!oracle) return [];
-  return (oracle.readings ?? []).map(([title, meaning, position]) => ({
-    glyph: oracle.glyph,
-    title,
-    meaning,
-    position,
-  }));
+  return (oracle.readings ?? []).map(([title, meaning, position]) => {
+    const cardInfo = systemId === "tarot" ? getMeaning(title, false) : null;
+    return {
+      glyph: oracle.glyph,
+      title,
+      meaning: cardInfo ? cardInfo.meaning : meaning,
+      position,
+      keywords: cardInfo ? cardInfo.keywords : undefined,
+      symbolism: cardInfo ? cardInfo.symbolism : undefined,
+    };
+  });
 }

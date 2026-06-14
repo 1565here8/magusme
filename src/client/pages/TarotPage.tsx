@@ -386,8 +386,25 @@ function ReadingView({ deckId, deck }: { deckId: string; deck: TarotDeckDef }) {
       {reading.interpretation && (
         <div className="mx-auto max-w-2xl px-5 pb-12">
           <div className="rounded-xl border border-amber-500/10 bg-gradient-to-br from-amber-500/[0.04] to-transparent p-5 sm:p-6">
-            <h3 className="mb-3 text-center text-xs uppercase tracking-[0.2em] text-amber-400/50">Interpretation</h3>
-            <p className="text-center text-sm leading-relaxed text-zinc-300">{reading.interpretation}</p>
+            <h3 className="mb-4 text-center text-xs uppercase tracking-[0.2em] text-amber-400/50">Interpretation</h3>
+            <div className="text-left text-sm leading-relaxed text-zinc-300 space-y-2">
+              {reading.interpretation.split("\n").map((line, j) => {
+                if (line.startsWith("══") || line.startsWith("═══")) {
+                  return <hr key={j} className="border-amber-700/20 my-3" />;
+                }
+                if (line === "") return null;
+                if (line === line.toUpperCase() && line.length > 3 && !line.includes(" ")) {
+                  return null;
+                }
+                const isHeader = !line.includes("Keywords") && !line.includes("Verdict:") &&
+                  (line.endsWith("Spread") || line.match(/^[A-Z][a-z]+ [A-Z][a-z]/) && !line.includes("\u2014"));
+                return (
+                  <p key={j} className={isHeader ? "text-base font-semibold text-amber-300/60 mt-3 mb-1" : "leading-relaxed"}>
+                    {line}
+                  </p>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
@@ -421,6 +438,7 @@ function CardBrowser({ deckId }: { deckId: string }) {
             <div className="flex justify-center"><CardFace el={{...c, glyph: "🃏", reversed: false}} deckId={deckId} size="sm" /></div>
             <div className="mt-1.5 text-[9px] font-semibold leading-tight text-white/80">{c.title}</div>
             <div className="mt-0.5 text-[8px] leading-tight text-zinc-600">{c.position}</div>
+            {c.keywords && <div className="mt-1 text-[6px] leading-tight text-zinc-500">{c.keywords}</div>}
           </div>
         ))}
       </div>
