@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ArrowLeft, Sparkles, Loader2, Scroll, BookOpen, Moon, Sun, Star, Globe, Heart, Wind, Cloud, Flame, Droplets, Eye, Brain, Music, Coffee, Home, Calendar, Users } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Scroll, BookOpen, Moon, Sun, Star, Globe, Heart, Wind, Cloud, Flame, Droplets, Eye, Brain, Music, Coffee, Home, Calendar, Users, X } from "lucide-react";
 import { SeoHead } from "../components/SeoHead";
 import { getSystemById, DIVINATION_SYSTEMS, type DivinationSystemDef } from "../../shared/divinationSystems";
 import { DivinationPanel } from "../components/merlian/DivinationPanel";
@@ -14,6 +14,9 @@ import {
   useMerlianPersonalProfile,
   profileToApiPayload,
 } from "../components/merlian/MerlianPersonalProfilePanel";
+import { ImageUpload } from "../components/ImageUpload";
+import { analyzeFaceReading, analyzePalmReading } from "./uploadEngine";
+import type { ReadingResult } from "./uploadEngine";
 
 const CATEGORY_STYLES: Record<string, { from: string; via: string; icon: React.ReactNode; label: string }> = {
   "Cartomancy": { from: "from-indigo-900/10", via: "via-purple-900/5", icon: <Scroll className="h-3.5 w-3.5" />, label: "Card & Tile" },
@@ -43,6 +46,8 @@ export function GenericDivinationPage({ systemId }: { systemId?: string }) {
   const [method, setMethod] = useState<DivinationMethod | null>(null);
   const [loading, setLoading] = useState(true);
   const [drawing, setDrawing] = useState(false);
+  const [uploadReading, setUploadReading] = useState<ReadingResult | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
   const { profile, saveProfile, expanded, setExpanded, hasPersonalization, updateField } = useMerlianPersonalProfile();
 
   const systemDef = getSystemById(id) ?? DIVINATION_SYSTEMS.find((s) => s.route === `/consult/${id}`) ?? null;
@@ -66,6 +71,35 @@ export function GenericDivinationPage({ systemId }: { systemId?: string }) {
     setDrawing(true);
     setTimeout(() => setDrawing(false), 800);
   }, []);
+
+  const isPhotoSystem = id === "palm" || id === "face";
+
+  const handleUploadAnalyze = useCallback(async (files: File[]) => {
+    setAnalyzing(true);
+    try {
+      const loadImage = (file: File): Promise<HTMLImageElement> =>
+        new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = URL.createObjectURL(file);
+        });
+      const imgs = await Promise.all(files.map(loadImage));
+      const result = id === "face"
+        ? await analyzeFaceReading(imgs[0], imgs[1], imgs[2])
+        : await analyzePalmReading(imgs[0], imgs[1]);
+      setUploadReading(result);
+    } catch {
+      setUploadReading({
+        systemName: systemDef?.label ?? id,
+        method: "Analysis",
+        elements: [],
+        interpretation: "Could not analyze the uploaded image. Try again with a clearer photo.",
+      });
+    } finally {
+      setAnalyzing(false);
+    }
+  }, [id]);
 
   if (loading) {
     return (
@@ -135,7 +169,56 @@ export function GenericDivinationPage({ systemId }: { systemId?: string }) {
           </div>
         )}
 
-        {method ? (
+        {isPhotoSystem ? (
+          <div className="mt-8">
+            {uploadReading ? (
+              <div className="space-y-6">
+                {/* Reading result */}
+                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-xs text-purple-300">
+                    {uploadReading.method}
+                  </div>
+                  <h3 className="mb-4 font-serif text-2xl font-bold text-white">{uploadReading.systemName}</h3>
+                  <div className={`grid gap-3 mb-4 ${uploadReading.elements.length === 1 ? "grid-cols-1 max-w-sm" : uploadReading.elements.length === 2 ? "grid-cols-1 sm:grid-cols-2 max-w-md" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+                    {uploadReading.elements.map((el, i) => (
+                      <div key={i} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center hover:border-purple-500/25 transition-all duration-500"
+                        style={{ animationDelay: `${i * 80}ms`, animationFillMode: "backwards" }}
+                      >
+                        <span className="text-[10px] uppercase tracking-widest text-purple-400/50 font-semibold">{el.position}</span>
+                        <div className="text-4xl my-3 hover:scale-110 transition-transform duration-300">{el.glyph}</div>
+                        <h4 className="text-sm font-bold text-white mb-1">{el.title}</h4>
+                        <p className="text-xs text-zinc-400 leading-relaxed">{el.meaning}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {uploadReading.interpretation && (
+                    <div className="relative rounded-xl border border-purple-500/10 bg-gradient-to-br from-purple-500/5 to-transparent p-5 mb-4 overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+                      <p className="text-sm text-zinc-300 leading-relaxed text-center italic">{uploadReading.interpretation}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="text-center">
+                  <button
+                    onClick={() => setUploadReading(null)}
+                    className="inline-flex items-center gap-2 rounded-xl bg-white/[0.05] px-6 py-3 text-sm text-zinc-400 transition hover:bg-white/[0.08] hover:text-zinc-200"
+                  >
+                    Upload New Photo
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="max-w-lg mx-auto">
+                <ImageUpload
+                  mode={id === "face" ? "face" : "palm"}
+                  onCancel={() => window.history.back()}
+                  onAnalyze={handleUploadAnalyze}
+                  analyzing={analyzing}
+                />
+              </div>
+            )}
+          </div>
+        ) : method ? (
           <div className="mt-8">
             {/* Animated draw button */}
             <div className="mb-6 text-center">
