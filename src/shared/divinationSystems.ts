@@ -17,7 +17,8 @@ export type DivinationSystemMode =
   | "astro_natal"
   | "astro_deep"
   | "manifestation_llm"
-  | "kabbalah";
+  | "kabbalah"
+  | "card-draw";
 
 export interface DivinationSystemDef {
   id: string;
@@ -51,10 +52,10 @@ export const DIVINATION_SYSTEMS: DivinationSystemDef[] = [
     icon: "Sparkles",
     route: "/consult/lenormand",
     category: "Cartomancy",
-    mode: "generic_llm",
-    description: "36-card petit jeu — blunt practical answers to any question",
+    mode: "card-draw",
+    description: "36-card Petit Lenormand — Grand Tableau, card pairs, full authentic meanings based on European tradition",
     tradition: "French cartomancy",
-    generic: true,
+    generic: false,
   },
   {
     id: "playing_cards",

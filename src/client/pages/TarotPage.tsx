@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, Book, Wand2 } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, Book, Wand2, History } from "lucide-react";
 import { SeoHead } from "../components/SeoHead";
 import {
   getTraditionalReading,
@@ -9,6 +9,7 @@ import {
   TAROT_DECKS,
 } from "./traditionalReadings";
 import type { ReadingResult, SpreadElement, TarotDeckDef } from "./traditionalReadings";
+import { TAROT_ORIGINS } from "./tarotHistory";
 
 /* ─── Per-deck color system ─── */
 
@@ -446,6 +447,37 @@ function CardBrowser({ deckId }: { deckId: string }) {
   );
 }
 
+/* ─── History Section (at bottom) ─── */
+function HistorySection() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-white/[0.04] bg-white/[0.015] overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-5 py-3 text-left transition hover:bg-white/[0.01]"
+      >
+        <div className="flex items-center gap-2">
+          <History className="h-3.5 w-3.5 text-amber-400/60" />
+          <span className="text-xs font-semibold text-white/70">History of the Tarot</span>
+        </div>
+        {open ? <ChevronUp className="h-3 w-3 text-zinc-600" /> : <ChevronDown className="h-3 w-3 text-zinc-600" />}
+      </button>
+      {open && (
+        <div className="px-5 pb-5 space-y-4 text-[10px] leading-relaxed text-zinc-500">
+          {TAROT_ORIGINS.map((section, i) => (
+            <div key={i}>
+              <h4 className={`font-bold text-white/60 mb-1 ${section.title.startsWith("Interesting") ? "mt-2" : ""}`}>{section.title}</h4>
+              {section.paragraphs.map((p, j) => (
+                <p key={j} className={j > 0 ? "mt-2" : ""}>{p}</p>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── Main Page ─── */
 
 export function TarotPage() {
@@ -511,6 +543,11 @@ export function TarotPage() {
       {view === "gallery" && <DeckGallery decks={TAROT_DECKS} onSelect={handleSelect} />}
       {view === "read" && selectedDeck && <ReadingView deckId={selectedDeck.id} deck={selectedDeck} />}
       {view === "browse" && selectedDeckId && <CardBrowser deckId={selectedDeckId} />}
+
+      {/* History & Sources */}
+      <div className="mx-auto max-w-3xl px-5 pb-16 pt-8">
+        <HistorySection />
+      </div>
     </div>
   );
 }
