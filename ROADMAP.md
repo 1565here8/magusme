@@ -8,7 +8,7 @@
 
 | Tier | Count | Status |
 |------|-------|--------|
-| ✅ **Complete** (full data + custom page) | 4 | Tarot, Runes, I Ching, Lenormand |
+| ✅ **Complete** (full data + custom page) | 5 | Tarot, Runes, I Ching, Lenormand, Playing Cards |
 | 🟡 **Generic** (uses GenericDivinationPage, LLM-driven) | 75 | Needs authentic data |
 | 🔲 **Not started** (no route exists) | 3 | All generic systems have routes |
 | **Total** | **81** | |
@@ -340,7 +340,7 @@ Research Pythagorean and Chaldean numerology. I need all 9 numbers (1-9) plus ma
 [████████████████░░] Runes        24/24  ✅
 [████████████████░░] I Ching      64/64  ✅
 [████████████████░░] Lenormand    36/36  ✅ 🏆
-[░░░░░░░░░░░░░░░░░░] Playing Cards 0/52  🔲
+[████████████████░░] Playing Cards 52/52  🏆
 [░░░░░░░░░░░░░░░░░░] Oracle        0/44  🔲
 [░░░░░░░░░░░░░░░░░░] Kipper        0/36  🔲
 [░░░░░░░░░░░░░░░░░░] Ogham         0/25  🔲
@@ -586,5 +586,5 @@ export interface HistorySection {
 
 ---
 
-*Last updated: 2026-06-14*
-*Next: 🔴 Coffee Cup Reading (Turkish Kahve Falı) — 100+ symbols with photo upload*
+*Last updated: 2026-06-15*
+*Next: 🂡 Playing Cards (52-Card Cartomancy) — traditional English cartomancy with spreads*

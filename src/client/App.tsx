@@ -23,6 +23,7 @@ import { GENERIC_SYSTEMS, SPECIALIZED_SYSTEMS } from "../shared/divinationSystem
 import { GenericDivinationPage } from "./pages/GenericDivinationPage";
 import { IChingPage } from "./pages/IChingPage";
 import { LenormandPage } from "./pages/LenormandPage";
+import { PlayingCardsPage } from "./pages/PlayingCardsPage";
 import AstroWatchPage from "./pages/AstroWatchPage";
 import { TarotPage } from "./pages/TarotPage";
 
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="/consult/lenormand" element={<LenormandPage />} />
             <Route path="/consult/astrology" element={<AstrologyConsultPage />} />
             <Route path="/consult/iching" element={<IChingPage />} />
+            <Route path="/consult/playing-cards" element={<PlayingCardsPage />} />
             <Route path="/consult/astro-watch" element={<AstroWatchPage />} />
 
             {/* Generic divination routes — auto-generated from registry */}
