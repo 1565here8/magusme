@@ -177,13 +177,13 @@ export class SpellsDb {
 
     if (existing) {
       await this.driver.exec(
-        `UPDATE spells SET tradition_id=?, source_id=?, category_id=?, rating=?, review_count=?, difficulty=?, difficulty_level=?, danger=?, danger_level=?, element=?, timing=?, counter_spell=?, warning=?, summary=?, tags=?, reference_link=?, verified=?, verification_status=?, verification_source=?, verified_by=?, verified_at=?, updated_at=? WHERE slug=?`,
+        `UPDATE spells SET tradition_id=?, source_id=?, category_id=?, rating=?, review_count=?, difficulty=?, difficulty_level=?, danger=?, danger_level=?, element=?, timing=?, counter_spell=?, warning=?, summary=?, tags=?, full_text=?, reference_link=?, verified=?, verification_status=?, verification_source=?, verified_by=?, verified_at=?, updated_at=? WHERE slug=?`,
         [
           spell.traditionId, spell.sourceId, spell.categoryId,
           spell.rating, spell.reviewCount, spell.difficulty, spell.difficultyLevel,
           spell.danger, spell.dangerLevel, spell.element, spell.timing,
           spell.counterSpell, spell.warning, spell.summary,
-          spell.tags.join(","), spell.referenceLink ?? null,
+          spell.tags.join(","), spell.fullText ?? null, spell.referenceLink ?? null,
           isVerified ? 1 : 0, verificationStatus, verificationSource, verifiedBy, verifiedAt,
           now, slug,
         ],

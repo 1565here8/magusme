@@ -1,6 +1,6 @@
 import { getSpellsDb } from "./spellsDb";
 import { generateAllSpells } from "./generatedSpells";
-import { generateRichContent } from "./richContent";
+import { generateRichContent, RichContent } from "./richContent";
 
 const HAND_WRITTEN_TRADITIONS = ["Wiccan", "Hoodoo", "Ceremonial", "Chaos", "Tantra", "Kabbalah", "Taoist", "Buddhist", "Norse", "Egyptian", "Greek", "Mediterranean", "African", "Celtic", "Modern"];
 
@@ -65,6 +65,34 @@ const HAND_WRITTEN_SPELLS: SpellSeed[] = [
   { title: "Ocean Release", tradition: "Greek", source: "Traditional (Community Verified)", category: "Letting Go", rating: 4.4, reviewCount: 78, difficulty: "Easy", difficultyLevel: 2, danger: "None", dangerLevel: 0, element: "Water", timing: "Sunset, Waning moon", counterSpell: "N/A", summary: "Write your grief or attachment on a shell or stone and cast it into the ocean.", warning: "Only natural materials. Respect the ocean.", tags: ["Nature-based", "Greek", "Symbolic"], referenceLink: "https://magusme.com/references/traditional/ocean-release" },
 ];
 
+const HAND_WRITTEN_RICH_CONTENT: Record<string, RichContent> = {
+  "lesser-banishing-ritual-of-the-pentagram": {
+    purpose: "The Lesser Banishing Ritual of the Pentagram (LBRP) is the foundational ritual of the Hermetic Order of the Golden Dawn and Western ceremonial magic. It cleanses the aura, banishes unwanted or hostile energies, establishes a consecrated sacred space aligned with the divine names, and strengthens the practitioner's connection to the divine light. Daily practice builds the magician's will, visualization, and sensitivity to subtle energies.",
+    materials: [
+      "No physical tools required — the ritual is performed through visualization and finger-tracing, though a ritual dagger (athame) may be used",
+      "A quiet, undisturbed space large enough to turn in each direction",
+      "Optional: black or white candle for focus",
+    ],
+    steps: [
+      "1. STAND FACING EAST. Ground yourself with three deep breaths. Visualize roots extending from your feet into the earth.",
+      "2. THE KABBALISTIC CROSS. Touch your forehead and vibrate: ATEH (Thou art). Touch your chest and vibrate: MALKUTH (the Kingdom). Touch your right shoulder and vibrate: VE-GEBURAH (and the Power). Touch your left shoulder and vibrate: VE-GEDULAH (and the Glory). Clasp your hands on your chest and vibrate: LE-OLAHM, AMEN (forever, Amen). Visualize a cross of white light forming on your body.",
+      "3. TRACE THE BANISHING PENTAGRAM OF EARTH. Using your right hand (or dagger) extended, trace the pentagram in the air before you. The Banishing Pentagram of Earth is drawn as follows: start at the lower left point, draw upward to the top point (apex), draw diagonally down to the lower right point, draw upward to the upper left point, draw horizontally across to the upper right point, and return diagonally down to the starting lower left point to close. Trace a circle around the pentagram with the same hand to seal it.",
+      "4. EAST — Facing East, trace the pentagram and circle. Vibrate the divine name: YHVH (Yod-Heh-Vav-Heh).",
+      "5. SOUTH — Turn to face South. Trace the same pentagram and circle. Vibrate: ADNI (Adonai).",
+      "6. WEST — Turn to face West. Trace the same pentagram and circle. Vibrate: EHYEH (Eheieh).",
+      "7. NORTH — Turn to face North. Trace the same pentagram and circle. Vibrate: AGLA (pronounced Ah-Gah-Lah).",
+      "8. ARCHANGEL INVOCATION — Return to facing East. Extend your arms in a cross position (like the god-form of Harpocrates). Vibrate with authority: BEFORE ME, RAPHAEL (archangel of Air, East). BEHIND ME, MICHAEL (archangel of Fire, South). ON MY RIGHT HAND, GABRIEL (archangel of Water, West). ON MY LEFT HAND, URIAEL (archangel of Earth, North). FOR ABOUT ME FLAMES THE PENTAGRAM, AND IN THE COLUMN SHINES THE SIX-RAYED STAR.",
+      "9. REPEAT THE KABBALISTIC CROSS exactly as in step 2, closing the ritual. Stand in silence for a moment, feeling the protected space you have created.",
+    ],
+    variations: [
+      "GOLDEN DAWN INVOKING VERSION: To invoke rather than banish, trace the pentagram starting from the top point, drawing down to the lower left, then up to the upper right, across to the upper left, down to the lower right, and back up to the top. This draws energy in rather than pushing it out.",
+      "THELEMIC / CROWLEY VERSION (STAR RUBY): Aleister Crowley adapted the LBRP into the Star Ruby, replacing Hebrew divine names with Thelemic equivalents (Hadit, Nuit, Ra-Hoor-Khuit) and altering the pentagram orientation for the Aeon of Horus.",
+      "WICCAN ADAPTATION: Some Wiccan traditions replace the Hebrew divine names and archangels with Goddess/God invocations and elemental watchtowers while maintaining the pentagram structure.",
+      "ELEMENTAL PENTAGRAMS: Advanced practitioners may substitute specific elemental pentagrams (Earth, Air, Water, Fire, Spirit) by changing the starting point and direction of the tracing. Each element has both invoking and banishing forms.",
+    ],
+  },
+};
+
 function getAllTraditions(handWritten: SpellSeed[], generated: SpellSeed[]): string[] {
   const set = new Set<string>();
   for (const s of HAND_WRITTEN_TRADITIONS) set.add(s);
@@ -120,7 +148,9 @@ export async function seedSpellData() {
       catIds[spell.category] = await db.upsertCategory(spell.category);
     }
 
-    const rc = generateRichContent(spell.title, spell.category, spell.element, spell.tradition, spell.difficultyLevel, spell.dangerLevel);
+    const slug = spell.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const handWritten = HAND_WRITTEN_RICH_CONTENT[slug];
+    const rc = handWritten ?? generateRichContent(spell.title, spell.category, spell.element, spell.tradition, spell.difficultyLevel, spell.dangerLevel);
     const fullText = JSON.stringify(rc);
 
     const verificationSource = sourceCitations[spell.source] || spell.referenceLink || `Verified source: ${spell.source}`;
@@ -154,3 +184,16 @@ export async function seedSpellData() {
   const finalCount = await db.count();
   console.log(`[spells] seeded ${seeded} verified spells (${finalCount} total in DB)`);
 }
+
+// Run directly: tsx src/server/spells/seed.ts
+import { initDatabase, getDb } from "../db";
+import { initSpellsDb } from "./spellsDb";
+
+initDatabase().then(() => {
+  const driver = getDb().getDriver();
+  initSpellsDb(driver);
+  return seedSpellData();
+}).catch((err) => {
+  console.error("[spells] seed failed:", err);
+  process.exit(1);
+});

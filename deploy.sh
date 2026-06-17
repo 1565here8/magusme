@@ -5,7 +5,7 @@
 set -e
 
 VPS_IP="178.105.155.211"
-SSH_KEY="$HOME/.ssh/id_rsa"
+SSH_KEY="$HOME/.ssh/magusme-vps"
 SSH_CMD="ssh -i $SSH_KEY root@$VPS_IP"
 SCP_CMD="scp -i $SSH_KEY"
 

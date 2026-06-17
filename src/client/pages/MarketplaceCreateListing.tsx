@@ -84,7 +84,7 @@ export function MarketplaceCreateListing() {
 
   function handleRemoveInclusion(pkgIdx: number, incIdx: number) {
     const next = [...packages];
-    next[pkgIdx] = next[pkgIdx].inclusions.filter((_, i) => i !== incIdx);
+    next[pkgIdx] = { ...next[pkgIdx], inclusions: next[pkgIdx].inclusions.filter((_, i) => i !== incIdx) };
     setPackages(next);
   }
 

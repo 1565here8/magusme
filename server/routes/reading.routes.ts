@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { asyncHandler } from "../middleware/errorHandler";
 import { requireAuth } from "../middleware/auth";
+import fetch from "node-fetch";
 
 const SAMPLE_SITUATIONS = [
   "Feeling stuck in my career, no growth for 2 years",
@@ -152,6 +153,26 @@ function buildReading(situation: string) {
   };
 }
 
+async function fetchDivinationProviders(query: string): Promise<Array<{ userId: string; handle: string; displayName: string; traditions: string[]; kycStatus: string }>> {
+  try {
+    const base = process.env.APP_URL || process.env.VITE_APP_URL || "";
+    const url = new URL(`${base}/api/marketplace/divination-providers`);
+    url.searchParams.set("q", query.slice(0, 100));
+    url.searchParams.set("limit", "6");
+    
+    const res = await fetch(url.toString(), {
+      headers: {
+        "User-Agent": "opencode-agent",
+      },
+    });
+    if (!res.ok) return [];
+    const data = (await res.json()) as { providers: Array<{ userId: string; handle: string; displayName: string; traditions: string[]; kycStatus: string }> };
+    return data.providers;
+  } catch {
+    return [];
+  }
+}
+
 export function registerReadingRoutes(app: Express) {
   app.post(
     "/api/reading/analyze",
@@ -163,7 +184,12 @@ export function registerReadingRoutes(app: Express) {
         return;
       }
       const result = buildReading(situation.trim());
-      res.json({ ok: true, ...result });
+      
+      // Fetch relevant providers based on reading themes
+      const query = `protection ritual, spell casting, ${result.reading[0]?.content.split(" ").filter(w => w.length > 4).slice(0, 3).join(" ")}`;
+      const providers = await fetchDivinationProviders(query);
+      
+      res.json({ ok: true, ...result, providers });
     }),
   );
 }

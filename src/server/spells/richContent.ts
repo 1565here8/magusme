@@ -1,4 +1,4 @@
-interface RichContent {
+export interface RichContent {
   purpose: string;
   materials: string[];
   steps: string[];

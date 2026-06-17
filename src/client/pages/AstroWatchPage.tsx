@@ -1,9 +1,27 @@
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft, Clock, Loader2 } from "lucide-react";
 import { SeoHead } from "../components/SeoHead";
 import { AstroWatch } from "../components/merlian/AstroWatch";
+import { CelestialSphere } from "../components/merlian/CelestialSphere";
+import { fetchAstroNow, type AstroSnapshot } from "../api/merlianReadingsClient";
 
 export default function AstroWatchPage() {
+  const [snapshot, setSnapshot] = useState<AstroSnapshot | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchAstroNow({ lat: 40.7128, lon: -74.006 });
+      setSnapshot(data);
+    } catch {} finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { load(); const t = setInterval(load, 60000); return () => clearInterval(t); }, [load]);
+
   return (
     <div className="min-h-screen">
       <SeoHead title="Astro Watch · Live Sky Dashboard" description="Real-time planetary positions, moon phase, and astrological data for your current location." path="/astro-watch" />
@@ -29,6 +47,23 @@ export default function AstroWatchPage() {
           </Link>
         </div>
       </section>
+
+      {loading && !snapshot ? (
+        <section className="flex justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-sky-400/60" />
+        </section>
+      ) : null}
+
+      {snapshot ? (
+        <section className="mx-auto max-w-6xl px-5 py-8 md:px-8">
+          <div className="mb-8 flex justify-center">
+            <div className="rounded-2xl border border-white/5 bg-black/40 p-4 backdrop-blur-sm">
+              <CelestialSphere snapshot={snapshot} size={440} />
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="mx-auto max-w-6xl px-5 py-8 md:px-8">
         <AstroWatch />
       </section>

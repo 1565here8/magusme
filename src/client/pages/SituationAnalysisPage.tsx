@@ -17,6 +17,7 @@ type ReadingResult = {
   psychology: Array<{ name: string; desc: string; type: string }>;
   actionPlan: Array<{ day: string; action: string; icon: string }>;
   avoid: string;
+  providers?: Array<{ userId: string; handle: string; displayName: string; traditions: string[]; kycStatus: string }>;
 };
 
 const SAMPLE_SITUATIONS = [
@@ -318,6 +319,39 @@ export function SituationAnalysisPage() {
                 </div>
               </>
             ) : null}
+
+          {/* Providers Section */}
+          {result?.providers && result.providers.length > 0 && (
+            <div className="mt-12">
+              <h2 className="mb-6 font-serif text-xl font-bold text-white">Recommended Verified Providers</h2>
+              <p className="mb-4 text-sm text-zinc-500">
+                Based on your reading, here are verified practitioners who specialize in your situation:
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {result.providers.map((p) => (
+                  <div key={p.userId} className="rounded-xl border border-violet-500/20 bg-violet-500/[0.02] p-5 transition hover:border-violet-400/40">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-bold text-white">{p.displayName}</h3>
+                      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-300">Verified</span>
+                    </div>
+                    <p className="text-xs text-zinc-500 mb-2">@{p.handle}</p>
+                    {p.traditions && p.traditions.length > 0 && (
+                      <p className="text-[10px] text-violet-400/60 mb-3">{p.traditions.join(", ")}</p>
+                    )}
+                    <button
+                      onClick={() => navigate(`/marketplace/providers/${p.handle}`)}
+                      className="w-full rounded-lg bg-violet-600 py-2.5 text-xs font-medium text-white transition hover:bg-violet-500"
+                    >
+                      View Profile
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-4 text-xs text-zinc-600">
+                All providers are background-checked, KYC verified, and tradition-authenticated. Consult them directly through their profiles.
+              </p>
+            </div>
+          )}
           </div>
         )}
       </div>

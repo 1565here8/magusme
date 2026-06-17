@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "start": "tsx server/index.ts",
     "typecheck": "tsc --noEmit",
-    "db:seed": "tsx src/server/db/seed.ts",
+    "db:seed": "tsx src/server/spells/seed.ts",
     "ollama:spells": "tsx server/scripts/ollama-nightly-spells.ts",
     "bulk:spells": "tsx server/scripts/bulk-generate-spells.ts"
   },
