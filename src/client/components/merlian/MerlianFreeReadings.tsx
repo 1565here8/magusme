@@ -103,7 +103,7 @@ export function MerlianFreeReadings() {
             Divination Suite
           </h2>
           <p className="body-muted mt-2 max-w-xl">
-            {catalog?.total ?? "130+"} methods — sorted by the magic spectrum from white to black.
+            {catalog?.total ?? "130+"} methods. sorted by the magic spectrum from white to black.
           </p>
         </div>
         <span className="badge-free shrink-0">100% Free</span>
@@ -120,7 +120,7 @@ export function MerlianFreeReadings() {
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,260px)_1fr]">
-        {/* Sidebar — Apple Settings-style navigation */}
+        {/* Sidebar. Apple Settings-style navigation */}
         <aside className="glass-inset flex max-h-[min(70vh,640px)] flex-col overflow-hidden p-0">
           <div className="border-b border-[color:var(--border)] p-3">
             <div className="relative">
@@ -242,7 +242,7 @@ export function MerlianFreeReadings() {
         <BookOpen className="icon-accent mt-0.5 h-4 w-4 shrink-0" />
         <p>
           Magubrain indexes magic and wisdom traditions worldwide.{" "}
-          <strong className="text-[color:var(--text-primary)]">Practical Kabbalah</strong> is in the menu above — more dangerous than most other practices; you must accept the warning before each session.
+          <strong className="text-[color:var(--text-primary)]">Practical Kabbalah</strong> is in the menu above. more dangerous than most other practices; you must accept the warning before each session.
         </p>
       </div>
     </section>

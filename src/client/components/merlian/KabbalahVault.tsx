@@ -60,14 +60,14 @@ export function KabbalahVault() {
  <div>
  <SpectrumBadge meta={KABBALAH_SPECTRUM} className="mb-3" />
  <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--spectrum-item-text)" }}>
- Isolated vault — spectrum tier {KABBALAH_SPECTRUM.index}
+ Isolated vault. spectrum tier {KABBALAH_SPECTRUM.index}
  </p>
  <h2 className="mt-2 text-2xl font-semibold tracking-tight text-primary">
  Practical Kabbalah · Deep Oracle
  </h2>
  <p className="mt-3 text-sm leading-relaxed text-secondary">
  Practical Kabbalah sits in the main readings menu with every other tradition.{" "}
- Magubrain classifies it as <strong className="text-primary">more dangerous than most other practices</strong> — including many dark arts — due to documented psychological and spiritual risks.{" "}
+ Magubrain classifies it as <strong className="text-primary">more dangerous than most other practices</strong>. including many dark arts. due to documented psychological and spiritual risks.{" "}
  <strong className="text-primary">At your own risk.</strong>
  </p>
  </div>
@@ -90,7 +90,7 @@ export function KabbalahVault() {
  />
  <span className="text-sm text-red-100/80">
  {status?.vaultAcknowledgment ??
- "I understand Kabbalistic magic is the MOST DANGEROUS type of magic on AllMagus — separate from all other traditions. I accept full risk."}
+ "I understand Kabbalistic magic is the MOST DANGEROUS type of magic on AllMagus. separate from all other traditions. I accept full risk."}
  </span>
  </label>
  </div>
@@ -105,7 +105,7 @@ export function KabbalahVault() {
  <form onSubmit={onVaultConsult} className="space-y-4">
  <h3 className="text-lg font-semibold text-red-200">Deep Kabbalah Oracle</h3>
  <p className="text-sm text-tertiary">
- Full corpus consultation — {status?.totalEntries ?? 0} Kabbalistic entries indexed.
+ Full corpus consultation. {status?.totalEntries ?? 0} Kabbalistic entries indexed.
  Gematria, Tree of Life, and letter work are also in the <strong className="text-red-200/90">Practical Kabbalah</strong> category above.
  </p>
  <textarea

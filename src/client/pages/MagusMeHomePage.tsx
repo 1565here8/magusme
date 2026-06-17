@@ -5,8 +5,8 @@ import { SeoHead } from "../components/SeoHead";
 
 const TRUST_ITEMS = [
   { icon: CheckCircle2, text: "63 Verified Spells from Primary Sources" },
-  { icon: ScrollText, text: "16 Divination Systems — Tarot, Runes, Astrology & More" },
-  { icon: Shield, text: "No Censorship — All Traditions, White to Black" },
+  { icon: ScrollText, text: "16 Divination Systems. Tarot, Runes, Astrology & More" },
+  { icon: Shield, text: "No Censorship. All Traditions, White to Black" },
   { icon: Sparkles, text: "AI That Believes in Magic, Not a Skeptical Chatbot" },
 ];
 
@@ -15,7 +15,7 @@ const PATHWAYS = [
     to: "/consult",
     icon: Compass,
     title: "Consult the Oracle",
-    desc: "Ask anything. Choose from 16 divination systems — Tarot, Runes, Astrology, I Ching, Pendulum, Scrying & more. Get answers the AI that believes in magic.",
+    desc: "Ask anything. Choose from 16 divination systems. Tarot, Runes, Astrology, I Ching, Pendulum, Scrying & more. Get answers the AI that believes in magic.",
     color: "from-violet-600/20 to-fuchsia-600/10",
     border: "border-violet-500/20 hover:border-violet-500/50",
     cta: "Start Your Reading",
@@ -35,7 +35,7 @@ const PATHWAYS = [
     to: "/create",
     icon: Wand2,
     title: "Practice Manifestation",
-    desc: "Visualization, affirmations, sigil magic, NLP, quantum jumping, chakra work, energy healing — 40+ techniques with step-by-step guides.",
+    desc: "Visualization, affirmations, sigil magic, NLP, quantum jumping, chakra work, energy healing. 40+ techniques with step-by-step guides.",
     color: "from-amber-600/20 to-orange-600/10",
     border: "border-amber-500/20 hover:border-amber-500/50",
     cta: "Begin Creating",
@@ -66,11 +66,11 @@ export function MagusMeHomePage() {
   return (
     <div className="min-h-screen">
       <SeoHead
-        title="MagusMe — The Vault of Everything Occult"
+        title="MagusMe. The Vault of Everything Occult"
         description="The world's largest open occult library. 63+ verified spells, 81 divination systems, AI-powered tarot/runes/astrology readings. No censorship, all traditions welcome."
         path="/"
       />
-      {/* HERO — vault messaging */}
+      {/* HERO. vault messaging */}
       <section className="relative overflow-hidden border-b border-white/5">
         <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-violet-600/5 blur-3xl" />
         <div className="absolute left-1/2 top-20 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-fuchsia-600/3 blur-3xl" />
@@ -88,12 +88,12 @@ export function MagusMeHomePage() {
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-zinc-400 md:text-lg">
-            Everything known about changing your fate — in one place.
+            Everything known about changing your fate. in one place.
             <br />
             Natal Charts · Tarot · Runes · Spells · Manifestation · Kabbalah · All Traditions
           </p>
 
-          {/* SEARCH — primary action */}
+          {/* SEARCH. primary action */}
           <div className="mx-auto mt-8 max-w-xl">
             <div className="relative flex gap-2">
               <div className="relative flex-1">
@@ -157,7 +157,7 @@ export function MagusMeHomePage() {
         </div>
       </section>
 
-      {/* TRUST BADGES — prominent */}
+      {/* TRUST BADGES. prominent */}
       <section className="border-b border-white/5 bg-white/[0.01]">
         <div className="mx-auto max-w-5xl px-5 py-8 md:px-8">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -171,12 +171,12 @@ export function MagusMeHomePage() {
         </div>
       </section>
 
-      {/* 3 PATHWAYS — choose your path */}
+      {/* 3 PATHWAYS. choose your path */}
       <section className="border-b border-white/5">
         <div className="mx-auto max-w-6xl px-5 py-16 md:px-8">
           <div className="mb-10 text-center">
             <h2 className="font-serif text-2xl font-bold text-white">Choose Your Path</h2>
-            <p className="mt-2 text-sm text-zinc-500">Three ways into the vault — pick what calls you</p>
+            <p className="mt-2 text-sm text-zinc-500">Three ways into the vault. pick what calls you</p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {PATHWAYS.map((p) => (
@@ -210,7 +210,7 @@ export function MagusMeHomePage() {
         </div>
       </section>
 
-      {/* SECONDARY FEATURES — Daily Tools */}
+      {/* SECONDARY FEATURES. Daily Tools */}
       <section className="border-b border-white/5">
         <div className="mx-auto max-w-6xl px-5 py-12 md:px-8">
           <div className="grid gap-4 md:grid-cols-2">
@@ -223,7 +223,7 @@ export function MagusMeHomePage() {
               </div>
               <h3 className="font-serif text-lg font-bold text-white">Daily Tools</h3>
               <p className="mt-1 text-sm text-zinc-400">
-                Live planetary hours, moon phases, void-of-course moon, optimal magic timing, daily rituals — know when to act.
+                Live planetary hours, moon phases, void-of-course moon, optimal magic timing, daily rituals. know when to act.
               </p>
               <div className="mt-4 flex items-center gap-2 text-xs text-zinc-500">
                 <span className="rounded-full bg-white/[0.04] px-2.5 py-0.5">Live data</span>
@@ -240,10 +240,10 @@ export function MagusMeHomePage() {
               </div>
               <h3 className="font-serif text-lg font-bold text-white">Situation Analysis</h3>
               <p className="mt-1 text-sm text-zinc-400">
-                Describe what's happening. Get a full cross-system analysis: Tarot, Runes, Astrology, Numerology, Grimoire — with spells and psychological techniques.
+                Describe what's happening. Get a full cross-system analysis: Tarot, Runes, Astrology, Numerology, Grimoire. with spells and psychological techniques.
               </p>
               <div className="mt-4 flex items-center gap-2 text-xs text-zinc-500">
-                <span className="rounded-full bg-violet-500/15 px-2.5 py-0.5 text-violet-300">⭐ New — AI powered</span>
+                <span className="rounded-full bg-violet-500/15 px-2.5 py-0.5 text-violet-300">⭐ New. AI powered</span>
                 <span className="text-fuchsia-400 opacity-0 transition-opacity group-hover:opacity-100">Try it →</span>
               </div>
             </Link>
@@ -251,7 +251,7 @@ export function MagusMeHomePage() {
         </div>
       </section>
 
-      {/* QUICK LINKS — browse by topic */}
+      {/* QUICK LINKS. browse by topic */}
       <section className="border-b border-white/5">
         <div className="mx-auto max-w-6xl px-5 py-12 md:px-8">
           <div className="mb-6 flex items-center justify-between">
@@ -311,7 +311,7 @@ export function MagusMeHomePage() {
             </div>
             <h2 className="font-serif text-xl font-bold text-white">Built by Practitioners, For Practitioners</h2>
             <p className="mt-2 text-sm text-zinc-400">
-              Every spell sourced, every tradition respected, every path honored — from white to black, from Wiccan to Hoodoo to Chaos.
+              Every spell sourced, every tradition respected, every path honored. from white to black, from Wiccan to Hoodoo to Chaos.
               No censorship. No gatekeeping. Just the knowledge.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-6 text-xs text-zinc-600">
@@ -328,7 +328,7 @@ export function MagusMeHomePage() {
       <section className="mx-auto max-w-6xl px-5 py-8 text-center md:px-8">
         <p className="text-xs text-zinc-600">
           ✓ Verified sources from Goetia, Key of Solomon, Eddas, Atharva Veda & more&nbsp;&nbsp;·&nbsp;&nbsp;
-          ✓ No censorship — all traditions equally shown&nbsp;&nbsp;·&nbsp;&nbsp;
+          ✓ No censorship. all traditions equally shown&nbsp;&nbsp;·&nbsp;&nbsp;
           ✓ AI assistant, not skeptical chatbot&nbsp;&nbsp;·&nbsp;&nbsp;
           ✓ Counter-spell linked: every curse comes with removal
         </p>

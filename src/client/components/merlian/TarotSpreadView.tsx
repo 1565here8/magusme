@@ -404,7 +404,7 @@ export function TarotSpread({ onBack, onReadingComplete }: TarotSpreadProps) {
                 <Sparkles className="h-4 w-4 text-amber-400/70 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-xs text-zinc-400">
-                    Currently using <strong className="text-amber-300">{deck.name}</strong> —{" "}
+                    Currently using <strong className="text-amber-300">{deck.name}</strong> . {" "}
                     <span className="text-zinc-500">{deck.tradition}</span>
                   </p>
                   <p className="text-[10px] text-zinc-600 mt-0.5">{deck.description}</p>
@@ -488,7 +488,7 @@ export function TarotSpread({ onBack, onReadingComplete }: TarotSpreadProps) {
                           : "bg-zinc-800/50 text-zinc-500"
                       }`}
                     >
-                      {phase === "read" ? selectedSpread.positions[i] : "—"}
+                      {phase === "read" ? selectedSpread.positions[i] : ". "}
                     </span>
                   </div>
                 </div>

@@ -34,7 +34,7 @@ const METHODS = [
     items: [
       { name: "Meditation & Visualization", desc: "Deep practice from all traditions.", rating: 4.8, users: 1456, popular: true },
       { name: "Chakra Alignment", desc: "Balance your 7 energy centers.", rating: 4.7, users: 834 },
-      { name: "Energy Cultivation", desc: "Kundalini, Qi, Prana — raise your vibration.", rating: 4.6, users: 356 },
+      { name: "Energy Cultivation", desc: "Kundalini, Qi, Prana. raise your vibration.", rating: 4.6, users: 356 },
       { name: "Breathwork", desc: "Pranayama and specific breathing patterns for manifestation.", rating: 4.7, users: 523 },
       { name: "Sound & Frequency", desc: "Healing through vibration and sound.", rating: 4.5, users: 234 },
       { name: "Aura Cleansing", desc: "Clear and elevate your auric field.", rating: 4.6, users: 445 },
@@ -76,7 +76,7 @@ export function CreatePage() {
             40+ Manifestation & Reality-Bending Techniques
           </div>
           <h1 className="font-serif text-3xl font-bold text-white md:text-4xl">
-            Create — What Do You Want to Manifest?
+            Create. What Do You Want to Manifest?
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
             Mental, magical, energetic, and esoteric methods from every tradition. All tools, no limits.

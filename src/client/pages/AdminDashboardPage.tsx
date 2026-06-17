@@ -31,7 +31,7 @@ export function AdminDashboardPage() {
         <div className="label-premium">Operations</div>
         <h1 className="heading-premium mt-3">Admin Dashboard</h1>
         <p className="body-muted mt-4 max-w-2xl">
-          Real in-memory counters from this process — users, jobs, token transactions, HTTP status
+          Real in-memory counters from this process. users, jobs, token transactions, HTTP status
           buckets. No fake node telemetry.
         </p>
       </div>

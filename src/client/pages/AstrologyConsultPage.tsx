@@ -14,7 +14,7 @@ export default function AstrologyConsultPage() {
         </div>
         <h1 className="font-serif text-3xl font-bold text-white">Astrology</h1>
         <p className="mx-auto mt-3 max-w-2xl text-sm text-zinc-400">
-          Western, Vedic, Chinese BaZi — live sky, natal charts, transits, and deep cosmic profiles.
+          Western, Vedic, Chinese BaZi. live sky, natal charts, transits, and deep cosmic profiles.
         </p>
       </section>
 

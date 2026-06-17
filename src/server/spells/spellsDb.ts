@@ -34,9 +34,13 @@ export class SpellsDb {
     return { sql, params };
   }
 
+  private verifiedWhere(): string {
+    return "s.verification_status = 'verified'";
+  }
+
   async getSpells(params: SpellSearchParams): Promise<{ spells: SpellListItem[]; total: number }> {
     type SpellRow = Omit<SpellListItem, 'tags'> & { tags: string };
-    const conditions: string[] = ["s.verified = 1"];
+    const conditions: string[] = [this.verifiedWhere()];
     const values: unknown[] = [];
 
     if (params.query) {
@@ -72,7 +76,7 @@ export class SpellsDb {
     const { sql: countSqlFinal, params: countParams } = this.pg(countSql, values);
     const { total } = (await this.driver.get<{ total: number }>(countSqlFinal, countParams)) ?? { total: 0 };
 
-    const querySql = `SELECT s.id, s.title, s.slug, st.name AS tradition, sc.name AS category, s.rating, s.review_count, s.difficulty, s.danger, s.element, s.timing, s.counter_spell, s.warning, ss.title AS source, s.tags, s.summary, s.reference_link FROM spells s LEFT JOIN spell_traditions st ON s.tradition_id = st.id LEFT JOIN spell_categories sc ON s.category_id = sc.id LEFT JOIN spell_sources ss ON s.source_id = ss.id ${where} ORDER BY ${orderBy} LIMIT ? OFFSET ?`;
+    const querySql = `SELECT s.id, s.title, s.slug, st.name AS tradition, sc.name AS category, s.rating, s.review_count, s.difficulty, s.danger, s.element, s.timing, s.counter_spell, s.warning, ss.title AS source, s.tags, s.summary, s.reference_link, s.verified, s.verification_status, s.verification_source FROM spells s LEFT JOIN spell_traditions st ON s.tradition_id = st.id LEFT JOIN spell_categories sc ON s.category_id = sc.id LEFT JOIN spell_sources ss ON s.source_id = ss.id ${where} ORDER BY ${orderBy} LIMIT ? OFFSET ?`;
     const { sql: querySqlFinal, params: queryParams } = this.pg(querySql, [...values, limit, offset]);
     const rows = await this.driver.all<SpellRow>(querySqlFinal, queryParams);
 
@@ -84,7 +88,7 @@ export class SpellsDb {
 
   async getSpellBySlug(slug: string): Promise<(SpellListItem & { difficulty_level: number; danger_level: number; full_text: string | null }) | undefined> {
     const { sql, params } = this.pg(
-      `SELECT s.id, s.title, s.slug, st.name AS tradition, sc.name AS category, s.rating, s.review_count, s.difficulty, s.danger, s.difficulty_level, s.danger_level, s.element, s.timing, s.counter_spell, s.warning, ss.title AS source, s.tags, s.summary, s.full_text, s.reference_link FROM spells s LEFT JOIN spell_traditions st ON s.tradition_id = st.id LEFT JOIN spell_categories sc ON s.category_id = sc.id LEFT JOIN spell_sources ss ON s.source_id = ss.id WHERE s.slug = ? AND s.verified = 1`,
+      `SELECT s.id, s.title, s.slug, st.name AS tradition, sc.name AS category, s.rating, s.review_count, s.difficulty, s.danger, s.difficulty_level, s.danger_level, s.element, s.timing, s.counter_spell, s.warning, ss.title AS source, s.tags, s.summary, s.full_text, s.reference_link, s.verified, s.verification_status, s.verification_source, s.verified_by, s.verified_at FROM spells s LEFT JOIN spell_traditions st ON s.tradition_id = st.id LEFT JOIN spell_categories sc ON s.category_id = sc.id LEFT JOIN spell_sources ss ON s.source_id = ss.id WHERE s.slug = ? AND ${this.verifiedWhere()}`,
       [slug],
     );
     const row = await this.driver.get<Omit<SpellListItem, "tags"> & { tags: string; difficulty_level: number; danger_level: number; full_text: string | null }>(sql, params);
@@ -98,7 +102,7 @@ export class SpellsDb {
 
   async getCategoriesWithCounts(): Promise<(SpellCategoryRow & { count: number })[]> {
     return this.driver.all<(SpellCategoryRow & { count: number })>(
-      `SELECT sc.*, COUNT(s.id) AS count FROM spell_categories sc LEFT JOIN spells s ON s.category_id = sc.id AND s.verified = 1 GROUP BY sc.id ORDER BY sc.sort_order ASC`,
+      `SELECT sc.*, COUNT(s.id) AS count FROM spell_categories sc LEFT JOIN spells s ON s.category_id = sc.id AND ${this.verifiedWhere()} GROUP BY sc.id ORDER BY sc.sort_order ASC`,
     );
   }
 
@@ -158,26 +162,30 @@ export class SpellsDb {
     fullText?: string | null;
     referenceLink?: string | null;
     verified?: boolean;
+    verificationStatus?: 'pending' | 'verified' | 'rejected';
+    verificationSource?: string | null;
   }): Promise<string> {
     const slug = slugify(spell.title);
     const existing = await this.driver.get<SpellRow>("SELECT id FROM spells WHERE slug = ?", [slug]);
     const now = isoNow();
 
-    // HARD RULE: Only verified spells can enter the site
     const isVerified = spell.verified === true;
-    if (!isVerified) {
-      throw new Error(`Spell "${spell.title}" rejected: Only verified content can be added to magusme.com`);
-    }
+    const verificationStatus = spell.verificationStatus ?? (isVerified ? 'verified' : 'pending');
+    const verificationSource = spell.verificationSource ?? null;
+    const verifiedBy = isVerified ? 'system' : null;
+    const verifiedAt = isVerified ? now : null;
 
     if (existing) {
       await this.driver.exec(
-        `UPDATE spells SET tradition_id=?, source_id=?, category_id=?, rating=?, review_count=?, difficulty=?, difficulty_level=?, danger=?, danger_level=?, element=?, timing=?, counter_spell=?, warning=?, summary=?, tags=?, reference_link=?, verified=?, updated_at=? WHERE slug=?`,
+        `UPDATE spells SET tradition_id=?, source_id=?, category_id=?, rating=?, review_count=?, difficulty=?, difficulty_level=?, danger=?, danger_level=?, element=?, timing=?, counter_spell=?, warning=?, summary=?, tags=?, reference_link=?, verified=?, verification_status=?, verification_source=?, verified_by=?, verified_at=?, updated_at=? WHERE slug=?`,
         [
           spell.traditionId, spell.sourceId, spell.categoryId,
           spell.rating, spell.reviewCount, spell.difficulty, spell.difficultyLevel,
           spell.danger, spell.dangerLevel, spell.element, spell.timing,
           spell.counterSpell, spell.warning, spell.summary,
-          spell.tags.join(","), spell.referenceLink ?? null, isVerified ? 1 : 0, now, slug,
+          spell.tags.join(","), spell.referenceLink ?? null,
+          isVerified ? 1 : 0, verificationStatus, verificationSource, verifiedBy, verifiedAt,
+          now, slug,
         ],
       );
       return existing.id;
@@ -185,20 +193,22 @@ export class SpellsDb {
 
     const id = makeId("sp");
     await this.driver.exec(
-      `INSERT INTO spells (id, title, slug, tradition_id, source_id, category_id, rating, review_count, difficulty, difficulty_level, danger, danger_level, element, timing, counter_spell, warning, summary, tags, full_text, reference_link, verified, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO spells (id, title, slug, tradition_id, source_id, category_id, rating, review_count, difficulty, difficulty_level, danger, danger_level, element, timing, counter_spell, warning, summary, tags, full_text, reference_link, verified, verification_status, verification_source, verified_by, verified_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id, spell.title, slug, spell.traditionId, spell.sourceId, spell.categoryId,
         spell.rating, spell.reviewCount, spell.difficulty, spell.difficultyLevel,
         spell.danger, spell.dangerLevel, spell.element, spell.timing,
         spell.counterSpell, spell.warning, spell.summary,
-        spell.tags.join(","), spell.fullText ?? null, spell.referenceLink ?? null, isVerified ? 1 : 0, now, now,
+        spell.tags.join(","), spell.fullText ?? null, spell.referenceLink ?? null,
+        isVerified ? 1 : 0, verificationStatus, verificationSource, verifiedBy, verifiedAt,
+        now, now,
       ],
     );
     return id;
   }
 
   async getRandomSpell(params: { element?: string; category?: string }): Promise<SpellListItem | undefined> {
-    const conditions: string[] = ["s.verified = 1"];
+    const conditions: string[] = [this.verifiedWhere()];
     const values: unknown[] = [];
 
     if (params.element && params.element !== "All") {
@@ -212,7 +222,7 @@ export class SpellsDb {
 
     const where = `WHERE ${conditions.join(" AND ")}`;
     const { sql, params: queryParams } = this.pg(
-      `SELECT s.id, s.title, s.slug, st.name AS tradition, sc.name AS category, s.rating, s.review_count, s.difficulty, s.danger, s.element, s.timing, s.counter_spell, s.warning, ss.title AS source, s.tags, s.summary, s.reference_link FROM spells s LEFT JOIN spell_traditions st ON s.tradition_id = st.id LEFT JOIN spell_categories sc ON s.category_id = sc.id LEFT JOIN spell_sources ss ON s.source_id = ss.id ${where} ORDER BY RANDOM() LIMIT 1`,
+      `SELECT s.id, s.title, s.slug, st.name AS tradition, sc.name AS category, s.rating, s.review_count, s.difficulty, s.danger, s.element, s.timing, s.counter_spell, s.warning, ss.title AS source, s.tags, s.summary, s.reference_link, s.verified, s.verification_status, s.verification_source FROM spells s LEFT JOIN spell_traditions st ON s.tradition_id = st.id LEFT JOIN spell_categories sc ON s.category_id = sc.id LEFT JOIN spell_sources ss ON s.source_id = ss.id ${where} ORDER BY RANDOM() LIMIT 1`,
       values,
     );
     const row = await this.driver.get<Omit<SpellListItem, "tags"> & { tags: string }>(sql, queryParams);
@@ -228,21 +238,21 @@ export class SpellsDb {
   }
 
   async count(): Promise<number> {
-    const row = await this.driver.get<{ count: number }>("SELECT COUNT(*) AS count FROM spells WHERE verified = 1");
+    const row = await this.driver.get<{ count: number }>(`SELECT COUNT(*) AS count FROM spells WHERE ${this.verifiedWhere()}`);
     return row?.count ?? 0;
   }
 
   async getAllSpellSlugs(): Promise<string[]> {
-    const rows = await this.driver.all<{ slug: string }>("SELECT slug FROM spells WHERE verified = 1 ORDER BY slug");
+    const rows = await this.driver.all<{ slug: string }>(`SELECT slug FROM spells WHERE ${this.verifiedWhere()} ORDER BY slug`);
     return rows.map((r) => r.slug);
   }
 
   async getSpellsWithReferences(limit = 100, offset = 0): Promise<{ spells: SpellListItem[]; total: number }> {
-    const where = "WHERE s.reference_link IS NOT NULL AND s.reference_link != '' AND s.verified = 1";
+    const where = `WHERE s.reference_link IS NOT NULL AND s.reference_link != '' AND ${this.verifiedWhere()}`;
     const countResult = await this.driver.get<{ total: number }>(`SELECT COUNT(*) AS total FROM spells s ${where}`);
     const total = countResult?.total ?? 0;
     const rows = await this.driver.all<Omit<SpellListItem, "tags"> & { tags: string }>(
-      `SELECT s.id, s.title, s.slug, st.name AS tradition, sc.name AS category, s.rating, s.review_count, s.difficulty, s.danger, s.element, s.timing, s.counter_spell, s.warning, ss.title AS source, s.tags, s.summary, s.reference_link FROM spells s LEFT JOIN spell_traditions st ON s.tradition_id = st.id LEFT JOIN spell_categories sc ON s.category_id = sc.id LEFT JOIN spell_sources ss ON s.source_id = ss.id ${where} ORDER BY s.title ASC LIMIT ? OFFSET ?`,
+      `SELECT s.id, s.title, s.slug, st.name AS tradition, sc.name AS category, s.rating, s.review_count, s.difficulty, s.danger, s.element, s.timing, s.counter_spell, s.warning, ss.title AS source, s.tags, s.summary, s.reference_link, s.verified, s.verification_status, s.verification_source FROM spells s LEFT JOIN spell_traditions st ON s.tradition_id = st.id LEFT JOIN spell_categories sc ON s.category_id = sc.id LEFT JOIN spell_sources ss ON s.source_id = ss.id ${where} ORDER BY s.title ASC LIMIT ? OFFSET ?`,
       [limit, offset],
     );
     return { spells: rows.map((r) => ({ ...r, tags: r.tags ? r.tags.split(",") : [] })), total };
@@ -284,8 +294,35 @@ export class SpellsDb {
   }
 
   async getSpellIdBySlug(slug: string): Promise<string | undefined> {
-    const row = await this.driver.get<{ id: string }>("SELECT id FROM spells WHERE slug = ? AND verified = 1", [slug]);
+    const row = await this.driver.get<{ id: string }>(`SELECT id FROM spells WHERE slug = ? AND ${this.verifiedWhere()}`, [slug]);
     return row?.id;
+  }
+
+  async getPendingSpells(limit = 100, offset = 0): Promise<{ spells: SpellListItem[]; total: number }> {
+    const where = "WHERE s.verification_status = 'pending'";
+    const countResult = await this.driver.get<{ total: number }>(`SELECT COUNT(*) AS total FROM spells s ${where}`);
+    const total = countResult?.total ?? 0;
+    const rows = await this.driver.all<Omit<SpellListItem, "tags"> & { tags: string; verification_status: string; verification_source: string | null }>(
+      `SELECT s.id, s.title, s.slug, st.name AS tradition, sc.name AS category, s.rating, s.review_count, s.difficulty, s.danger, s.element, s.timing, s.counter_spell, s.warning, ss.title AS source, s.tags, s.summary, s.reference_link, s.verified, s.verification_status, s.verification_source FROM spells s LEFT JOIN spell_traditions st ON s.tradition_id = st.id LEFT JOIN spell_categories sc ON s.category_id = sc.id LEFT JOIN spell_sources ss ON s.source_id = ss.id ${where} ORDER BY s.created_at ASC LIMIT ? OFFSET ?`,
+      [limit, offset],
+    );
+    return { spells: rows.map((r) => ({ ...r, tags: r.tags ? r.tags.split(",") : [] })), total };
+  }
+
+  async verifySpell(slug: string, verifiedBy: string, verificationSource: string): Promise<void> {
+    const now = isoNow();
+    await this.driver.exec(
+      `UPDATE spells SET verified = 1, verification_status = 'verified', verification_source = ?, verified_by = ?, verified_at = ?, updated_at = ? WHERE slug = ?`,
+      [verificationSource, verifiedBy, now, now, slug],
+    );
+  }
+
+  async rejectSpell(slug: string, verifiedBy: string, reason: string): Promise<void> {
+    const now = isoNow();
+    await this.driver.exec(
+      `UPDATE spells SET verified = 0, verification_status = 'rejected', verification_source = ?, verified_by = ?, verified_at = ?, updated_at = ? WHERE slug = ?`,
+      [reason, verifiedBy, now, now, slug],
+    );
   }
 }
 

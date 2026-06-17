@@ -84,7 +84,7 @@ export function SpellBox() {
           </div>
           <div>
             <h3 className="text-lg font-bold text-white">Spell Box</h3>
-            <p className="text-xs text-zinc-500">Random spell puller — filtered by element, intent, and planetary timing</p>
+            <p className="text-xs text-zinc-500">Random spell puller. filtered by element, intent, and planetary timing</p>
           </div>
         </div>
       </div>
@@ -203,7 +203,7 @@ export function SpellBox() {
               <div className="rounded-lg bg-white/[0.03] p-3 text-center">
                 <div className="mb-1 text-xs text-zinc-500">Element</div>
                 <div className="text-sm font-medium text-zinc-300">
-                  {spell.element ? `${elementIcon(spell.element)} ${spell.element}` : "—"}
+                  {spell.element ? `${elementIcon(spell.element)} ${spell.element}` : ". "}
                 </div>
               </div>
               <div className="rounded-lg bg-white/[0.03] p-3 text-center">
@@ -282,7 +282,7 @@ export function SpellBox() {
                   : spell.danger === "Moderate"
                     ? "This spell requires caution. Ensure you have protection before casting."
                     : spell.difficulty === "Medium"
-                      ? "Intermediate spell — recommended for those with some practice."
+                      ? "Intermediate spell. recommended for those with some practice."
                       : "Review the full instructions and have all materials ready before starting."}
               </div>
             </div>

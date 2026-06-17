@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { clsx } from "clsx";
-import { Sparkles, BookOpen, Wand2, Clock, Menu, User, BookMarked, LayoutDashboard } from "lucide-react";
+import { Sparkles, BookOpen, Wand2, Clock, Menu, User, BookMarked, LayoutDashboard, Store } from "lucide-react";
 import { LoginModal } from "./LoginModal";
 
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Sparkles, exact: true },
   { path: "/consult", label: "Consult", icon: Sparkles },
   { path: "/learn", label: "Learn", icon: BookOpen },
+  { path: "/marketplace", label: "Shop", icon: Store },
   { path: "/create", label: "Create", icon: Wand2 },
   { path: "/tools", label: "Tools", icon: Clock },
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },

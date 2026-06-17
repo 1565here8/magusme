@@ -18,7 +18,7 @@ export function ReferencesPage() {
 
   return (
     <div className="min-h-screen">
-      <SeoHead title="External References · Source Attribution" description="Browse 300+ verified spells with external source references — books, grimoires, academic papers, and historical records." path="/references" />
+      <SeoHead title="External References · Source Attribution" description="Browse 300+ verified spells with external source references. books, grimoires, academic papers, and historical records." path="/references" />
       <section className="relative border-b border-white/5">
         <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-indigo-900/5 to-transparent" />
         <div className="relative mx-auto max-w-4xl px-5 py-12 text-center md:px-8 md:py-16">
@@ -30,7 +30,7 @@ export function ReferencesPage() {
             External References
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-            Every spell with a verifiable external source — books, grimoires, academic papers, historical records, and trusted online resources.
+            Every spell with a verifiable external source. books, grimoires, academic papers, historical records, and trusted online resources.
           </p>
         </div>
       </section>

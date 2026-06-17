@@ -31,7 +31,7 @@ export function PaywallGate(props: {
               </h2>
               <p className="body-muted mt-6">
                 Your session tokens are depleted. Local AI still runs on your
-                machine — you only pay for platform access after the included
+                machine. you only pay for platform access after the included
                 allowance.
               </p>
               {props.topUpUrl ? (

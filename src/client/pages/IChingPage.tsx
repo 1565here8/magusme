@@ -29,10 +29,10 @@ const LINE_POSITIONS = [
 
 /* ─── Line value definitions ─── */
 const LINE_VALUES = [
-  { value: 6, name: "Old Yin", symbol: "⚋", marker: "✕", yin: true, changing: true, meaning: "Changing Yin — transforms into a Yang line. This energy is in flux, about to turn." },
-  { value: 7, name: "Young Yang", symbol: "⚊", marker: "", yin: false, changing: false, meaning: "Stable Yang — firm, strong energy that stays as it is." },
-  { value: 8, name: "Young Yin", symbol: "⚋", marker: "", yin: true, changing: false, meaning: "Stable Yin — receptive, yielding energy that stays as it is." },
-  { value: 9, name: "Old Yang", symbol: "⚊", marker: "○", yin: false, changing: true, meaning: "Changing Yang — transforms into a Yin line. This energy has reached fullness and is turning." },
+  { value: 6, name: "Old Yin", symbol: "⚋", marker: "✕", yin: true, changing: true, meaning: "Changing Yin. transforms into a Yang line. This energy is in flux, about to turn." },
+  { value: 7, name: "Young Yang", symbol: "⚊", marker: "", yin: false, changing: false, meaning: "Stable Yang. firm, strong energy that stays as it is." },
+  { value: 8, name: "Young Yin", symbol: "⚋", marker: "", yin: true, changing: false, meaning: "Stable Yin. receptive, yielding energy that stays as it is." },
+  { value: 9, name: "Old Yang", symbol: "⚊", marker: "○", yin: false, changing: true, meaning: "Changing Yang. transforms into a Yin line. This energy has reached fullness and is turning." },
 ];
 
 /* ─── Glossary tooltip data ─── */
@@ -42,7 +42,7 @@ const GLOSSARY: Record<string, string> = {
   judgment: "The primary oracle text for the hexagram. It gives the overall answer, the central message of the situation.",
   image: "A poetic description of how the hexagram's pattern appears in nature. It shows how the principle operates in the world and how to apply its wisdom.",
   changingLine: "A line with value 6 (Old Yin) or 9 (Old Yang). These are 'old' energies that are about to transform into their opposite. Changing lines indicate where the action, tension, or transformation is happening in your reading.",
-  secondaryHexagram: "The hexagram that emerges when you swap every changing line to its opposite. It shows the direction your situation is moving — what is becoming.",
+  secondaryHexagram: "The hexagram that emerges when you swap every changing line to its opposite. It shows the direction your situation is moving. what is becoming.",
   nuclearHexagram: "The 'inner core' hexagram formed by lines 2-5 of the primary hexagram. It reveals the hidden dynamic at work inside the situation.",
 };
 
@@ -51,7 +51,7 @@ function YangLine({ changing, delay, label }: { changing: boolean; delay: number
   return (
     <div className="flex items-center gap-2 py-1" style={{ animation: `fadeSlideIn 0.4s ease-out ${delay}s both` }}>
       <div className={`h-1.5 flex-1 rounded-full ${changing ? "bg-[#c43a31]" : "bg-white/80"}`} />
-      {changing && <span className="text-[9px] font-mono text-[#c43a31]" title="Changing line — this yang line will become yin">○</span>}
+      {changing && <span className="text-[9px] font-mono text-[#c43a31]" title="Changing line. this yang line will become yin">○</span>}
       {label && <span className="text-[7px] text-zinc-600 w-16 text-right">{label}</span>}
     </div>
   );
@@ -63,7 +63,7 @@ function YinLine({ changing, delay, label }: { changing: boolean; delay: number;
       <div className={`h-1.5 w-[42%] rounded-full ${changing ? "bg-[#c43a31]" : "bg-white/40"}`} />
       <div className="flex-1" />
       <div className={`h-1.5 w-[42%] rounded-full ${changing ? "bg-[#c43a31]" : "bg-white/40"}`} />
-      {changing && <span className="text-[9px] font-mono text-[#c43a31]" title="Changing line — this yin line will become yang">✕</span>}
+      {changing && <span className="text-[9px] font-mono text-[#c43a31]" title="Changing line. this yin line will become yang">✕</span>}
       {label && <span className="text-[7px] text-zinc-600 w-16 text-right">{label}</span>}
     </div>
   );
@@ -214,11 +214,11 @@ function HowToRead() {
         <div className="px-5 pb-5 space-y-4 text-[10px] leading-relaxed text-zinc-500">
           <div>
             <h4 className="font-bold text-white/60 mb-1">What is the I Ching?</h4>
-            <p>The I Ching (易經), or <em>Book of Changes</em>, is one of the oldest Chinese classics — over 3,000 years old. It is both a philosophical text and an oracle. At its core is a simple insight: all situations follow predictable patterns of change, and by understanding the pattern of the present moment, you can navigate wisely.</p>
+            <p>The I Ching (易經), or <em>Book of Changes</em>, is one of the oldest Chinese classics. over 3,000 years old. It is both a philosophical text and an oracle. At its core is a simple insight: all situations follow predictable patterns of change, and by understanding the pattern of the present moment, you can navigate wisely.</p>
           </div>
           <div>
             <h4 className="font-bold text-white/60 mb-1">How does casting work?</h4>
-            <p>You ask a question and toss three coins six times. Each toss builds one line of a hexagram (a six-line figure). The coin values add up to 6, 7, 8, or 9 — each number has a specific meaning, and some lines are "changing" (the energy is in motion). The six lines together form a hexagram that describes your situation.</p>
+            <p>You ask a question and toss three coins six times. Each toss builds one line of a hexagram (a six-line figure). The coin values add up to 6, 7, 8, or 9. each number has a specific meaning, and some lines are "changing" (the energy is in motion). The six lines together form a hexagram that describes your situation.</p>
           </div>
           <div>
             <h4 className="font-bold text-white/60 mb-1">What do the numbers mean?</h4>
@@ -241,11 +241,11 @@ function HowToRead() {
           <div>
             <h4 className="font-bold text-white/60 mb-1">Parts of a reading</h4>
             <ul className="space-y-1 mt-1">
-              <li><strong className="text-white/50">The Judgment</strong> — The overall answer. The central message of the hexagram.</li>
-              <li><strong className="text-white/50">The Image</strong> — A natural metaphor showing how this principle works in the world, and how to apply it.</li>
-              <li><strong className="text-white/50">Changing Lines</strong> — Lines that are 6 or 9. They show where transformation is happening. Each changing line has its own message.</li>
-              <li><strong className="text-white/50">The Secondary Hexagram</strong> — What the situation is turning into. Created by flipping all changing lines to their opposite.</li>
-              <li><strong className="text-white/50">The Nuclear Hexagram</strong> — The hidden inner dynamic, formed by lines 2-5.</li>
+              <li><strong className="text-white/50">The Judgment</strong>. The overall answer. The central message of the hexagram.</li>
+              <li><strong className="text-white/50">The Image</strong>. A natural metaphor showing how this principle works in the world, and how to apply it.</li>
+              <li><strong className="text-white/50">Changing Lines</strong>. Lines that are 6 or 9. They show where transformation is happening. Each changing line has its own message.</li>
+              <li><strong className="text-white/50">The Secondary Hexagram</strong>. What the situation is turning into. Created by flipping all changing lines to their opposite.</li>
+              <li><strong className="text-white/50">The Nuclear Hexagram</strong>. The hidden inner dynamic, formed by lines 2-5.</li>
             </ul>
           </div>
           <div>
@@ -311,7 +311,7 @@ function HexagramReading({ hexagram, tosses }: { hexagram: HexagramDef; tosses: 
           <TrigramInfoCard tri={lowerTri} label="Lower Trigram (Inner Self)" />
         </div>
         <InfoCallout>
-          <GlossaryTerm term="trigram">Trigrams</GlossaryTerm> combine to tell a story: the <strong>upper trigram</strong> ({upperTri.name}) represents the outer situation, what is visible to others. The <strong>lower trigram</strong> ({lowerTri.name}) represents your inner state — your character, your foundation. {upperTri.name} over {lowerTri.name}: {upperTri.attribute.toLowerCase()} over {lowerTri.attribute.toLowerCase()}.
+          <GlossaryTerm term="trigram">Trigrams</GlossaryTerm> combine to tell a story: the <strong>upper trigram</strong> ({upperTri.name}) represents the outer situation, what is visible to others. The <strong>lower trigram</strong> ({lowerTri.name}) represents your inner state. your character, your foundation. {upperTri.name} over {lowerTri.name}: {upperTri.attribute.toLowerCase()} over {lowerTri.attribute.toLowerCase()}.
         </InfoCallout>
       </div>
 
@@ -322,7 +322,7 @@ function HexagramReading({ hexagram, tosses }: { hexagram: HexagramDef; tosses: 
           &ldquo;{hexagram.judgment}&rdquo;
         </blockquote>
         <InfoCallout>
-          <GlossaryTerm term="judgment">The Judgment</GlossaryTerm> is the central message of this hexagram — the oracle's direct answer to your situation. It describes the overall quality of the moment and gives guidance on how to proceed. Read it as the keynote of your reading.
+          <GlossaryTerm term="judgment">The Judgment</GlossaryTerm> is the central message of this hexagram. the oracle's direct answer to your situation. It describes the overall quality of the moment and gives guidance on how to proceed. Read it as the keynote of your reading.
         </InfoCallout>
       </div>
 
@@ -333,7 +333,7 @@ function HexagramReading({ hexagram, tosses }: { hexagram: HexagramDef; tosses: 
           &ldquo;{hexagram.image}&rdquo;
         </blockquote>
         <InfoCallout>
-          <GlossaryTerm term="image">The Image</GlossaryTerm> shows how this hexagram's principle appears in nature. It is a metaphor for how to apply the wisdom in your own life. The "superior man" referenced is an ideal — the person who acts in harmony with the Tao.
+          <GlossaryTerm term="image">The Image</GlossaryTerm> shows how this hexagram's principle appears in nature. It is a metaphor for how to apply the wisdom in your own life. The "superior man" referenced is an ideal. the person who acts in harmony with the Tao.
         </InfoCallout>
       </div>
 
@@ -343,7 +343,7 @@ function HexagramReading({ hexagram, tosses }: { hexagram: HexagramDef; tosses: 
           <SectionIcon icon={TriangleAlert} label="Where Energy is Moving" />
           <p className="text-[9px] text-zinc-600 mb-4">
             {changingLines.length === 1
-              ? "One line is changing. This is where the central energy of your reading is focused — the place where transformation is active."
+              ? "One line is changing. This is where the central energy of your reading is focused. the place where transformation is active."
               : `${changingLines.length} lines are changing. Each one reveals a different facet of how your situation is transforming. Read them in order: they describe the arc of change.`}
           </p>
           <div className="space-y-4">
@@ -371,7 +371,7 @@ function HexagramReading({ hexagram, tosses }: { hexagram: HexagramDef; tosses: 
                   </blockquote>
                   <p className="mt-1.5 text-[9px] text-zinc-600">
                     <strong>What this indicates: </strong>
-                    This line is at the <em>{posInfo.name}</em> position. The energy here is {t.isYang ? "yang (active, firm)" : "yin (receptive, yielding)"} but it is <em>old</em> — it has reached its peak and is transforming into its opposite. Pay close attention to this area of your life or situation.
+                    This line is at the <em>{posInfo.name}</em> position. The energy here is {t.isYang ? "yang (active, firm)" : "yin (receptive, yielding)"} but it is <em>old</em>. it has reached its peak and is transforming into its opposite. Pay close attention to this area of your life or situation.
                   </p>
                 </div>
               );
@@ -385,7 +385,7 @@ function HexagramReading({ hexagram, tosses }: { hexagram: HexagramDef; tosses: 
         <div className="rounded-xl border border-white/[0.04] bg-white/[0.01] p-5 text-center">
           <SectionIcon icon={Asterisk} label="No Changing Lines" />
           <p className="text-[9px] text-zinc-600">
-            No lines are changing. This means the situation is <strong>stable</strong> — the energy is not in flux. Focus on the Judgment and Image alone. The hexagram describes the situation as it is, without a trajectory of change. This is rare: it suggests a moment of stillness, clarity, or equilibrium.
+            No lines are changing. This means the situation is <strong>stable</strong>. the energy is not in flux. Focus on the Judgment and Image alone. The hexagram describes the situation as it is, without a trajectory of change. This is rare: it suggests a moment of stillness, clarity, or equilibrium.
           </p>
         </div>
       )}
@@ -422,9 +422,9 @@ function SecondaryView({ primary, secondary, tosses }: {
       {/* Secondary judgment */}
       <div className="mt-6 mx-auto max-w-2xl">
         <div className="rounded-xl border border-white/[0.06] bg-gradient-to-b from-white/[0.02] to-transparent p-5">
-          <SectionIcon icon={Compass} label="Secondary — Where You Are Heading" />
+          <SectionIcon icon={Compass} label="Secondary. Where You Are Heading" />
           <p className="text-[9px] text-zinc-600 mb-3">
-            <GlossaryTerm term="secondaryHexagram">The Secondary Hexagram</GlossaryTerm> shows what your situation is <em>becoming</em>. It emerges naturally as the changing lines transform. This is not a different answer — it is the continuation of the story, the direction of movement.
+            <GlossaryTerm term="secondaryHexagram">The Secondary Hexagram</GlossaryTerm> shows what your situation is <em>becoming</em>. It emerges naturally as the changing lines transform. This is not a different answer. it is the continuation of the story, the direction of movement.
           </p>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs font-bold text-white/70">{secondary.number}. {secondary.name}</span>
@@ -448,9 +448,9 @@ function NuclearSection({ hexagram }: { hexagram: HexagramDef }) {
 
   return (
     <div className="rounded-xl border border-white/[0.04] bg-white/[0.01] p-5">
-      <SectionIcon icon={Braces} label="Inner Core — Nuclear Hexagram" />
+      <SectionIcon icon={Braces} label="Inner Core. Nuclear Hexagram" />
       <p className="text-[9px] text-zinc-600 mb-3">
-        <GlossaryTerm term="nuclearHexagram">The Nuclear Hexagram</GlossaryTerm> is formed from lines 2-5 of the primary hexagram (the "inner" lines). It reveals the hidden dynamic, the inner machinery of the situation — what is going on beneath the surface.
+        <GlossaryTerm term="nuclearHexagram">The Nuclear Hexagram</GlossaryTerm> is formed from lines 2-5 of the primary hexagram (the "inner" lines). It reveals the hidden dynamic, the inner machinery of the situation. what is going on beneath the surface.
       </p>
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2 rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2">
@@ -583,7 +583,7 @@ function CoinTossAnimation({ onComplete }: { onComplete: (tosses: CoinTossResult
             <div className="text-center space-y-2">
               <div className="flex items-center justify-center gap-2 text-[10px] text-zinc-500">
                 <div className="h-1 w-1 rounded-full bg-[#c43a31]" />
-                Hexagram built — {tosses.filter(t => t.isChanging).length} changing line{tosses.filter(t => t.isChanging).length !== 1 ? "s" : ""}
+                Hexagram built. {tosses.filter(t => t.isChanging).length} changing line{tosses.filter(t => t.isChanging).length !== 1 ? "s" : ""}
               </div>
               <p className="text-[8px] text-zinc-700">Lines cast from bottom (line 1) to top (line 6). Lower trigram = lines 1-3, upper trigram = lines 4-6.</p>
             </div>
@@ -715,7 +715,7 @@ export function IChingPage() {
 
   return (
     <div className="min-h-screen" style={{ background: `linear-gradient(180deg, ${INK_BG}, #0a0a0a)` }}>
-      <SeoHead title="I Ching · Book of Changes" description="Ancient Chinese oracle — cast three coins or yarrow stalks for hexagram guidance from the 64 hexagrams of the Yì Jīng" path="/consult/iching" />
+      <SeoHead title="I Ching · Book of Changes" description="Ancient Chinese oracle. cast three coins or yarrow stalks for hexagram guidance from the 64 hexagrams of the Yì Jīng" path="/consult/iching" />
 
       {/* Header */}
       <div className="border-b border-white/[0.03]">
@@ -749,7 +749,7 @@ export function IChingPage() {
           {/* Subtitle for each view */}
           {view === "cast" && (
             <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-zinc-500">
-              The I Ching reveals the pattern of the present moment. Cast three coins six times to build a hexagram — the oracle speaks through lines of yin and yang, change and stability.
+              The I Ching reveals the pattern of the present moment. Cast three coins six times to build a hexagram. the oracle speaks through lines of yin and yang, change and stability.
             </p>
           )}
           {view === "read" && primary && (
@@ -876,7 +876,7 @@ export function IChingPage() {
             <div className="rounded-xl border border-white/[0.04] bg-white/[0.01] p-4">
               <Compass className="h-4 w-4 mx-auto text-[#c43a31]/40 mb-2" />
               <p className="text-[9px] leading-relaxed text-zinc-600">
-                A hexagram describes the <strong>energetic pattern</strong> of your situation, not a fixed fate. The I Ching guides you to act in harmony with the Tao — the natural order of things. Read with an open heart, contemplate the images, and apply the wisdom as your own insight dictates.
+                A hexagram describes the <strong>energetic pattern</strong> of your situation, not a fixed fate. The I Ching guides you to act in harmony with the Tao. the natural order of things. Read with an open heart, contemplate the images, and apply the wisdom as your own insight dictates.
               </p>
             </div>
           </div>

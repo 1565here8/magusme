@@ -12,7 +12,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <footer className="border-t border-white/5 bg-[#09090b]">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-start justify-between gap-4 px-5 py-8 md:flex-row md:items-center md:px-8">
           <p className="text-sm text-zinc-500">
-            🔮 MagusMe — The Vault of Everything Occult
+            🔮 MagusMe. The Vault of Everything Occult
           </p>
           <div className="flex items-center gap-6 text-sm">
             <Link className="font-medium text-zinc-500 transition hover:text-zinc-300" to="/terms">

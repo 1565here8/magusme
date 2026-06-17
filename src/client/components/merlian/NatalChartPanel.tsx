@@ -47,7 +47,7 @@ export function NatalChartPanel() {
  <Star className="icon-accent h-5 w-5" strokeWidth={1.5} />
  Natal Chart Map
  </h2>
- <p className="body-muted mt-1 text-sm">Free birth chart — planets, houses, ascendant &amp; midheaven</p>
+ <p className="body-muted mt-1 text-sm">Free birth chart. planets, houses, ascendant &amp; midheaven</p>
  </div>
 
  <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -109,7 +109,7 @@ export function NatalChartPanel() {
  <ChartWheel chart={chart} />
  <div className="space-y-4">
  {!chart.birth.timeKnown ? (
- <p className="text-sm text-amber-500/80">No birth time — chart uses noon placeholder. Ascendant &amp; houses are approximate.</p>
+ <p className="text-sm text-amber-500/80">No birth time. chart uses noon placeholder. Ascendant &amp; houses are approximate.</p>
  ) : null}
  <div className="glass-inset rounded-xl p-4">
  <div className="text-xs uppercase text-tertiary">Angles</div>

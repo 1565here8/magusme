@@ -27,6 +27,9 @@ export interface SpellListItem {
   tags: string[];
   summary: string | null;
   reference_link: string | null;
+  verified: number;
+  verification_status: 'pending' | 'verified' | 'rejected';
+  verification_source: string | null;
 }
 
 export interface SpellRow {
@@ -105,6 +108,11 @@ export interface SpellDetail extends SpellListItem {
   difficulty_level: number;
   danger_level: number;
   full_text: string | null;
+  verified: number;
+  verification_status: 'pending' | 'verified' | 'rejected';
+  verification_source: string | null;
+  verified_by: string | null;
+  verified_at: string | null;
 }
 
 export function fetchSpellBySlug(slug: string, signal?: AbortSignal): Promise<SpellDetail> {

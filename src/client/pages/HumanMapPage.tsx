@@ -151,9 +151,9 @@ export function HumanMapPage() {
     const features = ["Strong brows, deep-set eyes","Sharp eyes, full lips","Defined jaw, high cheekbones","Wide forehead, delicate chin","Balanced features, warm expression"][d % 5];
 
     setAnalyzing("Palmistry"); await sleep(400);
-    const handType = ["Earth — practical, grounded","Air — intellectual, communicative","Water — emotional, intuitive","Fire — passionate, energetic"][seed % 4];
-    const lifeline = ["Long & deep — strong vitality","Clear & defined — balanced energy","Short — lives in the moment","Double — protected by guides"][m % 4];
-    const headline = ["Straight — logical mind","Curved — creative thinker","Long & deep — intense focus","Wavy — adaptable intelligence"][d % 4];
+    const handType = ["Earth. practical, grounded","Air. intellectual, communicative","Water. emotional, intuitive","Fire. passionate, energetic"][seed % 4];
+    const lifeline = ["Long & deep. strong vitality","Clear & defined. balanced energy","Short. lives in the moment","Double. protected by guides"][m % 4];
+    const headline = ["Straight. logical mind","Curved. creative thinker","Long & deep. intense focus","Wavy. adaptable intelligence"][d % 4];
 
     setAnalyzing("Generating Unified Reading"); await sleep(800);
 
@@ -190,14 +190,14 @@ export function HumanMapPage() {
         `Sun in **${su}** · Rising **${s}** · Venus in **${ve}** · Moon in **${mo}**\n` +
         `Chinese: **${ca}** (${ce}) · Aztec: **${az}** · Life Path **${lp}**\n` +
         `Tarot: **${tc}** · Rune: **${tr}** · Face: **${fs}**\n\n` +
-        `**Interpretation:** Your Venus in **${ve}** shows you love through ${["fire","earth","air","water","fire","earth","air","water","fire","earth","air","water"][["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"].indexOf(ve)]} energy — ${["passionate and bold","steady and devoted","curious and witty","deep and nurturing","dramatic and generous","practical and serving","harmonious and fair","intense and transformative","adventurous and free","disciplined and loyal","detached and cerebral","dreamy and romantic"][["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"].indexOf(ve)]}.\n\n` +
-        `**Answer:** The **${tc}** card and **${tr}** rune together say: trust what you feel but watch what you see. Your **${ca}** year gives you natural intuition about people — use it. This connection has something real if both of you are willing to be honest. The stars don't lie, but they also don't make choices for you.`;
+        `**Interpretation:** Your Venus in **${ve}** shows you love through ${["fire","earth","air","water","fire","earth","air","water","fire","earth","air","water"][["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"].indexOf(ve)]} energy. ${["passionate and bold","steady and devoted","curious and witty","deep and nurturing","dramatic and generous","practical and serving","harmonious and fair","intense and transformative","adventurous and free","disciplined and loyal","detached and cerebral","dreamy and romantic"][["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"].indexOf(ve)]}.\n\n` +
+        `**Answer:** The **${tc}** card and **${tr}** rune together say: trust what you feel but watch what you see. Your **${ca}** year gives you natural intuition about people. use it. This connection has something real if both of you are willing to be honest. The stars don't lie, but they also don't make choices for you.`;
     }
 
     if (isCareer) {
       return `**🔮 Career Reading for ${d.name}**\n\n` +
         `Sun in **${su}** drives you toward ${["leadership","financial security","communication","nurturing","recognition","service","partnership","transformation","exploration","authority","innovation","spirituality"][["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"].indexOf(su)]}. Life Path **${lp}** confirms this is your growth edge.\n\n` +
-        `**The cards say:** **${tc}** — ${["new cycle begins","master your craft","trust your knowing","abundance","lead with authority","learn and teach","connections matter","willpower wins","find inner strength","go within","change is coming","truth will surface","pause and reflect","transform","find balance","face the shadow","release and rebuild","hope","clarity coming","success is near","be accountable","completion"][["The Fool","The Magician","The High Priestess","The Empress","The Emperor","The Hierophant","The Lovers","The Chariot","Strength","The Hermit","Wheel of Fortune","Justice","The Hanged Man","Death","Temperance","The Devil","The Tower","The Star","The Moon","The Sun","Judgement","The World"].indexOf(tc)]}.`;
+        `**The cards say:** **${tc}**. ${["new cycle begins","master your craft","trust your knowing","abundance","lead with authority","learn and teach","connections matter","willpower wins","find inner strength","go within","change is coming","truth will surface","pause and reflect","transform","find balance","face the shadow","release and rebuild","hope","clarity coming","success is near","be accountable","completion"][["The Fool","The Magician","The High Priestess","The Empress","The Emperor","The Hierophant","The Lovers","The Chariot","Strength","The Hermit","Wheel of Fortune","Justice","The Hanged Man","Death","Temperance","The Devil","The Tower","The Star","The Moon","The Sun","Judgement","The World"].indexOf(tc)]}.`;
     }
 
     return `**🔮 Reading for ${d.name}**\n\n**The Complete Human Map:**\n` +
@@ -205,15 +205,15 @@ export function HumanMapPage() {
       `• Chinese: **${ca}** (${ce}) · Aztec: **${az}**\n` +
       `• Life Path **${lp}** · Expression **${d.numerology.expression}** · Soul Urge **${d.numerology.soulUrge}**\n` +
       `• Tarot: **${tc}** · Runes: **${tr}**\n` +
-      `• Face: **${fs}** · Palm: **${d.palm.handType.split("—")[0].trim()}**\n\n` +
-      `**Answer:** The **${tc}** card reversed says look beneath the surface. Your **${ca}** wisdom + Life Path **${lp}** gives you everything needed to navigate this. Trust your instincts — they've been trained by every lifetime you've lived before this one.`;
+      `• Face: **${fs}** · Palm: **${d.palm.handType.split(". ")[0].trim()}**\n\n` +
+      `**Answer:** The **${tc}** card reversed says look beneath the surface. Your **${ca}** wisdom + Life Path **${lp}** gives you everything needed to navigate this. Trust your instincts. they've been trained by every lifetime you've lived before this one.`;
   }
 
   const PLANET_SYMBOLS: Record<string,string> = { Sun:"☀", Moon:"☽", Mercury:"☿", Venus:"♀", Mars:"♂", Jupiter:"♃", Saturn:"♄", Uranus:"♅", Neptune:"♆", Pluto:"♇" };
 
   return (
     <div className="min-h-screen">
-      <SeoHead title="Human Map · Complete Esoteric Profile" description="Your complete esoteric profile — Chinese zodiac, Aztec sign, numerology, astrological chart, tarot card, palmistry, and face reading from your name and birth date." path="/human-map" />
+      <SeoHead title="Human Map · Complete Esoteric Profile" description="Your complete esoteric profile. Chinese zodiac, Aztec sign, numerology, astrological chart, tarot card, palmistry, and face reading from your name and birth date." path="/human-map" />
       <div className="mx-auto max-w-4xl px-5 py-8 md:px-8">
 
         {step === "input" && (
@@ -315,7 +315,7 @@ export function HumanMapPage() {
                 <p className="mt-2 text-sm text-zinc-400">Let us consult the heavens, the ancients, and the cards to find your answer...</p>
               </div>
             )},
-            { title: "The Natal Map — Your Birth Chart", icon: Moon, render: () => (
+            { title: "The Natal Map. Your Birth Chart", icon: Moon, render: () => (
               <div>
                 <p className="mb-4 text-sm text-zinc-400">
                   Your soul entered this world at a specific cosmic moment. The planets were positioned in a unique pattern
@@ -338,7 +338,7 @@ export function HumanMapPage() {
                 </p>
               </div>
             )},
-            { title: "Ancient China — Your Zodiac Animal", icon: Star, render: () => (
+            { title: "Ancient China. Your Zodiac Animal", icon: Star, render: () => (
               <div>
                 <p className="mb-4 text-sm text-zinc-400">
                   The Chinese zodiac looks at the year of your birth to reveal your deepest character.
@@ -354,7 +354,7 @@ export function HumanMapPage() {
                 </div>
               </div>
             )},
-            { title: "Aztec Calendar — Your Day Sign", icon: Sun, render: () => (
+            { title: "Aztec Calendar. Your Day Sign", icon: Sun, render: () => (
               <div>
                 <p className="mb-4 text-sm text-zinc-400">
                   The Aztec calendar assigns a sacred sign to the day you were born.
@@ -367,7 +367,7 @@ export function HumanMapPage() {
                 </div>
               </div>
             )},
-            { title: "Numerology — The Numbers of Your Soul", icon: Brain, render: () => (
+            { title: "Numerology. The Numbers of Your Soul", icon: Brain, render: () => (
               <div>
                 <p className="mb-4 text-sm text-zinc-400">
                   Numbers are the language of the universe. Your name and birth date
@@ -389,7 +389,7 @@ export function HumanMapPage() {
                 </div>
               </div>
             )},
-            { title: "The Runes — Ancient Wisdom", icon: Scroll, render: () => (
+            { title: "The Runes. Ancient Wisdom", icon: Scroll, render: () => (
               <div>
                 <p className="mb-4 text-sm text-zinc-400">
                   The runes were carved by the Norse seers. Each symbol holds a key
@@ -414,7 +414,7 @@ export function HumanMapPage() {
                 </div>
               </div>
             )},
-            { title: "The Tarot — A Card for Your Journey", icon: Heart, render: () => (
+            { title: "The Tarot. A Card for Your Journey", icon: Heart, render: () => (
               <div>
                 <p className="mb-4 text-sm text-zinc-400">
                   The Tarot speaks in symbols that transcend time. The card drawn for you
@@ -424,12 +424,12 @@ export function HumanMapPage() {
                   <div className="mb-2 text-5xl">🎴</div>
                   <div className="text-xl font-bold text-white">{mapData.tarot.card}</div>
                   <div className={`text-sm font-medium ${mapData.tarot.reversed ? "text-amber-400" : "text-emerald-400"}`}>
-                    {mapData.tarot.reversed ? "Reversed — Look within" : "Upright — Move forward"}
+                    {mapData.tarot.reversed ? "Reversed. Look within" : "Upright. Move forward"}
                   </div>
                 </div>
               </div>
             )},
-            { title: "Face & Palm — The Body's Map", icon: Eye, render: () => (
+            { title: "Face & Palm. The Body's Map", icon: Eye, render: () => (
               <div>
                 <p className="mb-4 text-sm text-zinc-400">
                   Your face and hands reveal what the stars have written. These ancient arts
@@ -443,8 +443,8 @@ export function HumanMapPage() {
                   </div>
                   <div className="rounded-xl border border-teal-500/10 bg-teal-500/[0.02] p-4">
                     <div className="mb-1 text-2xl">✋</div>
-                    <div className="text-sm font-bold text-white">{mapData.palm.handType.split("—")[0].trim()}</div>
-                    <div className="text-xs text-zinc-400">{mapData.palm.lifeline.split("—")[0].trim()}</div>
+                    <div className="text-sm font-bold text-white">{mapData.palm.handType.split(". ")[0].trim()}</div>
+                    <div className="text-xs text-zinc-400">{mapData.palm.lifeline.split(". ")[0].trim()}</div>
                   </div>
                 </div>
               </div>
@@ -452,7 +452,7 @@ export function HumanMapPage() {
             { title: "The Oracle Answers", icon: Sparkles, render: () => (
               <div>
                 <p className="mb-4 text-sm text-zinc-400">
-                  Having consulted the stars, the ancients, the cards, and the numbers —
+                  Having consulted the stars, the ancients, the cards, and the numbers . 
                   here is the unified answer to your question.
                 </p>
                 <div className="whitespace-pre-line text-sm leading-relaxed text-zinc-300">

@@ -40,7 +40,7 @@ export function LearnPage() {
 
   return (
     <div className="min-h-screen">
-      <SeoHead title="The Grimoire · 63+ Verified Spells" description="Browse 63+ verified spells across 16 categories — protection, love, prosperity, healing, baneful, and more. No censorship, all traditions welcome." path="/learn" />
+      <SeoHead title="The Grimoire · 63+ Verified Spells" description="Browse 63+ verified spells across 16 categories. protection, love, prosperity, healing, baneful, and more. No censorship, all traditions welcome." path="/learn" />
       <section className="relative border-b border-white/5">
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/10 via-teal-900/5 to-transparent" />
         <div className="relative mx-auto max-w-6xl px-5 py-12 text-center md:px-8 md:py-16">
@@ -49,7 +49,7 @@ export function LearnPage() {
             {total.toLocaleString()} Verified Spells · All Traditions · No Censorship
           </div>
           <h1 className="font-serif text-3xl font-bold text-white md:text-4xl">
-            Learn — The Complete Occult Library
+            Learn. The Complete Occult Library
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
             Every spell, every tradition, every source. Full text. Full transparency. No gatekeeping.

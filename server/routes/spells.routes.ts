@@ -131,4 +131,44 @@ export function registerSpellsRoutes(app: Express) {
       res.json(spell);
     }),
   );
+
+  // Admin verification endpoints
+  app.get(
+    "/api/admin/spells/pending",
+    requireAdmin,
+    asyncHandler(async (req, res) => {
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+      const offset = parseInt(req.query.offset as string) || 0;
+      const result = await getSpellsDb().getPendingSpells(limit, offset);
+      res.json(result);
+    }),
+  );
+
+  app.post(
+    "/api/admin/spells/verify",
+    requireAdmin,
+    asyncHandler(async (req, res) => {
+      const { slug, verificationSource } = req.body as { slug: string; verificationSource: string };
+      if (!slug || !verificationSource) {
+        res.status(400).json({ error: "slug and verificationSource required" });
+        return;
+      }
+      await getSpellsDb().verifySpell(slug, req.session!.sub, verificationSource);
+      res.json({ ok: true });
+    }),
+  );
+
+  app.post(
+    "/api/admin/spells/reject",
+    requireAdmin,
+    asyncHandler(async (req, res) => {
+      const { slug, reason } = req.body as { slug: string; reason: string };
+      if (!slug || !reason) {
+        res.status(400).json({ error: "slug and reason required" });
+        return;
+      }
+      await getSpellsDb().rejectSpell(slug, req.session!.sub, reason);
+      res.json({ ok: true });
+    }),
+  );
 }

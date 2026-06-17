@@ -74,7 +74,7 @@ export function AstroWatch() {
             Astronomical Watch
           </h2>
           <p className="body-muted mt-1 text-sm">
-            Live planetary hours, moon phase, houses &amp; sky — free
+            Live planetary hours, moon phase, houses &amp; sky. free
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -176,7 +176,7 @@ export function AstroWatch() {
                           {p.retrograde ? <span className="ml-1 text-amber-500/80">℞</span> : null}
                         </td>
                         <td className="py-1.5 pr-4">{p.sign.label}</td>
-                        <td className="py-1.5">{p.house ?? "—"}</td>
+                        <td className="py-1.5">{p.house ?? ". "}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -195,7 +195,7 @@ export function AstroWatch() {
                 <ul className="space-y-1 text-xs text-secondary">
                   {snapshot.planetaryHours.dayHours.map((h) => (
                     <li key={`d-${h.index}`} className={h.ruler === hour?.ruler && h.isDay ? "text-accent" : ""}>
-                      {h.index}. {h.ruler} — {formatTime(h.start)}–{formatTime(h.end)}
+                      {h.index}. {h.ruler}. {formatTime(h.start)}–{formatTime(h.end)}
                     </li>
                   ))}
                 </ul>
@@ -205,7 +205,7 @@ export function AstroWatch() {
                 <ul className="space-y-1 text-xs text-secondary">
                   {snapshot.planetaryHours.nightHours.map((h) => (
                     <li key={`n-${h.index}`} className={h.ruler === hour?.ruler && !h.isDay ? "text-accent" : ""}>
-                      {h.index}. {h.ruler} — {formatTime(h.start)}–{formatTime(h.end)}
+                      {h.index}. {h.ruler}. {formatTime(h.start)}–{formatTime(h.end)}
                     </li>
                   ))}
                 </ul>

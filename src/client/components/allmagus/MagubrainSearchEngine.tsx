@@ -116,7 +116,7 @@ export function MagubrainSearchEngine() {
           <input
             type="search"
             className="input-field w-full py-4 pl-12 pr-32 text-base"
-            placeholder="Ask anything — white magic, psychology, manifestation, dark arts, folklore…"
+            placeholder="Ask anything. white magic, psychology, manifestation, dark arts, folklore…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             disabled={loading}
@@ -139,7 +139,7 @@ export function MagubrainSearchEngine() {
               ? `${quota.monthlyRemaining} / ${quota.monthlyLimit} monthly searches left`
               : quota.singleCreditsRemaining > 0
                 ? `${quota.singleCreditsRemaining} prepaid search${quota.singleCreditsRemaining === 1 ? "" : "es"} ready`
-                : "Free tier used — pay with Crypto or go monthly"}
+                : "Free tier used. pay with Crypto or go monthly"}
           {quota.monthlyActive && quota.monthlyExpiresAt
             ? ` · monthly until ${new Date(quota.monthlyExpiresAt).toLocaleDateString()}`
             : null}
@@ -151,10 +151,10 @@ export function MagubrainSearchEngine() {
           <p className="text-sm text-[color:var(--text-secondary)]">{error}</p>
           <div className="mt-4 flex flex-wrap justify-center gap-3">
             <button type="button" className="btn-premium text-sm" onClick={() => void buy("single")}>
-              {paymentInfo?.payramConfigured ? "Pay with Crypto" : quota.btcpayConfigured !== false ? "Pay with Bitcoin" : "Pay"} {quota.payPerSearchLabel} — one search
+              {paymentInfo?.payramConfigured ? "Pay with Crypto" : quota.btcpayConfigured !== false ? "Pay with Bitcoin" : "Pay"} {quota.payPerSearchLabel}. one search
             </button>
             <button type="button" className="btn-secondary text-sm" onClick={() => void buy("monthly")}>
-              {paymentInfo?.payramConfigured ? "Pay with Crypto — " : quota.btcpayConfigured !== false ? "Pay with Bitcoin — " : ""}
+              {paymentInfo?.payramConfigured ? "Pay with Crypto. " : quota.btcpayConfigured !== false ? "Pay with Bitcoin. " : ""}
               {quota.monthlyPriceLabel}/mo · {quota.monthlyLimit} searches
             </button>
           </div>

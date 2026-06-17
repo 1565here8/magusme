@@ -20,11 +20,11 @@ interface FaceFeature {
   meaning: string;
 }
 const faceFeatures: FaceFeature[] = [
-  { feature: "Oval Face", area: "Upper", meaning: "Balanced nature — adaptable, diplomatic, socially graceful." },
+  { feature: "Oval Face", area: "Upper", meaning: "Balanced nature. adaptable, diplomatic, socially graceful." },
   { feature: "Round Face", area: "Upper", meaning: "Warm-hearted, sociable, pleasure-seeking. Tendency toward indulgence." },
   { feature: "Square Face", area: "Upper", meaning: "Strong-willed, determined, practical. Leadership qualities with stubbornness." },
   { feature: "Long Face", area: "Upper", meaning: "Intellectual, reserved, thoughtful. May be prone to worry or over-analysis." },
-  { feature: "High Forehead", area: "Upper", meaning: "Early wisdom — quick learner, intuitive, spiritually inclined." },
+  { feature: "High Forehead", area: "Upper", meaning: "Early wisdom. quick learner, intuitive, spiritually inclined." },
   { feature: "Narrow Forehead", area: "Upper", meaning: "Intense focus, difficulty with abstract concepts, practical-minded." },
   { feature: "Arched Eyebrows", area: "Middle", meaning: "Artistic nature, idealism, appreciation for beauty and refinement." },
   { feature: "Straight Eyebrows", area: "Middle", meaning: "Logical, pragmatic, reliable. A natural realist with steady temperament." },
@@ -45,7 +45,7 @@ interface PalmFeature {
   meaning: string;
 }
 const palmFeatures: PalmFeature[] = [
-  { feature: "Square Hand (Earth)", type: "Hand Shape", meaning: "Practical, grounded, reliable. Good with hands — builder, artisan, maker." },
+  { feature: "Square Hand (Earth)", type: "Hand Shape", meaning: "Practical, grounded, reliable. Good with hands. builder, artisan, maker." },
   { feature: "Long Hand (Air)", type: "Hand Shape", meaning: "Intellectual, communicative, curious. Lives in ideas and words." },
   { feature: "Broad Hand (Water)", type: "Hand Shape", meaning: "Emotional, intuitive, empathetic. Deeply connected to others' feelings." },
   { feature: "Rectangular Hand (Fire)", type: "Hand Shape", meaning: "Energetic, charismatic, spontaneous. Driven by passion and creativity." },
@@ -59,11 +59,11 @@ const palmFeatures: PalmFeature[] = [
   { feature: "Prominent Mount of Mercury", type: "Mount", meaning: "Communication, wit, business acumen. A natural persuader and trader." },
   { feature: "Prominent Mount of Moon", type: "Mount", meaning: "Imagination, intuition, psychic sensitivity. Strong artistic and dream tendencies." },
   { feature: "Prominent Mount of Mars", type: "Mount", meaning: "Courage, aggression, resilience. Warrior spirit with strong will." },
-  { feature: "Balanced Mounts", type: "Mount", meaning: "Harmonious development — no single quality dominates your nature." },
+  { feature: "Balanced Mounts", type: "Mount", meaning: "Harmonious development. no single quality dominates your nature." },
 ];
 
 /* ============================================================
-   FACE ANALYSIS — Mian Xiang via FaceDetector API
+   FACE ANALYSIS. Mian Xiang via FaceDetector API
    ============================================================ */
 
 interface FaceMetrics {
@@ -166,7 +166,7 @@ export async function analyzeFaceReading(
   _rightImg?: HTMLImageElement,
 ): Promise<ReadingResult> {
   const metrics = await detectFaceMetrics(frontImg);
-  const sourceNote = "Source: Chinese Mian Xiang tradition — classical physiognomy texts (public domain). Face shape analysis via Web FaceDetector API (Chrome/Edge).";
+  const sourceNote = "Source: Chinese Mian Xiang tradition. classical physiognomy texts (public domain). Face shape analysis via Web FaceDetector API (Chrome/Edge).";
 
   if (!metrics) {
     const drawn = [faceFeatures[0], faceFeatures[5], faceFeatures[15]];
@@ -179,7 +179,7 @@ export async function analyzeFaceReading(
         meaning: `${f.area}: ${f.meaning}`,
         position: f.area,
       })),
-      interpretation: `Face detection not available in this browser. Upload a front-facing photo and use Chrome or Edge for real-time feature analysis. Reading based on classical Mian Xiang data: ${drawn[0].feature} (${drawn[0].area}) — ${drawn[0].meaning}. ${drawn[1].feature} (${drawn[1].area}) — ${drawn[1].meaning}. ${drawn[2].feature} (${drawn[2].area}) — ${drawn[2].meaning}.\n\n${sourceNote}`,
+      interpretation: `Face detection not available in this browser. Upload a front-facing photo and use Chrome or Edge for real-time feature analysis. Reading based on classical Mian Xiang data: ${drawn[0].feature} (${drawn[0].area}). ${drawn[0].meaning}. ${drawn[1].feature} (${drawn[1].area}). ${drawn[1].meaning}. ${drawn[2].feature} (${drawn[2].area}). ${drawn[2].meaning}.\n\n${sourceNote}`,
     };
   }
 
@@ -215,14 +215,14 @@ export async function analyzeFaceReading(
 
   return {
     systemName: "Face Reading",
-    method: "Mian Xiang — Real-Time Photo Analysis",
+    method: "Mian Xiang. Real-Time Photo Analysis",
     elements,
-    interpretation: `${elements[0].title} — ${elements[0].meaning}. ${elements[1].title} — ${elements[1].meaning}. ${elements[2].title} — ${elements[2].meaning}.\n\n${detectedDesc}\n\n${sourceNote}`,
+    interpretation: `${elements[0].title}. ${elements[0].meaning}. ${elements[1].title}. ${elements[1].meaning}. ${elements[2].title}. ${elements[2].meaning}.\n\n${detectedDesc}\n\n${sourceNote}`,
   };
 }
 
 /* ============================================================
-   PALM ANALYSIS — Chiromancy via Canvas Silhouette
+   PALM ANALYSIS. Chiromancy via Canvas Silhouette
    ============================================================ */
 
 interface PalmMetrics {
@@ -314,7 +314,7 @@ export async function analyzePalmReading(
   _leftImg?: HTMLImageElement,
 ): Promise<ReadingResult> {
   const metrics = analyzePalmCanvas(rightImg);
-  const sourceNote = "Source: Cheiro (Count Louis Hamon), William Benham — classical Western chiromancy (public domain). Hand shape analysis via canvas silhouette (Chrome/Edge/Safari/Firefox).";
+  const sourceNote = "Source: Cheiro (Count Louis Hamon), William Benham. classical Western chiromancy (public domain). Hand shape analysis via canvas silhouette (Chrome/Edge/Safari/Firefox).";
 
   if (!metrics) {
     const drawn = [palmFeatures[0], palmFeatures[3], palmFeatures[8]];
@@ -327,7 +327,7 @@ export async function analyzePalmReading(
         meaning: `${f.type}: ${f.meaning}`,
         position: f.type,
       })),
-      interpretation: `Palm could not be detected. Ensure your hand fills the frame with good lighting. Reading based on classical chiromancy data: ${drawn[0].feature} (${drawn[0].type}) — ${drawn[0].meaning}. ${drawn[1].feature} (${drawn[1].type}) — ${drawn[1].meaning}. ${drawn[2].feature} (${drawn[2].type}) — ${drawn[2].meaning}.\n\n${sourceNote}`,
+      interpretation: `Palm could not be detected. Ensure your hand fills the frame with good lighting. Reading based on classical chiromancy data: ${drawn[0].feature} (${drawn[0].type}). ${drawn[0].meaning}. ${drawn[1].feature} (${drawn[1].type}). ${drawn[1].meaning}. ${drawn[2].feature} (${drawn[2].type}). ${drawn[2].meaning}.\n\n${sourceNote}`,
     };
   }
 
@@ -359,7 +359,7 @@ export async function analyzePalmReading(
 
   return {
     systemName: "Palm Reading",
-    method: "Chiromancy — Real-Time Photo Analysis",
+    method: "Chiromancy. Real-Time Photo Analysis",
     elements,
     interpretation: `${elements[0].title} (${elements[0].meaning}). ${elements[1].title} (${elements[1].meaning}). ${elements[2].title} (${elements[2].meaning}).\n\n${detectedDesc}\n\n${sourceNote}`,
   };

@@ -5,7 +5,7 @@ const STEPS = [
   {
     icon: Compass,
     title: "Get Your First Reading",
-    desc: "Choose from 40+ divination systems — Tarot, Runes, Astrology, I Ching, Scrying, and more. AI that believes in magic.",
+    desc: "Choose from 40+ divination systems. Tarot, Runes, Astrology, I Ching, Scrying, and more. AI that believes in magic.",
     action: "Start Reading",
     href: "/consult",
   },

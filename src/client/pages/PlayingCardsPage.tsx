@@ -206,7 +206,7 @@ function CardBrowser() {
               <p className="text-[10px] leading-relaxed text-zinc-500">{selectedCard.reversedMeaning}</p>
             </div>
             <div className="mt-3 rounded-lg bg-white/[0.02] p-3">
-              <h4 className="text-[9px] font-semibold text-zinc-600">{SUIT_ICON[selectedCard.suit]} {selectedCard.suit.charAt(0).toUpperCase() + selectedCard.suit.slice(1)} — {SUIT_MEANINGS[selectedCard.suit].meaning}</h4>
+              <h4 className="text-[9px] font-semibold text-zinc-600">{SUIT_ICON[selectedCard.suit]} {selectedCard.suit.charAt(0).toUpperCase() + selectedCard.suit.slice(1)}. {SUIT_MEANINGS[selectedCard.suit].meaning}</h4>
               <p className="mt-1 text-[9px] leading-relaxed text-zinc-600">{SUIT_MEANINGS[selectedCard.suit].meaning}</p>
             </div>
           </div>
@@ -232,7 +232,7 @@ function HowItWorks() {
       </button>
       {open && (
         <div className="px-5 pb-5 space-y-3 text-[10px] leading-relaxed text-zinc-500">
-          <p>Cartomancy — reading standard playing cards for divination — is one of the oldest and most accessible forms of fortune-telling. Unlike tarot, which requires specialized knowledge of 78 cards and complex symbolism, playing card reading works with the deck you can buy at any grocery store. The system is based on the interaction between suit energy and number meaning.</p>
+          <p>Cartomancy. reading standard playing cards for divination. is one of the oldest and most accessible forms of fortune-telling. Unlike tarot, which requires specialized knowledge of 78 cards and complex symbolism, playing card reading works with the deck you can buy at any grocery store. The system is based on the interaction between suit energy and number meaning.</p>
           <h4 className="font-bold text-white/60">The four suits</h4>
           <p className="text-zinc-600">Each suit governs a domain of life. Hearts rule love and emotions. Diamonds rule money and material affairs. Clubs rule career, creativity, and enterprise. Spades rule challenges, health, and necessary endings. The suit tells you <em>what area of life</em> is affected; the number tells you <em>how</em>.</p>
           <h4 className="font-bold text-white/60">Number meanings</h4>
@@ -240,7 +240,7 @@ function HowItWorks() {
           <h4 className="font-bold text-white/60">Polarity</h4>
           <p className="text-zinc-600">Red cards (Hearts and Diamonds) are generally beneficial. Black cards (Clubs and Spades) indicate effort, obstacles, or challenges. In a reading, the ratio of red to black cards gives an immediate sense of the overall energy. A red-heavy spread suggests favorable conditions; a black-heavy spread warns of difficulties ahead.</p>
           <h4 className="font-bold text-white/60">Card combinations</h4>
-          <p className="text-zinc-600">When cards appear next to each other in a spread, they modify each other. A positive card next to a negative card softens the negative. Two cards from the same suit amplify each other's energy. A card from one suit followed by a card from a different suit suggests a shift in life domains — from love (Hearts) to money (Diamonds), for example.</p>
+          <p className="text-zinc-600">When cards appear next to each other in a spread, they modify each other. A positive card next to a negative card softens the negative. Two cards from the same suit amplify each other's energy. A card from one suit followed by a card from a different suit suggests a shift in life domains. from love (Hearts) to money (Diamonds), for example.</p>
           <h4 className="font-bold text-white/60">Reversals</h4>
           <p className="text-zinc-600">In traditional cartomancy, not all readers use reversals. When used, a reversed card suggests the card's energy is blocked, delayed, or turned inward. The meaning shifts from external action to internal experience, or from something that happens to something that is felt.</p>
         </div>
@@ -307,7 +307,7 @@ export function PlayingCardsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-gray-900">
-      <SeoHead title="Playing Cards · Cartomancy Readings" description="52-card standard deck cartomancy — hearts, spades, clubs, diamonds with full traditional meanings and multiple spreads" path="/consult/playing-cards" />
+      <SeoHead title="Playing Cards · Cartomancy Readings" description="52-card standard deck cartomancy. hearts, spades, clubs, diamonds with full traditional meanings and multiple spreads" path="/consult/playing-cards" />
 
       <div className="border-b border-white/5">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-3">

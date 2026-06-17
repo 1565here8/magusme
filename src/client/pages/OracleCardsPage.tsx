@@ -2,30 +2,36 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, Book, Wand2, History } from "lucide-react";
 import { SeoHead } from "../components/SeoHead";
-import {
-  getTraditionalReading,
-  getTraditionalDeck,
-  getSpreads,
-  TAROT_DECKS,
-} from "./traditionalReadings";
-import type { ReadingResult, SpreadElement, TarotDeckDef } from "./traditionalReadings";
-import { TAROT_ORIGINS } from "./tarotHistory";
+import { ORACLE_DECKS, getOracleDeck, getOracleDecks } from "../data/oracleDecks";
+import type { OracleDeckDef } from "../data/oracleDecks";
+import { getOracleCardsForDeck } from "./oracleCardsData";
+import { getOracleHistorySections } from "./oracleCardsHistory";
 
 /* ─── Per-deck color system ─── */
 
 const DECK_HUES: Record<string, number> = {
-  rws: 42, thoth: 270, marseille: 30, visconti: 25,
-  "golden-dawn": 45, "wild-unknown": 200, shadowscapes: 220,
-  "modern-witch": 340, "light-seer": 48, "ethereal-visions": 350,
-  "prisma-visions": 190, "cosmic-tarot": 240, haindl: 120,
-  "osho-zen": 80, motherpeace: 30, "deviant-moon": 260,
-  "tarot-divine": 300, "true-black": 0, lumina: 180,
-  "druid-craft": 140, wildwood: 110, hermetic: 45,
-  "victorian-romantic": 340, "mystic-mondays": 280,
-  linestrider: 200, "star-spinner": 360, "santa-muerte": 15,
-  zombie: 60, "bohemian-gothic": 330, "anna-k": 30,
-  "holy-light": 50, "mystic-sea": 220, "hidden-realm": 260,
-  "golden-thread": 200, "waking-wild": 150,
+  "wisdom-of-the-oracle": 42,
+  "work-your-light": 280,
+  moonology: 220,
+  "starseed-oracle": 250,
+  "sacred-rebels": 340,
+  "keepers-of-the-light": 45,
+  "angel-answers": 200,
+  "crystal-spirits": 160,
+  "spirit-animal-oracle": 120,
+  "wild-unknown-animal": 0,
+  "wild-unknown-archetypes": 0,
+  "divine-feminine-oracle": 330,
+  "universe-has-your-back": 50,
+  "rose-oracle": 350,
+  "healing-with-the-angels": 200,
+  "archangel-oracle": 45,
+  "rumi-oracle": 30,
+  "sacred-self-care": 180,
+  "enchanted-map": 42,
+  "ancient-stones": 110,
+  "light-seer-oracle": 48,
+  "wisdom-ancestors": 25,
 };
 
 interface DeckColors {
@@ -36,7 +42,7 @@ interface DeckColors {
 
 function deckColors(deckId: string): DeckColors {
   const h = DECK_HUES[deckId] ?? 42;
-  if (deckId === "true-black") return {
+  if (deckId === "wild-unknown-animal" || deckId === "wild-unknown-archetypes") return {
     faceBg: "linear-gradient(180deg,#1a1a1a,#0d0d0d)", faceBorder: "1px solid #333",
     faceInnerBg: "rgba(255,255,255,0.03)", faceInnerBorder: "1px solid rgba(255,255,255,0.06)",
     backBg: "#000", backBorder: "1px solid #222", backInnerBg: "rgba(255,255,255,0.02)",
@@ -60,12 +66,106 @@ function deckColors(deckId: string): DeckColors {
   };
 }
 
+/* ─── Oracle card interface for readings ─── */
+
+interface OracleSpreadElement {
+  glyph: string;
+  title: string;
+  meaning: string;
+  position: string;
+  reversed: boolean;
+  keywords: string;
+  symbolism: string;
+}
+
+interface OracleReadingResult {
+  deckName: string;
+  spreadName: string;
+  elements: OracleSpreadElement[];
+  interpretation: string;
+}
+
+interface OracleSpreadDef {
+  id: string;
+  name: string;
+  cardCount: number;
+  description: string;
+  positions: string[];
+  isYesNo: boolean;
+}
+
+const ORACLE_SPREADS: OracleSpreadDef[] = [
+  { id: "single", name: "Single Draw", cardCount: 1, description: "A single card for focused guidance on your question. Quick, direct, clear.", positions: ["Guidance"], isYesNo: false },
+  { id: "three-card", name: "Three Card", cardCount: 3, description: "Past, present, future or situation, obstacle, guidance depending on your question.", positions: ["Past", "Present", "Future"], isYesNo: false },
+  { id: "five-card", name: "Five Card Cross", cardCount: 5, description: "The heart of the matter surrounded by past influences, future direction, conscious intention, and hidden factors.", positions: ["Heart", "Past", "Future", "Conscious", "Hidden"], isYesNo: false },
+  { id: "seven-card", name: "Seven Card Horseshoe", cardCount: 7, description: "A horseshoe arc showing the flow of a situation from past through present to outcome.", positions: ["Past", "Present", "Hidden", "Obstacle", "Advice", "Near Future", "Outcome"], isYesNo: false },
+  { id: "yes-no", name: "Yes or No", cardCount: 3, description: "Three cards for direct yes or no answers. The balance of positive and negative cards reveals the answer.", positions: ["First", "Second", "Third"], isYesNo: true },
+];
+
+function shuffleArray<T>(array: T[]): T[] {
+  const a = [...array];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getOracleReading(deckId: string, deckName: string, spread: OracleSpreadDef): OracleReadingResult {
+  const deck = getOracleDeck(deckId);
+  if (!deck) {
+    return {
+      deckName, spreadName: spread.name, elements: [], interpretation: "Deck not found."
+    };
+  }
+
+  const allCards = getOracleCardsForDeck(deckId);
+  const selected = shuffleArray(allCards).slice(0, spread.cardCount);
+
+  const elements: OracleSpreadElement[] = selected.map((card, i) => {
+    const reversed = deck.hasReversals ? Math.random() > 0.7 : false;
+    return {
+      glyph: getGlyph(deckId, i + 1),
+      title: card.title.split("|")[1] ?? card.title,
+      meaning: reversed && card.reversed ? card.reversed : card.upright,
+      position: spread.positions[i] ?? `Position ${i + 1}`,
+      reversed,
+      keywords: card.keywords?.join(", ") ?? "",
+      symbolism: card.symbolism ?? "",
+    };
+  });
+
+  const interpretation = elements.map((el, i) => {
+    const revText = el.reversed ? " (reversed)" : "";
+    return `${el.position}: ${el.title}${revText}\n${el.meaning}`;
+  }).join("\n\n");
+
+  let verdict = "";
+  if (spread.isYesNo) {
+    const positive = elements.filter(e => !e.reversed).length;
+    verdict = positive >= 2 ? "Yes" : positive === 0 ? "No" : "Mixed";
+  }
+
+  return { deckName, spreadName: spread.name, elements, interpretation: verdict ? interpretation + `\n\nVerdict: ${verdict}` : interpretation };
+}
+
+function getGlyph(deckId: string, cardNum: number): string {
+  const glyphs: Record<string, string[]> = {
+    "wisdom-of-the-oracle": ["🔮","🌿","🌉","🌸","🔥","🌊","🌙","⭐","🕊","🌳","🏔","🌺","🦋","🌻","🍃","💎","🌈","🌌","🎭","⏳","🗝","🪞","⚖","🌱","🕯","🎵","🌸","🪨","🌊","🔥","🌙","⭐","🕊","🌳","🏔","🌺","🦋","🌻","🍃","💎","🌈","🌌","🎭","⏳","🗝","🪞","⚖","🌱","🕯","🎵","📿","🪶"],
+    "work-your-light": ["🕯","🌸","🦋","🌙","⭐","🌊","🔥","🌿","💎","🕊","🌈","🌻","🍃","🎵","🪞","🗝","🌌","🏔","🌺","🪨","🌱","🎭","⏳","⚖","📿","🪶","🌳","🔮","🌉","🌟","✨","🪐","🌠","🌄","🌅","🌇","🌃","🌉","🌊","🔥","🌿","💎","🕊","🌈"],
+    moonology: ["🌑","🌒","🌓","🌔","🌕","🌖","🌗","🌘","🌙","🌚","🌛","🌜","🌝","🌞","⭐","🌟","✨","💫","🌠","🌌","🌃","🌄","🌅","🌇","🌉","🌊","🔥","🌿","💎","🕊","🌈","🌻","🍃","🎵","🪞","🗝","🌺","🪨","🌱","🎭","⏳","⚖","📿","🪶"],
+  };
+  const deckGlyphs = glyphs[deckId];
+  if (deckGlyphs && cardNum <= deckGlyphs.length) return deckGlyphs[cardNum - 1];
+  return ["🔮","✨","🌙","⭐","🕊","🌿","🔥","🌊","💎","🌸","🦋","🌈","🍃","🎵","🪞","🗝","🌺","🪨","🌱","🎭","⏳","⚖","📿","🪶","🌳","🌻","🌌","🌠","🌄","🌅"][cardNum % 30];
+}
+
 /* ─── Card components ─── */
 
 type CardSize = "lg" | "md" | "sm";
 const CARD_W: Record<CardSize, string> = { lg: "w-44", md: "w-36", sm: "w-28" };
 
-function CardFace({ el, deckId, size = "md" }: { el: SpreadElement; deckId: string; size?: CardSize }) {
+function OracleCardFace({ el, deckId, size = "md" }: { el: OracleSpreadElement; deckId: string; size?: CardSize }) {
   const c = deckColors(deckId);
   return (
     <div className={`relative ${CARD_W[size]} ${el.reversed ? "rotate-180" : ""}`} style={{ aspectRatio: "2.5/3.5" }}>
@@ -83,7 +183,7 @@ function CardFace({ el, deckId, size = "md" }: { el: SpreadElement; deckId: stri
   );
 }
 
-function CardBack({ deckId, i }: { deckId: string; i: number }) {
+function OracleCardBack({ deckId, i }: { deckId: string; i: number }) {
   const c = deckColors(deckId);
   return (
     <div
@@ -116,92 +216,20 @@ const VERDICT_STYLES: Record<string, string> = {
   Yes: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
   No: "border-rose-500/40 bg-rose-500/10 text-rose-300",
   Mixed: "border-amber-500/40 bg-amber-500/10 text-amber-300",
-  Unclear: "border-zinc-500/40 bg-zinc-500/10 text-zinc-300",
 };
 
 function VerdictBadge({ answer }: { answer: string }) {
+  const style = VERDICT_STYLES[answer] ?? "border-zinc-500/40 bg-zinc-500/10 text-zinc-300";
   return (
-    <span className={`inline-block rounded-full border px-5 py-1.5 text-sm font-semibold tracking-wider ${VERDICT_STYLES[answer] ?? VERDICT_STYLES.Unclear}`}>
+    <span className={`inline-block rounded-full border px-5 py-1.5 text-sm font-semibold tracking-wider ${style}`}>
       {answer}
     </span>
   );
 }
 
-/* ─── Spread Layouts ─── */
-
-function CelticCross({ elements, deckId }: { elements: SpreadElement[]; deckId: string }) {
-  const c = (i: number) => elements[i];
-  const cc = deckColors(deckId);
-  return (
-    <div className="relative mx-auto hidden md:block" style={{ width: 500, height: 460 }}>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-        <div className="absolute -top-28 left-1/2 -translate-x-1/2">
-          <div className="flex flex-col items-center gap-1"><CardFace el={c(2)} deckId={deckId} size="sm" /><span className="text-[7px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>Foundation</span></div>
-        </div>
-        <div className="absolute -left-28 top-1/2 -translate-y-1/2">
-          <div className="flex flex-col items-center gap-1"><CardFace el={c(4)} deckId={deckId} size="sm" /><span className="text-[7px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>Recent Past</span></div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col items-center gap-1"><CardFace el={c(0)} deckId={deckId} size="sm" /><span className="text-[7px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>Present</span></div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="relative"><CardFace el={c(1)} deckId={deckId} size="sm" /><div className="pointer-events-none absolute inset-0 flex items-center justify-center"><span className="text-xl font-bold text-rose-500/50">⨯</span></div></div>
-            <span className="text-[7px] uppercase tracking-[0.15em] text-rose-500/50">Challenge</span>
-          </div>
-        </div>
-        <div className="absolute -right-28 top-1/2 -translate-y-1/2">
-          <div className="flex flex-col items-center gap-1"><CardFace el={c(5)} deckId={deckId} size="sm" /><span className="text-[7px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>Near Future</span></div>
-        </div>
-        <div className="absolute -bottom-28 left-1/2 -translate-x-1/2">
-          <div className="flex flex-col items-center gap-1"><CardFace el={c(3)} deckId={deckId} size="sm" /><span className="text-[7px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>Crown</span></div>
-        </div>
-      </div>
-      <div className="absolute -right-24 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-        {[6,7,8,9].map(i => (
-          <div key={i} className="flex flex-col items-center gap-0.5">
-            <CardFace el={c(i)} deckId={deckId} size="sm" />
-            <span className="text-[6px] uppercase tracking-[0.15em] text-center leading-tight" style={{color:cc.labelColor}}>{elements[i].position.replace(/\s*&\s*/,"\n")}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function HorseshoeArc({ elements, deckId }: { elements: SpreadElement[]; deckId: string }) {
-  const cc = deckColors(deckId);
-  const slots = [
-    {i:0,x:-120,y:-80},{i:1,x:-40,y:-100},{i:2,x:40,y:-100},{i:3,x:120,y:-80},
-    {i:4,x:-120,y:130},{i:5,x:-40,y:150},{i:6,x:40,y:150},
-  ];
-  return (
-    <div className="relative mx-auto hidden md:block" style={{ width: 420, height: 340 }}>
-      {slots.map(p => (
-        <div key={p.i} className="absolute flex flex-col items-center gap-1" style={{left:`calc(50%+${p.x}px)`,top:`calc(50%+${p.y}px)`,transform:"translate(-50%,-50%)"}}>
-          <CardFace el={elements[p.i]} deckId={deckId} size="sm" />
-          <span className="text-[7px] uppercase tracking-[0.15em] text-center max-w-[80px] leading-tight" style={{color:cc.labelColor}}>{elements[p.i].position}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function MobileGrid({ elements, dealt, shuffling, deckId }: { elements: SpreadElement[]; dealt: boolean; shuffling: boolean; deckId: string }) {
-  return (
-    <div className="md:hidden grid gap-3 grid-cols-2 sm:grid-cols-3">
-      {elements.map((el,i) => (
-        <div key={i} className={`transition-all duration-500 ${dealt&&!shuffling?"opacity-100":"opacity-0"}`} style={{transitionDelay:`${i*80}ms`}}>
-          <div className="flex flex-col items-center">
-            <CardFace el={el} deckId={deckId} size="sm" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /* ─── Deck Gallery ─── */
 
-function DeckPreview({ deck, onSelect }: { deck: TarotDeckDef; onSelect: (id: string) => void }) {
+function DeckPreview({ deck, onSelect }: { deck: OracleDeckDef; onSelect: (id: string) => void }) {
   const c = deckColors(deck.id);
   return (
     <button onClick={() => onSelect(deck.id)} className="group relative flex flex-col items-center gap-2 rounded-xl border border-white/[0.04] bg-white/[0.015] p-4 transition hover:border-white/10 hover:bg-white/[0.03]">
@@ -245,7 +273,7 @@ function DeckPreview({ deck, onSelect }: { deck: TarotDeckDef; onSelect: (id: st
               color: `hsla(${DECK_HUES[deck.id]??42},40%,60%,0.7)`,
             }}
           >
-            {deck.tradition}
+            {deck.cardCount} cards
           </span>
         </div>
       </div>
@@ -253,12 +281,12 @@ function DeckPreview({ deck, onSelect }: { deck: TarotDeckDef; onSelect: (id: st
   );
 }
 
-function DeckGallery({ decks, onSelect }: { decks: TarotDeckDef[]; onSelect: (id: string) => void }) {
+function DeckGallery({ decks, onSelect }: { decks: OracleDeckDef[]; onSelect: (id: string) => void }) {
   return (
     <div className="mx-auto max-w-5xl px-5 pb-16 pt-8">
       <div className="mb-6 text-center">
-        <h2 className="text-lg font-semibold text-white/90">Choose Your Deck</h2>
-        <p className="mt-1 text-xs text-zinc-600">{decks.length} tarot decks from 6 centuries of tradition</p>
+        <h2 className="text-lg font-semibold text-white/90">Choose Your Oracle Deck</h2>
+        <p className="mt-1 text-xs text-zinc-600">{decks.length} oracle decks from the world's leading creators</p>
       </div>
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {decks.map(d => <DeckPreview key={d.id} deck={d} onSelect={onSelect} />)}
@@ -269,19 +297,19 @@ function DeckGallery({ decks, onSelect }: { decks: TarotDeckDef[]; onSelect: (id
 
 /* ─── Reading View ─── */
 
-function ReadingView({ deckId, deck }: { deckId: string; deck: TarotDeckDef }) {
-  const [reading, setReading] = useState<ReadingResult | null>(null);
+function OracleReadingView({ deckId, deck }: { deckId: string; deck: OracleDeckDef }) {
+  const [reading, setReading] = useState<OracleReadingResult | null>(null);
   const [shuffling, setShuffling] = useState(false);
   const [dealt, setDealt] = useState(false);
   const [spreadId, setSpreadId] = useState("three-card");
-  const spreads = getSpreads("tarot");
 
   const doReading = useCallback((sid?: string) => {
     const s = sid ?? spreadId;
+    const spread = ORACLE_SPREADS.find(sp => sp.id === s) ?? ORACLE_SPREADS[0];
     setShuffling(true);
     setDealt(false);
-    const r = getTraditionalReading("tarot", deck.name, s, deckId);
     setTimeout(() => {
+      const r = getOracleReading(deckId, deck.name, spread);
       setReading(r);
       setShuffling(false);
       setTimeout(() => setDealt(true), 100);
@@ -289,26 +317,25 @@ function ReadingView({ deckId, deck }: { deckId: string; deck: TarotDeckDef }) {
   }, [deckId, spreadId, deck.name]);
 
   useEffect(() => {
-    const initial = spreads[0]?.id ?? "single";
+    const initial = ORACLE_SPREADS[1]?.id ?? "single";
     setSpreadId(initial);
-    const r = getTraditionalReading("tarot", deck.name, initial, deckId);
+    const spread = ORACLE_SPREADS.find(sp => sp.id === initial) ?? ORACLE_SPREADS[0];
+    const r = getOracleReading(deckId, deck.name, spread);
     setReading(r);
     setDealt(true);
   }, [deckId]);
 
   if (!reading) return <div className="flex min-h-[30vh] items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" /></div>;
 
-  const currentSpread = spreads.find(s => s.id === spreadId);
-  const isYesNo = currentSpread?.layout === "yes-no";
-  const isComplex = reading.elements.length === 7 || reading.elements.length === 10;
+  const currentSpread = ORACLE_SPREADS.find(s => s.id === spreadId);
+  const isYesNo = currentSpread?.isYesNo ?? false;
   const cc = deckColors(deckId);
 
   return (
     <div>
-      {/* Spread selector */}
-      {spreads.length > 1 && (
+      {ORACLE_SPREADS.length > 1 && (
         <div className="flex flex-wrap gap-2 justify-center">
-          {spreads.map(s => (
+          {ORACLE_SPREADS.map(s => (
             <button key={s.id} onClick={() => { setSpreadId(s.id); doReading(s.id); }}
               className={`rounded-full border px-4 py-1.5 text-xs transition ${spreadId===s.id ? "border-amber-500/40 bg-amber-500/10 text-amber-300" : "border-white/10 text-zinc-500 hover:border-white/20 hover:text-zinc-300"}`}
             >{s.name}</button>
@@ -319,90 +346,70 @@ function ReadingView({ deckId, deck }: { deckId: string; deck: TarotDeckDef }) {
       {currentSpread && (
         <div className="mx-auto max-w-lg px-5 pt-3 text-center">
           <p className="text-[10px] text-zinc-600">{currentSpread.description}</p>
-          <p className="mt-0.5 text-[9px] italic text-zinc-700">Best for: {currentSpread.bestFor}</p>
         </div>
       )}
 
-      {/* Shuffle + Draw */}
       <div className="mx-auto max-w-lg px-5 py-6 text-center">
         <div className={`relative mx-auto h-32 w-28 sm:h-36 sm:w-32 transition-all duration-700 ${shuffling ? "animate-[shake_0.3s_ease-in-out_infinite]" : ""}`}>
-          {Array.from({ length: 6 }).map((_, i) => <CardBack key={i} deckId={deckId} i={i} />)}
+          {Array.from({ length: 6 }).map((_, i) => <OracleCardBack key={i} deckId={deckId} i={i} />)}
         </div>
-        <p className="mt-2 text-xs text-zinc-600">78 cards</p>
+        <p className="mt-2 text-xs text-zinc-600">{deck.cardCount} cards</p>
         <div className="mt-4">
           <button onClick={() => doReading()} disabled={shuffling}
             className="inline-flex items-center gap-2 rounded-xl bg-amber-500/10 px-6 py-3 text-sm text-amber-300 transition hover:bg-amber-500/20 disabled:opacity-40"
           >
             {shuffling ? <><div className="h-3.5 w-3.5 animate-spin rounded-full border border-amber-300 border-t-transparent" /> Shuffling...</>
-              : <><Sparkles className="h-3.5 w-3.5" /> Shuffle &amp; Draw</>}
+              : <><Sparkles className="h-3.5 w-3.5" /> Shuffle & Draw</>}
           </button>
         </div>
       </div>
 
-      {/* Cards */}
       {reading.elements.length > 0 && (
         <div className="mx-auto max-w-5xl px-5 pb-6">
-          {reading.elements.length === 10 && <><CelticCross elements={reading.elements} deckId={deckId} /><MobileGrid elements={reading.elements} dealt={dealt} shuffling={shuffling} deckId={deckId} /></>}
-          {reading.elements.length === 7 && <><HorseshoeArc elements={reading.elements} deckId={deckId} /><MobileGrid elements={reading.elements} dealt={dealt} shuffling={shuffling} deckId={deckId} /></>}
-          {isYesNo && (
+          {isYesNo ? (
             <div className="flex flex-col items-center gap-4">
               <div className="flex flex-wrap justify-center gap-5 md:gap-8">
                 {reading.elements.map((el,i) => (
                   <div key={i} className={`transition-all duration-500 ${dealt&&!shuffling?"translate-y-0 opacity-100":"translate-y-6 opacity-0"}`} style={{transitionDelay:`${i*120}ms`}}>
-                    <div className="flex flex-col items-center gap-1"><CardFace el={el} deckId={deckId} size="lg" /><span className="text-[9px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>{el.position}</span></div>
+                    <div className="flex flex-col items-center gap-1"><OracleCardFace el={el} deckId={deckId} size="lg" /><span className="text-[9px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>{el.position}</span></div>
                   </div>
                 ))}
               </div>
             </div>
-          )}
-          {!isYesNo && !isComplex && reading.elements.length > 1 && (
+          ) : (
             <div className="flex flex-wrap justify-center gap-5 md:gap-8">
               {reading.elements.map((el,i) => (
                 <div key={i} className={`transition-all duration-500 ${dealt&&!shuffling?"translate-y-0 opacity-100":"translate-y-6 opacity-0"}`} style={{transitionDelay:`${i*120}ms`}}>
-                  <div className="flex flex-col items-center gap-1"><CardFace el={el} deckId={deckId} size={reading.elements.length<=3?"lg":"md"} /><span className="text-[9px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>{el.position}</span></div>
+                  <div className="flex flex-col items-center gap-1"><OracleCardFace el={el} deckId={deckId} size={reading.elements.length<=3?"lg":"md"} /><span className="text-[9px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>{el.position}</span></div>
                 </div>
               ))}
             </div>
           )}
-          {reading.elements.length === 1 && (
-            <div className={`flex justify-center transition-all duration-500 ${dealt&&!shuffling?"translate-y-0 opacity-100":"translate-y-6 opacity-0"}`}>
-              <div className="flex flex-col items-center gap-1"><CardFace el={reading.elements[0]} deckId={deckId} size="lg" /><span className="text-[9px] uppercase tracking-[0.15em]" style={{color:cc.labelColor}}>{reading.elements[0].position}</span></div>
-            </div>
-          )}
         </div>
       )}
 
-      {/* Verdict */}
-      {reading.verdict && (
-        <div className="mx-auto max-w-lg px-5 pb-6">
-          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 text-center">
-            <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-zinc-600">Verdict</p>
-            <VerdictBadge answer={reading.verdict.answer} />
-            <p className="mt-3 text-xs leading-relaxed text-zinc-500">{reading.verdict.explanation}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Interpretation */}
       {reading.interpretation && (
         <div className="mx-auto max-w-2xl px-5 pb-12">
           <div className="rounded-xl border border-amber-500/10 bg-gradient-to-br from-amber-500/[0.04] to-transparent p-5 sm:p-6">
             <h3 className="mb-4 text-center text-xs uppercase tracking-[0.2em] text-amber-400/50">Interpretation</h3>
             <div className="text-left text-sm leading-relaxed text-zinc-300 space-y-2">
-              {reading.interpretation.split("\n").map((line, j) => {
-                if (line.startsWith("══") || line.startsWith("═══")) {
-                  return <hr key={j} className="border-amber-700/20 my-3" />;
+              {reading.interpretation.split("\n\n").map((block, j) => {
+                if (block.startsWith("Verdict:")) {
+                  const answer = block.replace("Verdict: ", "");
+                  return (
+                    <div key={j} className="mt-4 text-center">
+                      <VerdictBadge answer={answer} />
+                    </div>
+                  );
                 }
-                if (line === "") return null;
-                if (line === line.toUpperCase() && line.length > 3 && !line.includes(" ")) {
-                  return null;
-                }
-                const isHeader = !line.includes("Keywords") && !line.includes("Verdict:") &&
-                  (line.endsWith("Spread") || line.match(/^[A-Z][a-z]+ [A-Z][a-z]/) && !line.includes("\u2014"));
+                const lines = block.split("\n");
                 return (
-                  <p key={j} className={isHeader ? "text-base font-semibold text-amber-300/60 mt-3 mb-1" : "leading-relaxed"}>
-                    {line}
-                  </p>
+                  <div key={j}>
+                    <p className="text-base font-semibold text-amber-300/60 mb-1">{lines[0]}</p>
+                    {lines.slice(1).map((line, k) => (
+                      <p key={k} className="leading-relaxed text-zinc-400">{line}</p>
+                    ))}
+                  </div>
                 );
               })}
             </div>
@@ -415,30 +422,27 @@ function ReadingView({ deckId, deck }: { deckId: string; deck: TarotDeckDef }) {
 
 /* ─── Card Browser ─── */
 
-function CardBrowser({ deckId }: { deckId: string }) {
-  const [cards, setCards] = useState<SpreadElement[]>([]);
-  const [filter, setFilter] = useState<string>("all");
-  useEffect(() => { setCards(getTraditionalDeck("tarot", deckId)); }, [deckId]);
-  if (cards.length === 0) return null;
+function OracleCardBrowser({ deckId }: { deckId: string }) {
+  const deck = getOracleDeck(deckId);
+  if (!deck) return null;
 
-  const suits = ["All","Major Arcana","Wands","Cups","Swords","Pentacles","Disks","Batons","Coupes","Épées","Deniers"];
-  const filtered = filter === "all" ? cards : cards.filter(c => c.position.toLowerCase().includes(filter.toLowerCase()));
+  const allCards = getOracleCardsForDeck(deckId);
+  const cards: { title: string; keywords: string }[] = allCards.map(c => ({
+    title: c.title.split("|")[1] ?? c.title,
+    keywords: c.keywords.join(", "),
+  }));
+
+  if (cards.length === 0) return null;
 
   return (
     <div className="mx-auto max-w-5xl px-5 pb-16">
-      <div className="mb-4 flex flex-wrap justify-center gap-2">
-        {suits.map(s => (
-          <button key={s} onClick={() => setFilter(s)}
-            className={`rounded-full border px-3 py-1 text-[9px] uppercase tracking-wider transition ${filter===s ? "border-amber-500/40 bg-amber-500/10 text-amber-300" : "border-white/10 text-zinc-600 hover:border-white/20"}`}
-          >{s}</button>
-        ))}
+      <div className="mb-4 text-center">
+        <p className="text-[10px] text-zinc-600">{deck.name} - {deck.cardCount} cards by {deck.artist}</p>
       </div>
       <div className="grid gap-2 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
-        {filtered.map((c, i) => (
+        {cards.map((c, i) => (
           <div key={i} className="rounded-lg border border-white/[0.04] bg-white/[0.015] px-2 py-3 text-center transition hover:border-white/10">
-            <div className="flex justify-center"><CardFace el={{...c, glyph: "🃏", reversed: false}} deckId={deckId} size="sm" /></div>
             <div className="mt-1.5 text-[9px] font-semibold leading-tight text-white/80">{c.title}</div>
-            <div className="mt-0.5 text-[8px] leading-tight text-zinc-600">{c.position}</div>
             {c.keywords && <div className="mt-1 text-[6px] leading-tight text-zinc-500">{c.keywords}</div>}
           </div>
         ))}
@@ -447,9 +451,11 @@ function CardBrowser({ deckId }: { deckId: string }) {
   );
 }
 
-/* ─── History Section (at bottom) ─── */
-function HistorySection() {
+/* ─── History Section ─── */
+
+function OracleHistorySection() {
   const [open, setOpen] = useState(false);
+  const history = getOracleHistorySections();
   return (
     <div className="rounded-xl border border-white/[0.04] bg-white/[0.015] overflow-hidden">
       <button
@@ -458,13 +464,13 @@ function HistorySection() {
       >
         <div className="flex items-center gap-2">
           <History className="h-3.5 w-3.5 text-amber-400/60" />
-          <span className="text-xs font-semibold text-white/70">History of the Tarot</span>
+          <span className="text-xs font-semibold text-white/70">History of Oracle Cards</span>
         </div>
         {open ? <ChevronUp className="h-3 w-3 text-zinc-600" /> : <ChevronDown className="h-3 w-3 text-zinc-600" />}
       </button>
       {open && (
         <div className="px-5 pb-5 space-y-4 text-[10px] leading-relaxed text-zinc-500">
-          {TAROT_ORIGINS.map((section, i) => (
+          {history.map((section, i) => (
             <div key={i}>
               <h4 className={`font-bold text-white/60 mb-1 ${section.title.startsWith("Interesting") ? "mt-2" : ""}`}>{section.title}</h4>
               {section.paragraphs.map((p, j) => (
@@ -480,11 +486,11 @@ function HistorySection() {
 
 /* ─── Main Page ─── */
 
-export function TarotPage() {
+export function OracleCardsPage() {
   const [view, setView] = useState<"gallery" | "read" | "browse">("gallery");
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
 
-  const selectedDeck = TAROT_DECKS.find(d => d.id === selectedDeckId);
+  const selectedDeck = getOracleDeck(selectedDeckId ?? "");
 
   const handleSelect = useCallback((id: string) => {
     setSelectedDeckId(id);
@@ -498,7 +504,7 @@ export function TarotPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-gray-900">
-      <SeoHead title="Tarot · Deck Library & Readings" description="35 tarot decks with full traditional spreads. choose your deck and read the cards" path="/consult/tarot" />
+      <SeoHead title="Oracle Cards · Deck Library & Readings" description="22 oracle decks from the world's leading creators. choose your deck and receive guidance" path="/consult/oracle-cards" />
 
       <div className="border-b border-white/5">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-3">
@@ -508,24 +514,23 @@ export function TarotPage() {
             <ArrowLeft className="h-3.5 w-3.5" />
             {view === "gallery" ? <Link to="/consult">All methods</Link> : "All Decks"}
           </button>
-          <span className="text-xs text-zinc-700">{view === "gallery" ? "Tarot" : selectedDeck?.name ?? "Tarot"}</span>
+          <span className="text-xs text-zinc-700">{view === "gallery" ? "Oracle Cards" : selectedDeck?.name ?? "Oracle Cards"}</span>
         </div>
       </div>
 
-      {/* Deck detail header when reading/browsing */}
       {selectedDeck && view !== "gallery" && (
         <div className="border-b border-white/5 bg-white/[0.01]">
           <div className="mx-auto max-w-5xl px-5 py-4">
             <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-start sm:gap-4">
               <div className="relative h-16 w-12 flex-shrink-0">
-                {Array.from({ length: 3 }).map((_, i) => <CardBack key={i} deckId={selectedDeck.id} i={i} />)}
+                {Array.from({ length: 3 }).map((_, i) => <OracleCardBack key={i} deckId={selectedDeck.id} i={i} />)}
               </div>
               <div className="text-center sm:text-left">
                 <h2 className="text-sm font-semibold text-white/90">{selectedDeck.name}</h2>
-                <p className="text-[10px] text-zinc-500">{selectedDeck.artist} · {selectedDeck.year}</p>
+                <p className="text-[10px] text-zinc-500">{selectedDeck.artist} · {selectedDeck.year} · {selectedDeck.cardCount} cards</p>
                 <p className="mt-1 text-[10px] italic text-zinc-600">{selectedDeck.description}</p>
                 <div className="mt-2 flex items-center justify-center gap-2 sm:justify-start">
-                  <span className="inline-block rounded-full border border-amber-700/30 px-2.5 py-0.5 text-[9px] uppercase tracking-wider text-amber-400/70">{selectedDeck.tradition}</span>
+                  <span className="inline-block rounded-full border border-amber-700/30 px-2.5 py-0.5 text-[9px] uppercase tracking-wider text-amber-400/70">{selectedDeck.theme}</span>
                   <button onClick={() => setView("browse")}
                     className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[9px] uppercase tracking-wider transition ${view==="browse" ? "border-amber-500/40 bg-amber-500/10 text-amber-300" : "border-white/10 text-zinc-500 hover:border-white/20"}`}
                   ><Book className="h-3 w-3" />Browse</button>
@@ -539,14 +544,12 @@ export function TarotPage() {
         </div>
       )}
 
-      {/* View content */}
-      {view === "gallery" && <DeckGallery decks={TAROT_DECKS} onSelect={handleSelect} />}
-      {view === "read" && selectedDeck && <ReadingView deckId={selectedDeck.id} deck={selectedDeck} />}
-      {view === "browse" && selectedDeckId && <CardBrowser deckId={selectedDeckId} />}
+      {view === "gallery" && <DeckGallery decks={getOracleDecks()} onSelect={handleSelect} />}
+      {view === "read" && selectedDeck && <OracleReadingView deckId={selectedDeck.id} deck={selectedDeck} />}
+      {view === "browse" && selectedDeckId && <OracleCardBrowser deckId={selectedDeckId} />}
 
-      {/* History & Sources */}
       <div className="mx-auto max-w-3xl px-5 pb-16 pt-8">
-        <HistorySection />
+        <OracleHistorySection />
       </div>
     </div>
   );

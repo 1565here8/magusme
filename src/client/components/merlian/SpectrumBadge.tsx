@@ -12,7 +12,7 @@ export function SpectrumDot(props: { meta: SpectrumMeta; className?: string }) {
   return (
     <span
       className={cx("spectrum-dot shrink-0", spectrumTierClass(props.meta.tier), props.className)}
-      title={`${props.meta.label} — ${props.meta.hint}`}
+      title={`${props.meta.label}. ${props.meta.hint}`}
       aria-hidden
     />
   );
@@ -67,7 +67,7 @@ export function SpectrumLegend(props: { className?: string }) {
 
   return (
     <div className={cx("spectrum-legend", props.className)}>
-      <p className="label-premium mb-2">Magic spectrum — white to black</p>
+      <p className="label-premium mb-2">Magic spectrum. white to black</p>
       <div className="spectrum-legend-track" aria-label="Magic color spectrum from white to black">
         {tiers.map((tier) => {
           const meta = getSpectrumMeta(tier);

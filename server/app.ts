@@ -17,8 +17,10 @@ import { registerSpellsRoutes } from "./routes/spells.routes";
 import { registerSitemapRoutes } from "./routes/sitemap.routes";
 import { registerInferenceRoutes } from "./routes/inference.routes";
 import { registerReadingRoutes } from "./routes/reading.routes";
+import { registerMarketplaceRoutes } from "./routes/marketplace.routes";
 import { initArcanaModule } from "../src/server/arcana/init";
 import { initSpellsModule } from "../src/server/spells/init";
+import { initMarketplaceModule } from "../src/server/marketplace/init";
 
 function configureTrustProxy(app: Express) {
   const shouldTrust =
@@ -34,6 +36,7 @@ export async function createApp(): Promise<Express> {
   await initDatabase();
   await initArcanaModule();
   await initSpellsModule();
+  await initMarketplaceModule();
 
   const app = express();
   configureTrustProxy(app);
@@ -66,6 +69,7 @@ export async function createApp(): Promise<Express> {
   registerInferenceRoutes(app);
   registerReadingRoutes(app);
   registerSitemapRoutes(app);
+  registerMarketplaceRoutes(app);
   app.use("/api", notFoundHandler);
 
   const distDir = path.resolve(process.cwd(), "dist");

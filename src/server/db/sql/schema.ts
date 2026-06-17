@@ -288,13 +288,19 @@ CREATE TABLE IF NOT EXISTS spells (
   reference_link TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  verified INTEGER NOT NULL DEFAULT 0
+  verified INTEGER NOT NULL DEFAULT 0,
+  verification_status TEXT NOT NULL DEFAULT 'pending' CHECK (verification_status IN ('pending', 'verified', 'rejected')),
+  verification_source TEXT,
+  verified_by TEXT,
+  verified_at TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_spells_category ON spells(category_id);
 CREATE INDEX IF NOT EXISTS idx_spells_tradition ON spells(tradition_id);
 CREATE INDEX IF NOT EXISTS idx_spells_rating ON spells(rating DESC);
 CREATE INDEX IF NOT EXISTS idx_spells_created ON spells(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_spells_verification ON spells(verification_status);
+CREATE INDEX IF NOT EXISTS idx_spells_verified ON spells(verified);
 
 CREATE TABLE IF NOT EXISTS spell_reviews (
   id TEXT PRIMARY KEY,
@@ -306,4 +312,140 @@ CREATE TABLE IF NOT EXISTS spell_reviews (
 );
 
 CREATE INDEX IF NOT EXISTS idx_spell_reviews_spell ON spell_reviews(spell_id, created_at DESC);
+
+-- Marketplace: service categories (seeded, not user-created)
+CREATE TABLE IF NOT EXISTS service_categories (
+  id TEXT PRIMARY KEY,
+  slug TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  icon TEXT NOT NULL DEFAULT 'Sparkles',
+  parent_id TEXT REFERENCES service_categories(id),
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+
+-- Marketplace: service listings (one provider can have many)
+CREATE TABLE IF NOT EXISTS service_listings (
+  id TEXT PRIMARY KEY,
+  provider_id TEXT NOT NULL REFERENCES social_profiles(user_id),
+  category_id TEXT REFERENCES service_categories(id),
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT NOT NULL DEFAULT '',
+  pricing_model TEXT NOT NULL DEFAULT 'fixed' CHECK(pricing_model IN ('fixed','hourly','package','contact')),
+  price_cents INTEGER NOT NULL DEFAULT 0,
+  duration_minutes INTEGER,
+  delivery_days INTEGER,
+  is_online INTEGER NOT NULL DEFAULT 1,
+  location TEXT,
+  tags TEXT NOT NULL DEFAULT '[]',
+  media_urls TEXT NOT NULL DEFAULT '[]',
+  status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','active','paused','archived')),
+  view_count INTEGER NOT NULL DEFAULT 0,
+  order_count INTEGER NOT NULL DEFAULT 0,
+  rating REAL NOT NULL DEFAULT 0,
+  review_count INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_svc_listings_provider ON service_listings(provider_id);
+CREATE INDEX IF NOT EXISTS idx_svc_listings_category ON service_listings(category_id);
+CREATE INDEX IF NOT EXISTS idx_svc_listings_status ON service_listings(status);
+CREATE INDEX IF NOT EXISTS idx_svc_listings_rating ON service_listings(rating DESC);
+
+-- Marketplace: service packages (tiered offerings per listing)
+CREATE TABLE IF NOT EXISTS service_packages (
+  id TEXT PRIMARY KEY,
+  listing_id TEXT NOT NULL REFERENCES service_listings(id),
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  price_cents INTEGER NOT NULL,
+  delivery_days INTEGER,
+  inclusions TEXT NOT NULL DEFAULT '[]',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_svc_packages_listing ON service_packages(listing_id);
+
+-- Marketplace: orders (transaction record)
+CREATE TABLE IF NOT EXISTS service_orders (
+  id TEXT PRIMARY KEY,
+  listing_id TEXT NOT NULL REFERENCES service_listings(id),
+  buyer_id TEXT NOT NULL REFERENCES users(id),
+  package_id TEXT REFERENCES service_packages(id),
+  custom_amount_cents INTEGER,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','confirmed','in_progress','completed','cancelled','disputed','refunded')),
+  buyer_instructions TEXT NOT NULL DEFAULT '',
+  seller_notes TEXT NOT NULL DEFAULT '',
+  delivery_notes TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  confirmed_at TEXT,
+  completed_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_svc_orders_buyer ON service_orders(buyer_id);
+CREATE INDEX IF NOT EXISTS idx_svc_orders_listing ON service_orders(listing_id);
+CREATE INDEX IF NOT EXISTS idx_svc_orders_status ON service_orders(status);
+
+-- Marketplace: order-gated messages
+CREATE TABLE IF NOT EXISTS service_order_messages (
+  id TEXT PRIMARY KEY,
+  order_id TEXT NOT NULL REFERENCES service_orders(id),
+  sender_id TEXT NOT NULL REFERENCES users(id),
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_svc_msgs_order ON service_order_messages(order_id, created_at);
+
+-- Marketplace: reviews (one per order, gated to completed)
+CREATE TABLE IF NOT EXISTS service_reviews (
+  id TEXT PRIMARY KEY,
+  order_id TEXT NOT NULL UNIQUE REFERENCES service_orders(id),
+  listing_id TEXT NOT NULL REFERENCES service_listings(id),
+  reviewer_id TEXT NOT NULL REFERENCES users(id),
+  rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
+  body TEXT NOT NULL,
+  is_public INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_svc_reviews_listing ON service_reviews(listing_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_svc_reviews_reviewer ON service_reviews(reviewer_id);
+
+-- Marketplace: payout accounts (sellers register to receive funds)
+CREATE TABLE IF NOT EXISTS marketplace_payout_accounts (
+  user_id TEXT PRIMARY KEY REFERENCES social_profiles(user_id),
+  email TEXT NOT NULL,
+  blockchain_code TEXT NOT NULL DEFAULT 'BASE',
+  currency_code TEXT NOT NULL DEFAULT 'USDC',
+  wallet_address TEXT NOT NULL,
+  is_active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+-- Marketplace: payment invoices for orders
+CREATE TABLE IF NOT EXISTS marketplace_invoices (
+  reference_id TEXT PRIMARY KEY,
+  order_id TEXT NOT NULL REFERENCES service_orders(id),
+  buyer_id TEXT NOT NULL REFERENCES users(id),
+  seller_id TEXT NOT NULL REFERENCES users(id),
+  amount_cents INTEGER NOT NULL,
+  platform_fee_cents INTEGER NOT NULL DEFAULT 0,
+  seller_payout_cents INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','paid','settled','refunded','expired')),
+  checkout_url TEXT,
+  paid_at TEXT,
+  settled_at TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_mkt_invoices_order ON marketplace_invoices(order_id);
+CREATE INDEX IF NOT EXISTS idx_mkt_invoices_buyer ON marketplace_invoices(buyer_id);
+CREATE INDEX IF NOT EXISTS idx_mkt_invoices_seller ON marketplace_invoices(seller_id);
+CREATE INDEX IF NOT EXISTS idx_mkt_invoices_status ON marketplace_invoices(status);
 `;

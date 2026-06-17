@@ -38,7 +38,7 @@ export function ConsultPage() {
 
   return (
     <div className="min-h-screen">
-      <SeoHead title="Consult the Oracle · 81 Divination Systems" description="Choose from 81 divination methods across 16 traditions — tarot, runes, astrology, I Ching, numerology, scrying, and more. AI-powered readings with full cross-system analysis." path="/consult" />
+      <SeoHead title="Consult the Oracle · 81 Divination Systems" description="Choose from 81 divination methods across 16 traditions. tarot, runes, astrology, I Ching, numerology, scrying, and more. AI-powered readings with full cross-system analysis." path="/consult" />
       {/* Header */}
       <section className="relative border-b border-white/5">
         <div className="absolute inset-0 bg-gradient-to-b from-violet-900/10 via-purple-900/5 to-transparent" />
@@ -48,7 +48,7 @@ export function ConsultPage() {
             {DIVINATION_SYSTEMS.length} Divination Systems Available
           </div>
           <h1 className="font-serif text-3xl font-bold text-white md:text-4xl">
-            Consult — Ask the Universe Anything
+            Consult. Ask the Universe Anything
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
             Choose your method or simply ask a question and let the universe guide you to the right tool.

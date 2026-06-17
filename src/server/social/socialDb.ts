@@ -679,4 +679,24 @@ export class SocialDb {
       note: "Configure KYC_CLIENT_ID and KYC_REDIRECT_URI for production. Verification handled externally — we never store ID documents.",
     };
   }
+
+  async updateKycStatus(userId: string, status: KycStatus, provider?: string): Promise<void> {
+    if (status === "verified") {
+      await this.driver.exec(
+        this.pg(
+          "UPDATE social_profiles SET kyc_status = ?, kyc_provider = COALESCE(?, kyc_provider), updated_at = ? WHERE user_id = ?",
+          [status, provider ?? null, isoNow(), userId],
+        ).sql,
+        [status, provider ?? null, isoNow(), userId],
+      );
+    } else {
+      await this.driver.exec(
+        this.pg(
+          "UPDATE social_profiles SET kyc_status = ?, updated_at = ? WHERE user_id = ?",
+          [status, isoNow(), userId],
+        ).sql,
+        [status, isoNow(), userId],
+      );
+    }
+  }
 }

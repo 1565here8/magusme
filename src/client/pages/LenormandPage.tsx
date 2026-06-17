@@ -125,37 +125,37 @@ function PairInterpretation({ cardA, cardB }: { cardA: LenormandCardDef; cardB: 
     "1-25": "A proposal or commitment offered. News of an engagement, a contract arriving, a commitment being presented.",
     "1-28": "A man arriving or a message from a man. The male figure is active and approaching.",
     "1-29": "A woman arriving or a message from a woman. She brings news or is coming to see you.",
-    "2-31": "Extraordinary good fortune. Luck and success combined — a fortunate breakthrough.",
-    "2-34": "Financial luck — unexpected money, a windfall, a lucky financial opportunity.",
+    "2-31": "Extraordinary good fortune. Luck and success combined. a fortunate breakthrough.",
+    "2-34": "Financial luck. unexpected money, a windfall, a lucky financial opportunity.",
     "3-4": "Moving house. A journey related to home or returning home after travel.",
     "3-35": "A journey for work or a stable relocation. Travel that leads to a settled outcome.",
     "4-24": "Domestic happiness. Love at home, a happy family life, emotional security in the home.",
-    "4-25": "A domestic commitment — moving in together, marriage at home, a home purchase.",
-    "5-8": "Health concerns. The tree's vitality affected by the coffin — illness or recovery from illness.",
+    "4-25": "A domestic commitment. moving in together, marriage at home, a home purchase.",
+    "5-8": "Health concerns. The tree's vitality affected by the coffin. illness or recovery from illness.",
     "5-31": "Robust health. Vitality restored, strong immune system, healing complete.",
-    "6-31": "Clarity after confusion. The sun burns through clouds — truth emerges, confusion resolves.",
+    "6-31": "Clarity after confusion. The sun burns through clouds. truth emerges, confusion resolves.",
     "6-32": "Emotional fog. Confused feelings, self-deception, a situation where emotions cloud judgment.",
-    "7-14": "A cunning deceiver. Someone who manipulates through cleverness — double deception.",
+    "7-14": "A cunning deceiver. Someone who manipulates through cleverness. double deception.",
     "7-24": "Love that is not trustworthy. A relationship with hidden agendas or emotional manipulation.",
-    "8-17": "An ending that leads to positive change. Death and rebirth — closure brings transformation.",
+    "8-17": "An ending that leads to positive change. Death and rebirth. closure brings transformation.",
     "8-31": "A happy ending. Transformation that leads to light. The coffin opens to sunshine.",
     "9-24": "A love gift or romantic invitation. A date, a proposal, a gesture of affection offered freely.",
     "9-25": "An engagement gift or a contract offer. A commitment presented as a gift.",
-    "10-24": "Sudden heartbreak. A relationship cut abruptly — a breakup that comes without warning.",
+    "10-24": "Sudden heartbreak. A relationship cut abruptly. a breakup that comes without warning.",
     "10-25": "A sudden divorce or contract cancellation. The scythe cuts through a commitment.",
-    "11-24": "Passionate but volatile love. Intense emotions with frequent arguments — fire and heat.",
+    "11-24": "Passionate but volatile love. Intense emotions with frequent arguments. fire and heat.",
     "11-25": "A turbulent relationship. Commitment that involves conflict, or a contract under dispute.",
     "13-17": "A new phase beginning. A birth, a new project launching, a fresh start that changes everything.",
     "13-24": "New love. A fresh romance, innocent and full of potential. The beginning of something beautiful.",
     "14-15": "A cunning authority figure. A boss who manipulates, or workplace politics requiring caution.",
-    "16-31": "Destined success. Your path and your purpose align — extraordinary clarity and fulfillment.",
+    "16-31": "Destined success. Your path and your purpose align. extraordinary clarity and fulfillment.",
     "16-32": "Spiritual intuition. Deep inner knowing, psychic awareness, guidance from within.",
     "17-24": "A change of heart. Feelings shift, a relationship transforms, emotional direction changes.",
-    "17-25": "A commitment that changes form — marriage after a period of change, a renewed contract.",
+    "17-25": "A commitment that changes form. marriage after a period of change, a renewed contract.",
     "18-24": "Loyal love. Faithful partnership, a devoted friend who loves truly, trust that holds.",
     "19-24": "Distant love. A long-distance relationship, emotional isolation, or coldness in love.",
     "20-24": "Social love. Meeting someone through friends, a public romance, love that thrives in community.",
-    "21-33": "An obstacle that will be overcome. The key unlocks the mountain — the solution exists.",
+    "21-33": "An obstacle that will be overcome. The key unlocks the mountain. the solution exists.",
     "22-24": "A choice in love. Between two people, or the decision to commit or walk away.",
     "23-34": "Financial loss. Money draining away, theft, bad investments, expenses exceeding income.",
     "24-25": "A committed love. Marriage, engagement, a deep partnership. The heart bound by the ring.",
@@ -169,12 +169,12 @@ function PairInterpretation({ cardA, cardB }: { cardA: LenormandCardDef; cardB: 
     "27-24": "A love letter or romantic message. Written declaration of affection.",
     "28-29": "The union of masculine and feminine. A partnership, relationship, or the integration of opposites.",
     "30-31": "Peace and joy together. Mature happiness, contentment, the bloom of a life well-lived.",
-    "31-32": "Day and night, conscious and unconscious aligned. A complete cycle — integration and wholeness.",
-    "31-33": "The answer is clear and positive. Success and solution together — the outcome is bright.",
-    "31-36": "A burden that ends in success. The cross carried to light — hard work rewarded.",
+    "31-32": "Day and night, conscious and unconscious aligned. A complete cycle. integration and wholeness.",
+    "31-33": "The answer is clear and positive. Success and solution together. the outcome is bright.",
+    "31-36": "A burden that ends in success. The cross carried to light. hard work rewarded.",
     "33-34": "The key to financial success. A solution to money problems, access to abundance.",
     "34-35": "Financial stability. Steady income, secure finances, money that provides lasting security.",
-    "35-36": "A stable burden. A responsibility that you carry because it provides security — work, family duty.",
+    "35-36": "A stable burden. A responsibility that you carry because it provides security. work, family duty.",
   };
 
   const key = `${Math.min(cardA.id, cardB.id)}-${Math.max(cardA.id, cardB.id)}`;
@@ -219,11 +219,11 @@ function HowToRead() {
         <div className="px-5 pb-5 space-y-4 text-[10px] leading-relaxed text-zinc-500">
           <div>
             <h4 className="font-bold text-white/60 mb-1">What is Lenormand?</h4>
-            <p>Lenormand is a 36-card cartomantic system named after Marie Anne Lenormand (1772–1843), though she did not design the deck herself. The cards as we know them today originated in 19th-century Germany as <em>Das Spiel der Hoffnung</em> (The Game of Hope), a simple fortune-telling game using symbolic images. Unlike Tarot (which uses archetypes and spiritual narratives), Lenormand is direct, practical, and literal. It answers specific questions about daily life — love, work, money, travel, health — with blunt honesty. No spiritual elevation, no hidden mysteries. Just clear, grounded answers.</p>
+            <p>Lenormand is a 36-card cartomantic system named after Marie Anne Lenormand (1772–1843), though she did not design the deck herself. The cards as we know them today originated in 19th-century Germany as <em>Das Spiel der Hoffnung</em> (The Game of Hope), a simple fortune-telling game using symbolic images. Unlike Tarot (which uses archetypes and spiritual narratives), Lenormand is direct, practical, and literal. It answers specific questions about daily life. love, work, money, travel, health. with blunt honesty. No spiritual elevation, no hidden mysteries. Just clear, grounded answers.</p>
           </div>
           <div>
             <h4 className="font-bold text-white/60 mb-1">How does reading work?</h4>
-            <p>Lenormand cards are read primarily in <strong>combinations</strong>. A single card has a range of meanings, but when placed next to another card, the two create a specific phrase — like words in a sentence. The Rider (news) next to the Heart (love) = "a love message." The Ship (travel) next to the Anchor (work) = "a business trip." The spread is read as a coherent story, not a collection of individual card meanings. Context is everything: the same card means something different depending on who it sits beside.</p>
+            <p>Lenormand cards are read primarily in <strong>combinations</strong>. A single card has a range of meanings, but when placed next to another card, the two create a specific phrase. like words in a sentence. The Rider (news) next to the Heart (love) = "a love message." The Ship (travel) next to the Anchor (work) = "a business trip." The spread is read as a coherent story, not a collection of individual card meanings. Context is everything: the same card means something different depending on who it sits beside.</p>
           </div>
           <div>
             <h4 className="font-bold text-white/60 mb-1">Essential techniques</h4>
@@ -237,7 +237,7 @@ function HowToRead() {
           </div>
           <div>
             <h4 className="font-bold text-white/60 mb-1">What makes Lenormand different from Tarot?</h4>
-            <p>Tarot uses 78 cards with complex symbolism, archetypes, and spiritual narratives. Lenormand uses 36 cards with simple, everyday images. Tarot asks "why" — Lenormand asks "what." Tarot explores the soul's journey; Lenormand tells you what to expect next week. Both are valid, but they speak different languages. Lenormand is faster, more specific, and less concerned with spiritual growth than with practical outcomes. It is the card system for people who want answers, not lessons.</p>
+            <p>Tarot uses 78 cards with complex symbolism, archetypes, and spiritual narratives. Lenormand uses 36 cards with simple, everyday images. Tarot asks "why". Lenormand asks "what." Tarot explores the soul's journey; Lenormand tells you what to expect next week. Both are valid, but they speak different languages. Lenormand is faster, more specific, and less concerned with spiritual growth than with practical outcomes. It is the card system for people who want answers, not lessons.</p>
           </div>
         </div>
       )}
@@ -282,7 +282,7 @@ function SpreadPreview({ spreadType }: { spreadType: SpreadType }) {
   return (
     <div className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-4">
       <h3 className="mb-3 text-[9px] uppercase tracking-[0.25em] text-zinc-600">
-        {spread.name} — {spread.cardCount} cards
+        {spread.name}. {spread.cardCount} cards
       </h3>
       <p className="text-[10px] text-zinc-500 mb-4">{spread.description}</p>
       <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(spread.positions.length, 3)}, 1fr)` }}>
@@ -741,7 +741,7 @@ export function LenormandPage() {
                   Read by <strong>rows</strong> (top = outer world, middle = present dynamic, bottom = hidden/subconscious), 
                   by <strong>columns</strong> (left = past, center = core, right = future), 
                   and by <strong>diagonals</strong> (hidden influences crossing the grid). 
-                  The center card (position 5) is the still point — the truth at the heart of the reading.
+                  The center card (position 5) is the still point. the truth at the heart of the reading.
                 </p>
               </div>
             </div>
@@ -767,7 +767,7 @@ export function LenormandPage() {
               <Info className="h-4 w-4 mx-auto text-indigo-400/40 mb-2" />
               <p className="text-[9px] leading-relaxed text-zinc-600">
                 Lenormand cards are read as a narrative, not a collection of isolated meanings. 
-                Each card modifies and is modified by its neighbors. The story is in the combination — 
+                Each card modifies and is modified by its neighbors. The story is in the combination. 
                 the sentence formed by the cards together. Read the pairs, read the flow, 
                 and remember: Lenormand speaks plainly. Trust what the cards say, not what you hope they will say.
               </p>

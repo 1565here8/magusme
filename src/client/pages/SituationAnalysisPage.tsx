@@ -101,7 +101,7 @@ export function SituationAnalysisPage() {
               <h1 className="font-serif text-3xl font-bold text-white">Describe Your Situation</h1>
               <p className="mx-auto mt-3 max-w-lg text-zinc-400">
                 Tell me what's happening. I'll analyze through Tarot, Runes, Astrology, Numerology,
-                and the Grimoire — then build you a complete action plan.
+                and the Grimoire. then build you a complete action plan.
               </p>
             </div>
 

@@ -267,7 +267,7 @@ export default function RuneConsultPage() {
           {view === "cast" && (
             <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-zinc-500">
               The runes were revealed to Odin when he hung nine days on Yggdrasil, pierced by his own spear. 
-              Cast them for the wisdom of the All-Father — each rune a key to the hidden patterns of fate.
+              Cast them for the wisdom of the All-Father. each rune a key to the hidden patterns of fate.
             </p>
           )}
 
@@ -477,7 +477,7 @@ export default function RuneConsultPage() {
                 <p className="text-[9px] uppercase tracking-[0.15em] text-zinc-600">The Norns Weave</p>
                 <p className="mt-2 text-[10px] leading-relaxed text-zinc-500">
                   Urd shapes the past from the well of memory. Verdandi weaves the present thread by thread. 
-                  Skuld cuts the cloth at its appointed length — but the pattern is not fixed until the moment passes.
+                  Skuld cuts the cloth at its appointed length. but the pattern is not fixed until the moment passes.
                 </p>
               </div>
             </div>

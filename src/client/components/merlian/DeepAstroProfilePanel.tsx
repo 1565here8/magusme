@@ -93,7 +93,7 @@ export function DeepAstroProfilePanel(props: {
  await streamDivination(
  {
  divinationId: "manifest_loa",
- question: `Deep cosmic profile synthesis for ${astroProfile.fullName} — personalized manifestation path using my chart, culture, destination, and growth areas.`,
+ question: `Deep cosmic profile synthesis for ${astroProfile.fullName}. personalized manifestation path using my chart, culture, destination, and growth areas.`,
  description: snapshot,
  ...personalizationPayload,
  },
@@ -114,7 +114,7 @@ export function DeepAstroProfilePanel(props: {
  Deep Cosmic Profile
  </h2>
  <p className="body-muted mt-1 text-sm">
- Natal chart + numerology + name letter map + Chinese zodiac + aspects + manifestation profile — from DOB &amp; full name
+ Natal chart + numerology + name letter map + Chinese zodiac + aspects + manifestation profile. from DOB &amp; full name
  </p>
  </div>
 

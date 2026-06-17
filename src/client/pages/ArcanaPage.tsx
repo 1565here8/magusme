@@ -57,7 +57,7 @@ function OraclePersonalReadingPanel(props: { reading: OraclePersonalReading }) {
  const { reading } = props;
  return (
  <div className="glass-inset space-y-4">
- <p className="label-premium">Your chart &amp; tarot — drawn for this oracle session</p>
+ <p className="label-premium">Your chart &amp; tarot. drawn for this oracle session</p>
  {reading.astroSummary ? (
  <div>
  <div className="text-xs font-medium uppercase tracking-wider text-tertiary">Natal / sky map</div>
@@ -110,7 +110,7 @@ function SpellCard(props: {
  {rec.isBaneful ? (
  <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs uppercase tracking-wider spectrum-tier-black spectrum-badge">
  <Flame className="h-3 w-3" />
- Baneful — Historical Source
+ Baneful. Historical Source
  </div>
  ) : null}
 
@@ -155,7 +155,7 @@ function SpellCard(props: {
  ) : (
  <Unlock className="h-4 w-4" />
  )}
- Unlock — {props.spellPrice}
+ Unlock. {props.spellPrice}
  </button>
  )}
 
@@ -167,7 +167,7 @@ function SpellCard(props: {
  onClick={() => props.onUnlockSource(rec.id)}
  >
  <BookOpen className="h-4 w-4" />
- Source — {props.sourcePrice}
+ Source. {props.sourcePrice}
  </button>
  ) : null}
 
@@ -283,7 +283,7 @@ export function ArcanaPage() {
  const detail = await fetchArcanaEntry(entryId);
  setSelectedEntry(detail);
  setSpellDetail(null);
- // Non-baneful: show directly. Baneful: user picks path manually — no auto-modal.
+ // Non-baneful: show directly. Baneful: user picks path manually. no auto-modal.
  }
 
  async function handleView(entryId: string) {
@@ -417,7 +417,7 @@ export function ArcanaPage() {
  <div>
  <h2 className="heading-premium mb-2">Spells Matched To You</h2>
  <p className="body-muted mb-6">
- Chosen from the corpus based on your chart, tarot, and question — unlock to read the full ritual.
+ Chosen from the corpus based on your chart, tarot, and question. unlock to read the full ritual.
  </p>
  <div className="grid gap-6 lg:grid-cols-2">
  {result.peacefulOptions.map((rec) => (
@@ -439,12 +439,12 @@ export function ArcanaPage() {
  {result.historicalBanefulOptions.length > 0 ? (
  <div>
  <h2 className="heading-premium mb-2 text-red-400/90">
- Tradition Documents — Curio Only
+ Tradition Documents. Curio Only
  </h2>
  <p className="body-muted mb-6">
  Only if you still want to read what historical sources say about harm work. Framed
  as folklore ("According to Vodou…"), with mandatory protection steps and full
- liability disclaimer. Not recommended — reversal paths above usually suffice.
+ liability disclaimer. Not recommended. reversal paths above usually suffice.
  </p>
  <div className="grid gap-6 lg:grid-cols-2">
  {result.historicalBanefulOptions.map((rec) => (
@@ -483,7 +483,7 @@ export function ArcanaPage() {
  ) : (
  <Lock className="h-4 w-4" />
  )}
- Unlock Plan — {planPrice}
+ Unlock Plan. {planPrice}
  </button>
  </div>
  </div>
@@ -532,7 +532,7 @@ export function ArcanaPage() {
  <div className="prose-luxury mt-8">
  <p className="text-xs uppercase tracking-wider text-tertiary">
  {spellDetail.pathChoice === "violent"
- ? "Tradition document (curio) — According to historical sources"
+ ? "Tradition document (curio). According to historical sources"
  : "Reversal & protection path"}
  </p>
  <ReactMarkdown remarkPlugins={[remarkGfm]}>{spellDetail.content}</ReactMarkdown>
@@ -548,7 +548,7 @@ export function ArcanaPage() {
  <p className="body-muted">
  We recommend <strong className="text-emerald-400/90">Reversal & Protection</strong>{" "}
  first. Only open the tradition document if you still want to read what historical
- sources say — entertainment/curio only.
+ sources say. entertainment/curio only.
  </p>
  <div className="flex flex-wrap gap-3">
  <button
@@ -699,7 +699,7 @@ export function ArcanaPage() {
  </h1>
  <p className="body-muted mx-auto mt-6 max-w-2xl text-base">
  Magubrain continuously indexes{" "}
- <strong className="text-[color:var(--text-primary)]">every magical tradition available on the internet</strong> — grimoires, folk magic, diaspora religions, shamanic
+ <strong className="text-[color:var(--text-primary)]">every magical tradition available on the internet</strong>. grimoires, folk magic, diaspora religions, shamanic
  rites, meditation systems, and historical curios from Internet Archive, Sacred Texts,
  Gutenberg, Yale Beinecke, Gallica, Wellcome, and global ethnographic libraries. Original
  languages with scholarly English translations. Warnings first, then peaceful paths.
@@ -753,7 +753,7 @@ export function ArcanaPage() {
   Example:{" "}
   <em className="text-tertiary">
   &ldquo;I&apos;m about to get married and would like to cast a protection spell on my loved ones
-  — what blessing or ward do the traditions recommend for our wedding and family?&rdquo;
+ . what blessing or ward do the traditions recommend for our wedding and family?&rdquo;
   </em>{" "}
   You will receive a personalized natal-chart reading, a tarot spread, then spells matched to you from the corpus. {spellPrice} per unlock · {sourcePrice} source · {planPrice}{" "}
   plan.
@@ -788,7 +788,7 @@ export function ArcanaPage() {
   <textarea
   className="arcana-input w-full resize-none p-4 text-sm text-primary placeholder:text-tertiary focus:border-default focus:outline-none focus:ring-1 focus:ring-[#C9A962]/20"
   rows={4}
-  placeholder={'e.g. "I\'m about to get married and want to cast a protection spell on my loved ones — what blessing do the traditions recommend for our wedding and family?"'}
+  placeholder={'e.g. "I\'m about to get married and want to cast a protection spell on my loved ones. what blessing do the traditions recommend for our wedding and family?"'}
   value={query}
   onChange={(e) => setQuery(e.target.value)}
   />

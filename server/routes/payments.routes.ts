@@ -6,6 +6,7 @@ import { requireAuth } from "../middleware/auth";
 import { getDb } from "../../src/server/db";
 import type { SqlDriver } from "../../src/server/db/sql/driver";
 import { grantSingleSearchCredit, grantMonthlySearchPack } from "../../src/server/arcana/searchQuota";
+import { handleMarketplaceWebhook } from "../../src/server/marketplace/marketplacePayments";
 
 function db(): SqlDriver {
   return getDb().getDriver();
@@ -125,8 +126,10 @@ export function registerPaymentRoutes(app: Express) {
 
       const middleware = payram.webhooks.expressWebhook(async (payload) => {
         const referenceId = payload.reference_id;
+        const webhookStatus = payload.status;
         if (!referenceId) return;
 
+        // First check: is this an arcana invoice?
         const row = await db().get<{
           reference_id: string;
           user_id: string;
@@ -134,19 +137,23 @@ export function registerPaymentRoutes(app: Express) {
           status: string;
         }>("SELECT reference_id, user_id, product, status FROM payram_invoices WHERE reference_id = ?", [referenceId]);
 
-        if (!row || row.status === "settled") return;
-
-        const now = new Date().toISOString();
-        await db().exec(
-          "UPDATE payram_invoices SET status = 'settled', settled_at = ? WHERE reference_id = ?",
-          [now, referenceId],
-        );
-
-        if (row.product === "search_monthly") {
-          await grantMonthlySearchPack(row.user_id);
-        } else {
-          await grantSingleSearchCredit(row.user_id);
+        if (row) {
+          if (row.status === "settled") return;
+          const now = new Date().toISOString();
+          await db().exec(
+            "UPDATE payram_invoices SET status = 'settled', settled_at = ? WHERE reference_id = ?",
+            [now, referenceId],
+          );
+          if (row.product === "search_monthly") {
+            await grantMonthlySearchPack(row.user_id);
+          } else {
+            await grantSingleSearchCredit(row.user_id);
+          }
+          return;
         }
+
+        // Second check: is this a marketplace invoice?
+        await handleMarketplaceWebhook(db(), referenceId, webhookStatus);
       });
 
       middleware(req, res, next);

@@ -65,7 +65,7 @@ function MoonPhaseCard({ snapshot }: { snapshot: AstroSnapshot | null }) {
       </div>
       <div className="mt-3 rounded-lg bg-white/[0.03] p-3">
         <div className="mb-1 text-xs font-medium text-emerald-300">
-          {m.waxing ? "🌱 Growth energy — good for:" : "🌘 Release energy — good for:"}
+          {m.waxing ? "🌱 Growth energy. good for:" : "🌘 Release energy. good for:"}
         </div>
         <div className="space-y-1 text-xs text-zinc-400">
           {m.waxing ? (
@@ -155,7 +155,7 @@ function VoidOfCourseCard() {
         View void-of-course timing in the live sky dashboard below.
       </div>
       <div className="mt-3 text-xs leading-relaxed text-zinc-500">
-        The moon between zodiac signs — spells may fail or be unclear. Rest, plan, or divine instead of active spellwork.
+        The moon between zodiac signs. spells may fail or be unclear. Rest, plan, or divine instead of active spellwork.
       </div>
     </div>
   );
@@ -187,7 +187,7 @@ export function DailyToolsPage() {
             Live Planetary Data · Real-Time Timing
           </div>
           <h1 className="font-serif text-3xl font-bold text-white md:text-4xl">
-            Daily Tools — What's Optimal Right Now
+            Daily Tools. What's Optimal Right Now
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
             Planetary hours, moon phases, timing recommendations, and all your reference libraries.
@@ -212,7 +212,7 @@ export function DailyToolsPage() {
         </div>
       </section>
 
-      {/* Full AstroWatch — live sky data */}
+      {/* Full AstroWatch. live sky data */}
       {loc && (
         <section className="border-b border-white/5">
           <div className="mx-auto max-w-6xl px-5 py-8 md:px-8">

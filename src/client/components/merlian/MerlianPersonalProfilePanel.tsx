@@ -49,7 +49,7 @@ export function MerlianPersonalProfilePanel(props: Props) {
  AI will personalize
  </span>
  ) : (
- <span className="text-xs text-tertiary">Optional — chart, culture, destination, growth</span>
+ <span className="text-xs text-tertiary">Optional. chart, culture, destination, growth</span>
  )}
  </div>
  {expanded ? (
@@ -137,7 +137,7 @@ export function MerlianPersonalProfilePanel(props: Props) {
  className="input-field mt-1"
  value={profile.heritageCommunity}
  onChange={(e) => set("heritageCommunity", e.target.value)}
- placeholder="Optional — self-described, used respectfully in readings"
+ placeholder="Optional. self-described, used respectfully in readings"
  />
  </label>
  <label className="block text-sm sm:col-span-2">

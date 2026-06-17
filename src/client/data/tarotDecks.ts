@@ -365,7 +365,7 @@ export const VISCONTI_SFORZA: TarotDeck = {
 export const SOLA_BUSCA: TarotDeck = {
   id: "sola-busca",
   name: "Sola Busca",
-  description: "The oldest complete 78-card tarot deck, engraved c. 1491 in Venice. Ancient Roman and military themes. The only pre-1900 deck with fully illustrated pip cards — a direct influence on Pamela Colman Smith's Rider-Waite-Smith.",
+  description: "The oldest complete 78-card tarot deck, engraved c. 1491 in Venice. Ancient Roman and military themes. The only pre-1900 deck with fully illustrated pip cards. a direct influence on Pamela Colman Smith's Rider-Waite-Smith.",
   tradition: "Italian Renaissance / Venetian",
   cards: [
     { name: "Mato", number: 0, suit: "Major", symbol: "∞", meaning: "The fool, wandering, free from convention" },
@@ -713,7 +713,7 @@ export const ONE_J_J_SWISS: TarotDeck = {
 export const CHINESE_TAROT: TarotDeck = {
   id: "chinese-tarot",
   name: "Chinese Tarot (Zhong Hua Tarot)",
-  description: "A unique 20th-century adaptation merging Western tarot with Chinese cultural symbolism. Major Arcana reimagined through Chinese philosophy — The Emperor becomes the Dragon Throne, The Star becomes the Celestial Bureaucracy. Suits re-envisioned through Chinese elemental theory: Wands as Bamboo, Cups as Tea, Swords as Jade, Coins as Gold.",
+  description: "A unique 20th-century adaptation merging Western tarot with Chinese cultural symbolism. Major Arcana reimagined through Chinese philosophy. The Emperor becomes the Dragon Throne, The Star becomes the Celestial Bureaucracy. Suits re-envisioned through Chinese elemental theory: Wands as Bamboo, Cups as Tea, Swords as Jade, Coins as Gold.",
   tradition: "Sino-Western Syncretic",
   cards: [
     { name: "The Wanderer", number: 0, suit: "Major", symbol: "☯", meaning: "The Fool. The wandering sage, infinite potential" },
@@ -974,7 +974,7 @@ export const SOPRAFINO: TarotDeck = {
 export const BESANCON: TarotDeck = {
   id: "besancon",
   name: "Tarot of Besançon",
-  description: "An 18th-century variant of the Tarot de Marseille produced in the city of Besançon, France, and spreading into Switzerland and Germany. Distinctively replaces The Pope (V) with Jupiter and The Popess (II) with Juno — a concession to Protestant regions where Catholic imagery was unacceptable. A key bridge between French and Germanic tarot traditions.",
+  description: "An 18th-century variant of the Tarot de Marseille produced in the city of Besançon, France, and spreading into Switzerland and Germany. Distinctively replaces The Pope (V) with Jupiter and The Popess (II) with Juno. a concession to Protestant regions where Catholic imagery was unacceptable. A key bridge between French and Germanic tarot traditions.",
   tradition: "Franco-Germanic / Protestant Marseille",
   cards: [
     { name: "Le Mat", number: 0, suit: "Major", symbol: "∞", meaning: "The Fool. The wanderer, the unnumbered soul" },
@@ -1061,7 +1061,7 @@ export const BESANCON: TarotDeck = {
 export const GOLDEN_DAWN: TarotDeck = {
   id: "golden-dawn",
   name: "Golden Dawn Tarot (Liber T System)",
-  description: "Based on the public domain teachings of the Hermetic Order of the Golden Dawn (1888), as published by Israel Regardie in 'The Golden Dawn' (1937-1940). The GD system assigns specific astrological, Hebrew-letter, and Qabalistic correspondences to every card. Major Arcana follow GD titles and attributions. The minor arcana integrate the astrological decan system developed by the Order — the foundation of Crowley's Thoth deck and much of modern esoteric tarot.",
+  description: "Based on the public domain teachings of the Hermetic Order of the Golden Dawn (1888), as published by Israel Regardie in 'The Golden Dawn' (1937-1940). The GD system assigns specific astrological, Hebrew-letter, and Qabalistic correspondences to every card. Major Arcana follow GD titles and attributions. The minor arcana integrate the astrological decan system developed by the Order. the foundation of Crowley's Thoth deck and much of modern esoteric tarot.",
   tradition: "Hermetic / Qabalistic / Golden Dawn",
   cards: [
     { name: "The Fool", number: 0, suit: "Major", symbol: "א", meaning: "Aleph. Spirit seeking incarnation. The breath of life" },

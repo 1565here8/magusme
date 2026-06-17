@@ -41,7 +41,7 @@ export function DashboardPage() {
 
   return (
     <div className="min-h-screen">
-      <SeoHead title="Dashboard" description={`Welcome, ${user.id.slice(0, 8)} — manage your MagusMe session.`} path="/dashboard" />
+      <SeoHead title="Dashboard" description={`Welcome, ${user.id.slice(0, 8)}. manage your MagusMe session.`} path="/dashboard" />
       <section className="relative border-b border-white/5">
         <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-indigo-900/5 to-transparent" />
         <div className="relative mx-auto max-w-4xl px-5 py-12 md:px-8 md:py-16">

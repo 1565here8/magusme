@@ -60,7 +60,7 @@ export function ArcanaSpellFooter() {
       <AlertTriangle className="mb-2 h-4 w-4 text-amber-600/70" />
       <p className="font-medium text-amber-600/80">Entertainment & curio only</p>
       <p className="mt-2">
-        This spell is reproduced from traceable historical sources for curiosity and amusement — not
+        This spell is reproduced from traceable historical sources for curiosity and amusement. not
         as advice to perform against any person. Merlian and its operators{" "}
         <strong className="text-zinc-400">deny all liability</strong> for backlash, injury, legal
         consequences, or any outcome. You chose to read this; we are not responsible for what you do
@@ -114,7 +114,7 @@ export function PathChoiceModal(props: {
       <div className="arcana-path-modal relative z-10 w-full max-w-lg rounded-2xl border border-white/[0.06] bg-[#030303] p-8">
         <h3 className="text-xl font-semibold text-[#E8D5A3]">How do you want to proceed?</h3>
         <p className="body-muted mt-2">
-          <strong className="text-zinc-300">{props.title}</strong> — we strongly recommend the
+          <strong className="text-zinc-300">{props.title}</strong>. we strongly recommend the
           non-harmful path first. The tradition document is curio/entertainment only.
         </p>
 

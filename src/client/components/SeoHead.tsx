@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 
 const SITE_NAME = "MagusMe";
 const SITE_URL = "https://magusme.com";
-const DEFAULT_DESC = "The Vault of Everything Occult — 63+ verified spells, 81 divination systems, AI-powered readings, and no censorship. Tarot, runes, astrology, grimoire, and manifestation.";
+const DEFAULT_DESC = "The Vault of Everything Occult. 63+ verified spells, 81 divination systems, AI-powered readings, and no censorship. Tarot, runes, astrology, grimoire, and manifestation.";
 const DEFAULT_IMAGE = "/og-image.png";
 
 export function SeoHead(props: {

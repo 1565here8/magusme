@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen, Star, Shield, AlertTriangle, Clock, Share2, Bookmark, Sparkles, Loader2, Send, MessageSquare } from "lucide-react";
+import { ArrowLeft, BookOpen, Star, Shield, AlertTriangle, Clock, Share2, Bookmark, Sparkles, Loader2, Send, MessageSquare, CheckCircle, BadgeCheck, FileText } from "lucide-react";
 import { fetchSpellBySlug, fetchSpellReviews, submitSpellReview, type SpellDetail, type SpellReview } from "../api/spellsClient";
 import { SeoHead } from "../components/SeoHead";
 
@@ -15,7 +15,7 @@ const RICH_SPELLS: Record<string, {
       "Light a candle (if using one). Optionally, cast a circle with salt.",
       "Hold the mirror in front of you. Close your eyes and breathe deeply.",
       "Visualize a bright, reflective shield forming around your entire body.",
-      "See the shield made of pure light — silver, white, or gold.",
+      "See the shield made of pure light. silver, white, or gold.",
       "Say 3 times: 'What is sent to me returns to source. This mirror reflects, rejects, protects me.'",
       "Seal the spell: 'So mote it be' or 'It is done.'",
       "Leave the mirror visible as a reminder of your protection.",
@@ -167,10 +167,10 @@ export function SpellDetailPage() {
           {[
             { label: "Difficulty", value: spell.difficulty ? `${spell.difficulty} (${spell.difficulty_level}/10)` : `${formatDifficulty(spell.difficulty_level)} (${spell.difficulty_level}/10)` },
             { label: "Danger Level", value: spell.danger ? `${spell.danger} (${spell.danger_level}/10)` : `${formatDanger(spell.danger_level)} (${spell.danger_level}/10)`, warn: spell.danger_level >= 5 },
-            { label: "Elements", value: spell.element ?? "—" },
+            { label: "Elements", value: spell.element ?? ". " },
             { label: "Timing", value: spell.timing ?? "Any" },
             { label: "Source", value: spell.source ?? "Traditional", wide: true },
-            { label: "Counter-Spell", value: spell.counter_spell ?? "—" },
+            { label: "Counter-Spell", value: spell.counter_spell ?? ". " },
           ].map((item) => (
             <div key={item.label} className={item.wide ? "col-span-2" : ""}>
               <div className="text-xs text-zinc-500">{item.label}</div>
@@ -276,7 +276,7 @@ export function SpellDetailPage() {
                 </div>
                 <div>
                   <div className="text-xs text-zinc-500">Element</div>
-                  <div className="text-sm text-zinc-300">{spell.element ?? "—"}</div>
+                  <div className="text-sm text-zinc-300">{spell.element ?? ". "}</div>
                 </div>
                 <div>
                   <div className="text-xs text-zinc-500">Timing</div>
@@ -288,7 +288,7 @@ export function SpellDetailPage() {
                 </div>
                 <div>
                   <div className="text-xs text-zinc-500">Counter-Spell</div>
-                  <div className="text-sm text-zinc-300">{spell.counter_spell ?? "—"}</div>
+                  <div className="text-sm text-zinc-300">{spell.counter_spell ?? ". "}</div>
                 </div>
               </div>
             </section>
@@ -319,15 +319,63 @@ export function SpellDetailPage() {
           </>
         )}
 
-        <section className="mb-8 rounded-xl border border-emerald-500/10 bg-emerald-500/[0.02] p-5">
-          <div className="mb-2 flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-emerald-400" />
-            <span className="text-sm font-medium text-emerald-300">Source Verified</span>
-          </div>
-          <p className="text-xs text-zinc-400">
-            {spell.source ?? "Traditional"} — Community verified by {spell.review_count}+ practitioners.
-          </p>
-        </section>
+        {spell.verification_status === 'verified' && spell.verification_source && (
+          <section className="mb-8 rounded-xl border border-emerald-500/10 bg-emerald-500/[0.02] p-5">
+            <div className="mb-2 flex items-center gap-2">
+              <BadgeCheck className="h-4 w-4 text-emerald-400" />
+              <span className="text-sm font-medium text-emerald-300">Verified Source Citation</span>
+            </div>
+            <div className="mb-2">
+              <p className="text-xs text-emerald-300 font-medium">Source:</p>
+              <p className="text-xs text-zinc-300">{spell.source ?? "Traditional"}</p>
+            </div>
+            <div className="mb-2">
+              <p className="text-xs text-emerald-300 font-medium">Citation:</p>
+              <p className="text-xs text-zinc-400 leading-relaxed">{spell.verification_source}</p>
+            </div>
+            {spell.verified_by && spell.verified_at && (
+              <div className="text-[10px] text-zinc-500">
+                Verified by {spell.verified_by} on {new Date(spell.verified_at).toLocaleDateString()}
+              </div>
+            )}
+          </section>
+        )}
+
+        {spell.verification_status === 'pending' && (
+          <section className="mb-8 rounded-xl border border-amber-500/10 bg-amber-500/[0.02] p-5">
+            <div className="mb-2 flex items-center gap-2">
+              <Clock className="h-4 w-4 text-amber-400" />
+              <span className="text-sm font-medium text-amber-300">Pending Verification</span>
+            </div>
+            <p className="text-xs text-zinc-400">
+              This spell is awaiting manual review. Source: {spell.verification_source ?? "Unknown"}
+            </p>
+          </section>
+        )}
+
+        {spell.verification_status === 'rejected' && (
+          <section className="mb-8 rounded-xl border border-red-500/10 bg-red-500/[0.02] p-5">
+            <div className="mb-2 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-400" />
+              <span className="text-sm font-medium text-red-300">Not Verified</span>
+            </div>
+            <p className="text-xs text-zinc-400">
+              This spell did not pass verification. Reason: {spell.verification_source ?? "Not specified"}
+            </p>
+          </section>
+        )}
+
+        {spell.verification_status === 'verified' && !spell.verification_source && (
+          <section className="mb-8 rounded-xl border border-emerald-500/10 bg-emerald-500/[0.02] p-5">
+            <div className="mb-2 flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-emerald-400" />
+              <span className="text-sm font-medium text-emerald-300">Source Verified</span>
+            </div>
+            <p className="text-xs text-zinc-400">
+              {spell.source ?? "Traditional"}. Community verified by {spell.review_count}+ practitioners.
+            </p>
+          </section>
+        )}
 
         <div className="flex justify-center gap-4 pt-4">
           <Link to="/learn" className="rounded-full border border-white/10 px-8 py-3 text-sm text-zinc-400 transition hover:border-white/20">

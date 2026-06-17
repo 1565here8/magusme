@@ -24,7 +24,7 @@ type ReadingConfig = {
 const CONFIGS: Record<ReadingType, ReadingConfig> = {
  tarot: {
  title: "Tarot Reading",
- blurb: "Draw cards from the full 78-card deck — free streaming interpretation",
+ blurb: "Draw cards from the full 78-card deck. free streaming interpretation",
  fields: [
  { key: "question", label: "Your question", type: "text", placeholder: "What should I focus on this month?" },
  {
@@ -41,7 +41,7 @@ const CONFIGS: Record<ReadingType, ReadingConfig> = {
  },
  rune: {
  title: "Rune Magic Reading",
- blurb: "Elder Futhark cast with Norse magical correspondence — free",
+ blurb: "Elder Futhark cast with Norse magical correspondence. free",
  fields: [
  { key: "question", label: "Your question", type: "text", placeholder: "What force should I invoke?" },
  {
@@ -58,7 +58,7 @@ const CONFIGS: Record<ReadingType, ReadingConfig> = {
  },
  coffee: {
  title: "Coffee Cup Reading",
- blurb: "Tasseography — describe symbols in your cup after drinking",
+ blurb: "Tasseography. describe symbols in your cup after drinking",
  fields: [
  { key: "question", label: "Your question", type: "text", placeholder: "Optional focus" },
  {
@@ -72,7 +72,7 @@ const CONFIGS: Record<ReadingType, ReadingConfig> = {
  },
  palm: {
  title: "Palm Reading",
- blurb: "Chiromancy from your line and mount description — free",
+ blurb: "Chiromancy from your line and mount description. free",
  fields: [
  { key: "question", label: "Your question", type: "text", placeholder: "Optional" },
  {
@@ -95,7 +95,7 @@ const CONFIGS: Record<ReadingType, ReadingConfig> = {
  },
  face: {
  title: "Face Reading",
- blurb: "Physiognomy & face correspondence from your description — free",
+ blurb: "Physiognomy & face correspondence from your description. free",
  fields: [
  { key: "question", label: "Your question", type: "text", placeholder: "Optional" },
  {

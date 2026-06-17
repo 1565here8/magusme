@@ -15,7 +15,7 @@ export default function AstroWatchPage() {
             Live Sky Data
           </div>
           <h1 className="font-serif text-3xl font-bold text-white md:text-4xl">
-            Astro Watch — Live Sky Dashboard
+            Astro Watch. Live Sky Dashboard
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
             Real-time planetary positions, moon phase, and astrological data for your location.

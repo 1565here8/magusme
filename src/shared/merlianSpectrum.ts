@@ -1,25 +1,25 @@
 /**
- * Merlian magic spectrum — white (harmless / manifestation) → black (baneful).
+ * Merlian magic spectrum. white (harmless / manifestation) → black (baneful).
  * Every index, category, and tradition maps to a tier so users can navigate by color.
  */
 
 export type SpectrumTier =
-  | "pure_white"   // 0  — psychology, philosophy, manifestation (not magic, but white)
-  | "pearl"        // 1  — white magic, wicca, meditation
-  | "angelic"      // 2  — angels, divine names, protective ceremonial
-  | "celestial"    // 3  — astrology, planetary benign, numerology
-  | "nature"       // 4  — natural omens, herbal, body reading
-  | "cultural"     // 5  — Indian, Chinese, Japanese lineages
-  | "oracle"       // 6  — tarot, scrying, cartomancy, divination
-  | "spirit"       // 7  — mediumship, ancestors, trance spirits
-  | "passion"      // 8  — love magic, consensual sex magic, Thelema
-  | "folk"         // 9  — hoodoo, rootwork, Arabic folk
-  | "warrior"      // 10 — reversal, binding, aggressive defense
-  | "orisha"       // 11 — vodou, orisha, powerful entities
-  | "kabbalah"     // 12 — Kabbalah vault (isolated, highest danger)
-  | "death"        // 13 — necromancy, death work
-  | "black"        // 14 — black magic, baneful grimoires
-  | "infernal";    // 15 — demonic, Satan, Goetia spirits
+  | "pure_white"   // 0 . psychology, philosophy, manifestation (not magic, but white)
+  | "pearl"        // 1 . white magic, wicca, meditation
+  | "angelic"      // 2 . angels, divine names, protective ceremonial
+  | "celestial"    // 3 . astrology, planetary benign, numerology
+  | "nature"       // 4 . natural omens, herbal, body reading
+  | "cultural"     // 5 . Indian, Chinese, Japanese lineages
+  | "oracle"       // 6 . tarot, scrying, cartomancy, divination
+  | "spirit"       // 7 . mediumship, ancestors, trance spirits
+  | "passion"      // 8 . love magic, consensual sex magic, Thelema
+  | "folk"         // 9 . hoodoo, rootwork, Arabic folk
+  | "warrior"      // 10. reversal, binding, aggressive defense
+  | "orisha"       // 11. vodou, orisha, powerful entities
+  | "kabbalah"     // 12. Kabbalah vault (isolated, highest danger)
+  | "death"        // 13. necromancy, death work
+  | "black"        // 14. black magic, baneful grimoires
+  | "infernal";    // 15. demonic, Satan, Goetia spirits
 
 export type SpectrumMeta = {
   tier: SpectrumTier;
@@ -55,28 +55,28 @@ export const SPECTRUM_META: Record<SpectrumTier, SpectrumMeta> = {
     index: 0,
     label: "Pure White",
     family: "Manifestation & Mind",
-    hint: "Psychology, philosophy, LOA, affirmations — harmless white light",
+    hint: "Psychology, philosophy, LOA, affirmations. harmless white light",
   },
   pearl: {
     tier: "pearl",
     index: 1,
     label: "Pearl",
     family: "White Magic",
-    hint: "Wicca, benign folk, healing — classic white magic",
+    hint: "Wicca, benign folk, healing. classic white magic",
   },
   angelic: {
     tier: "angelic",
     index: 2,
     label: "Angelic Ivory",
     family: "Divine / Angelic",
-    hint: "Angels, archangels, LBRP, divine names — off-white holy work",
+    hint: "Angels, archangels, LBRP, divine names. off-white holy work",
   },
   celestial: {
     tier: "celestial",
     index: 3,
     label: "Celestial",
     family: "Stars & Numbers",
-    hint: "Astrology, planetary hours, numerology — sky wisdom",
+    hint: "Astrology, planetary hours, numerology. sky wisdom",
   },
   nature: {
     tier: "nature",
@@ -97,14 +97,14 @@ export const SPECTRUM_META: Record<SpectrumTier, SpectrumMeta> = {
     index: 6,
     label: "Oracle Violet",
     family: "Divination",
-    hint: "Tarot, runes, scrying, bibliomancy — seeing without summoning",
+    hint: "Tarot, runes, scrying, bibliomancy. seeing without summoning",
   },
   spirit: {
     tier: "spirit",
     index: 7,
     label: "Spirit Mist",
     family: "Spirit & Mediumship",
-    hint: "Ancestors, mediums, dreams — neutral spirit contact",
+    hint: "Ancestors, mediums, dreams. neutral spirit contact",
   },
   passion: {
     tier: "passion",
@@ -132,14 +132,14 @@ export const SPECTRUM_META: Record<SpectrumTier, SpectrumMeta> = {
     index: 11,
     label: "Orisha Ember",
     family: "Orisha & Vodou",
-    hint: "Vodou, Santería, orisha — powerful living spirits",
+    hint: "Vodou, Santería, orisha. powerful living spirits",
   },
   kabbalah: {
     tier: "kabbalah",
     index: 12,
     label: "Kabbalah Void",
     family: "Kabbalah Vault",
-    hint: "Isolated vault — Tree of Life, gematria — highest danger class",
+    hint: "Isolated vault. Tree of Life, gematria. highest danger class",
   },
   death: {
     tier: "death",
@@ -153,18 +153,18 @@ export const SPECTRUM_META: Record<SpectrumTier, SpectrumMeta> = {
     index: 14,
     label: "Black Magic",
     family: "Baneful",
-    hint: "Harmful historical grimoires — curio / academic only",
+    hint: "Harmful historical grimoires. curio / academic only",
   },
   infernal: {
     tier: "infernal",
     index: 15,
     label: "Infernal Abyss",
     family: "Demonic",
-    hint: "Satan, demons, Goetia — darkest tier",
+    hint: "Satan, demons, Goetia. darkest tier",
   },
 };
 
-/** Manifestation sidebar categories — always pure white */
+/** Manifestation sidebar categories. always pure white */
 export const MANIFESTATION_CATEGORY_LIST = [
   "Manifestation & Law of Attraction",
   "Affirmations & Scripts",

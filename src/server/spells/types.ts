@@ -23,6 +23,11 @@ export interface SpellRow {
   reference_link: string | null;
   created_at: string;
   updated_at: string;
+  verified: number;
+  verification_status: 'pending' | 'verified' | 'rejected';
+  verification_source: string | null;
+  verified_by: string | null;
+  verified_at: string | null;
 }
 
 export interface SpellTraditionRow {
@@ -72,6 +77,9 @@ export interface SpellListItem {
   tags: string[];
   summary: string | null;
   reference_link: string | null;
+  verified: number;
+  verification_status: 'pending' | 'verified' | 'rejected';
+  verification_source: string | null;
 }
 
 export interface SpellDetail extends SpellListItem {
@@ -83,6 +91,9 @@ export interface SpellDetail extends SpellListItem {
   full_text: string | null;
   created_at: string;
   updated_at: string;
+  verification_source: string | null;
+  verified_by: string | null;
+  verified_at: string | null;
 }
 
 export interface SpellReview {
