@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, Book, Wand2, History } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, Book, Wand2, History, BookOpen } from "lucide-react";
 import { SeoHead } from "../components/SeoHead";
 import { ORACLE_DECKS, getOracleDeck, getOracleDecks } from "../data/oracleDecks";
 import type { OracleDeckDef } from "../data/oracleDecks";
 import { getOracleCardsForDeck } from "./oracleCardsData";
 import { getOracleHistorySections } from "./oracleCardsHistory";
+import { ORACLE_REFERENCES } from "../data/oracleReferences";
 
 /* ─── Per-deck color system ─── */
 
@@ -135,10 +136,7 @@ function getOracleReading(deckId: string, deckName: string, spread: OracleSpread
     };
   });
 
-  const interpretation = elements.map((el, i) => {
-    const revText = el.reversed ? " (reversed)" : "";
-    return `${el.position}: ${el.title}${revText}\n${el.meaning}`;
-  }).join("\n\n");
+  const interpretation = buildInterpretation(elements, spread, deckName);
 
   let verdict = "";
   if (spread.isYesNo) {
@@ -147,6 +145,67 @@ function getOracleReading(deckId: string, deckName: string, spread: OracleSpread
   }
 
   return { deckName, spreadName: spread.name, elements, interpretation: verdict ? interpretation + `\n\nVerdict: ${verdict}` : interpretation };
+}
+
+const POSITION_FRAMES: Record<string, (title: string, meaning: string, keywords: string) => string> = {
+  Guidance: (t, m) => `The card that has come forward for you is ${t}. ${takeFirst(m, 2)}`,
+  Past: (t, m) => `For the past, we have ${t}. This card speaks to what you have been carrying with you. ${takeFirst(m, 2)}`,
+  Present: (t, m) => `Right now, ${t} is active in your life. This is where your energy is focused. ${takeFirst(m, 2)}`,
+  Future: (t, m) => `Looking ahead, ${t} appears on your path. This is what is emerging. ${takeFirst(m, 2)}`,
+  Heart: (t, m) => `At the heart of this situation is ${t}. This is the central energy. ${takeFirst(m, 2)}`,
+  Conscious: (t, m) => `What you are consciously aware of is represented by ${t}. You already sense this. ${takeFirst(m, 2)}`,
+  Hidden: (t, m) => `There is something beneath the surface here, and it is ${t}. This may be operating outside your awareness. ${takeFirst(m, 2)}`,
+  Obstacle: (t, m) => `The obstacle you are navigating is ${t}. This is what stands in the way. ${takeFirst(m, 2)}`,
+  Advice: (t, m) => `For advice, the cards offer ${t}. This is the guidance to lean into. ${takeFirst(m, 2)}`,
+  "Near Future": (t, m) => `In the near future, ${t} is coming into view. ${takeFirst(m, 2)}`,
+  Outcome: (t, m) => `The likely outcome is ${t}. ${takeFirst(m, 2)}`,
+  First: (t, m) => `The first card is ${t}. ${takeFirst(m, 2)}`,
+  Second: (t, m) => `The second card is ${t}. ${takeFirst(m, 2)}`,
+  Third: (t, m) => `The third card is ${t}. ${takeFirst(m, 2)}`,
+};
+
+function takeFirst(text: string, sentences: number): string {
+  const parts = text.match(/[^.!?\n]+[.!?]+/g);
+  if (!parts) return text.slice(0, 200);
+  return parts.slice(0, sentences).join(" ").trim();
+}
+
+function buildInterpretation(elements: OracleSpreadElement[], spread: OracleSpreadDef, deckName: string): string {
+  const lines: string[] = [];
+
+  const intros: Record<string, string> = {
+    "Single Draw": `I have drawn a single card from ${deckName} to offer you guidance. Here is what has come through.`,
+    "Three Card": `I have drawn three cards from ${deckName} to explore the flow of your situation from past through present into future. Let us see what they reveal.`,
+    "Five Card Cross": `Using ${deckName}, I have laid out five cards in a cross to look at the heart of your situation and the forces around it. Here is the reading.`,
+    "Seven Card Horseshoe": `I have drawn seven cards from ${deckName} in a horseshoe spread to trace the arc of your situation from its roots to its likely resolution.`,
+    "Yes or No": `I have drawn three cards from ${deckName} to seek a clear answer to your question. The balance of the cards will show the way.`,
+  };
+
+  const transitions = ["", "Next,", "Moving deeper,", "From here,", "Then,"];
+
+  lines.push(intros[spread.name] ?? `A reading from ${deckName}.`);
+
+  elements.forEach((el, i) => {
+    const frame = POSITION_FRAMES[el.position];
+    const revNote = el.reversed ? " This card has come through reversed, which often suggests the energy is blocked, internal, or asking for a different approach." : "";
+    const lead = i > 0 && transitions[i % transitions.length] ? transitions[i % transitions.length] + " " : "";
+    if (frame) {
+      lines.push(`${lead}${frame(el.title, el.meaning, el.keywords)}${revNote}`);
+    } else {
+      lines.push(`${lead}In the position of ${el.position}, we have ${el.title}. ${takeFirst(el.meaning, 2)}${revNote}`);
+    }
+  });
+
+  if (!spread.isYesNo && elements.length > 1) {
+    const closings = [
+      `Together, these cards suggest a direction. Trust what resonates and let the rest go. The cards do not predict a fixed future. They illuminate the energies at play.`,
+      `This is the full picture these cards offer. Sit with what stands out. The cards that stir something in you are the ones worth returning to.`,
+      `Take what lands and leave the rest. A reading is not a verdict. It is a conversation between you and the wisdom these cards carry.`,
+    ];
+    lines.push(closings[elements.length % closings.length]);
+  }
+
+  return lines.join("\n\n");
 }
 
 function getGlyph(deckId: string, cardNum: number): string {
@@ -291,6 +350,61 @@ function DeckGallery({ decks, onSelect }: { decks: OracleDeckDef[]; onSelect: (i
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {decks.map(d => <DeckPreview key={d.id} deck={d} onSelect={onSelect} />)}
       </div>
+    </div>
+  );
+}
+
+/* ─── Deck History ─── */
+
+function DeckHistoryBlock({ deck }: { deck: OracleDeckDef }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mx-auto mt-3 max-w-3xl rounded-lg border border-white/[0.04] bg-white/[0.01] overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-4 py-2.5 text-left transition hover:bg-white/[0.01]"
+      >
+        <div className="flex items-center gap-2">
+          <History className="h-3 w-3 text-amber-400/50" />
+          <span className="text-[10px] font-semibold text-white/60">History of this Deck</span>
+        </div>
+        {open ? <ChevronUp className="h-3 w-3 text-zinc-600" /> : <ChevronDown className="h-3 w-3 text-zinc-600" />}
+      </button>
+      {open && (
+        <div className="px-4 pb-4">
+          <p className="text-[10px] leading-relaxed text-zinc-500">{deck.history}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── References Section ─── */
+
+function OracleReferencesSection() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-white/[0.04] bg-white/[0.015] overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-5 py-3 text-left transition hover:bg-white/[0.01]"
+      >
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-3.5 w-3.5 text-amber-400/60" />
+          <span className="text-xs font-semibold text-white/70">References & Sources</span>
+        </div>
+        {open ? <ChevronUp className="h-3 w-3 text-zinc-600" /> : <ChevronDown className="h-3 w-3 text-zinc-600" />}
+      </button>
+      {open && (
+        <div className="px-5 pb-5 space-y-3">
+          {ORACLE_REFERENCES.map((ref, i) => (
+            <div key={i} className="text-[10px] leading-relaxed">
+              <p className="text-zinc-400">{ref.text}</p>
+              <p className="mt-0.5 text-zinc-600 italic">{ref.source}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -540,6 +654,7 @@ export function OracleCardsPage() {
                 </div>
               </div>
             </div>
+            <DeckHistoryBlock deck={selectedDeck} />
           </div>
         </div>
       )}
@@ -548,8 +663,9 @@ export function OracleCardsPage() {
       {view === "read" && selectedDeck && <OracleReadingView deckId={selectedDeck.id} deck={selectedDeck} />}
       {view === "browse" && selectedDeckId && <OracleCardBrowser deckId={selectedDeckId} />}
 
-      <div className="mx-auto max-w-3xl px-5 pb-16 pt-8">
+      <div className="mx-auto max-w-3xl px-5 pb-16 pt-8 space-y-4">
         <OracleHistorySection />
+        <OracleReferencesSection />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown, ChevronUp, Star, Store, ExternalLink } from "lucide-react";
 import { SeoHead } from "../components/SeoHead";
 import { getSystemById, DIVINATION_SYSTEMS } from "../../shared/divinationSystems";
 import {
@@ -10,6 +10,7 @@ import {
   getSystemDecks,
 } from "./traditionalReadings";
 import type { ReadingResult, SpreadElement, TarotDeckDef } from "./traditionalReadings";
+import { fetchDivinationProviders, type ServiceProviderProfile } from "../api/marketplaceClient";
 
 /* ── Deck style variants ── */
 type DeckStyleId = "classic" | "vintage" | "dark" | "minimal";
@@ -263,6 +264,8 @@ export function GenericDivinationPage({ systemId }: { systemId?: string }) {
   const [spreadId, setSpreadId] = useState<string>("three-card");
   const [deckStyleId, setDeckStyleId] = useState<DeckStyleId>("classic");
   const [deckId, setDeckId] = useState<string | undefined>(undefined);
+  const [recProviders, setRecProviders] = useState<ServiceProviderProfile[] | null>(null);
+  const [recLoading, setRecLoading] = useState(false);
   const deckStyle = useDeckStyle(deckStyleId);
 
   const systemDef = getSystemById(id) ?? DIVINATION_SYSTEMS.find((s) => s.route === `/consult/${id}`) ?? null;
@@ -314,6 +317,17 @@ export function GenericDivinationPage({ systemId }: { systemId?: string }) {
     setDeck(d);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  // Fetch recommended providers based on divination system
+  useEffect(() => {
+    if (!systemDef) return;
+    const q = [systemDef.category, systemDef.tradition].filter(Boolean).join(",");
+    setRecLoading(true);
+    fetchDivinationProviders(q, 4)
+      .then((res) => setRecProviders(res.providers))
+      .catch(() => setRecProviders([]))
+      .finally(() => setRecLoading(false));
+  }, [id, systemDef]);
 
   if (!reading) {
     return (
@@ -489,6 +503,53 @@ export function GenericDivinationPage({ systemId }: { systemId?: string }) {
           <div className="rounded-xl border border-amber-500/10 bg-gradient-to-br from-amber-500/[0.04] to-transparent p-5 sm:p-6">
             <h3 className="mb-3 text-center text-xs uppercase tracking-[0.2em] text-amber-400/50">Interpretation</h3>
             <p className="text-center text-sm leading-relaxed text-zinc-300">{reading.interpretation}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Recommended Providers */}
+      {recProviders && recProviders.length > 0 && (
+        <div className="mx-auto max-w-2xl px-5 pb-12">
+          <div className="rounded-xl border border-purple-500/10 bg-gradient-to-br from-purple-500/[0.04] to-transparent p-5 sm:p-6">
+            <h3 className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-purple-400/50">
+              <Store className="h-3.5 w-3.5" />
+              Recommended Service Providers
+            </h3>
+            <div className="space-y-3">
+              {recProviders.map((p) => (
+                <a
+                  key={p.userId}
+                  href={`/marketplace/s/${p.handle}`}
+                  className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3 transition hover:border-purple-500/30"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-white">{p.displayName}</span>
+                      <span className="text-[10px] text-zinc-500">@{p.handle}</span>
+                    </div>
+                    <div className="mt-1 flex items-center gap-2 text-[10px] text-zinc-600">
+                      {p.traditions.length > 0 && (
+                        <span>{p.traditions.slice(0, 3).join(", ")}</span>
+                      )}
+                      {p.reviewCount > 0 && (
+                        <span className="flex items-center gap-1 text-amber-400/70">
+                          <Star className="h-3 w-3 fill-amber-400/70" />
+                          {p.avgRating.toFixed(1)} ({p.reviewCount})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <ExternalLink className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
+                </a>
+              ))}
+            </div>
+            <Link
+              to={`/marketplace?q=${encodeURIComponent(systemDef?.category ?? displayName)}`}
+              className="mt-3 inline-flex items-center gap-1 text-[10px] text-purple-400/70 hover:text-purple-300"
+            >
+              Browse all services in {systemDef?.category ?? displayName}
+              <ExternalLink className="h-3 w-3" />
+            </Link>
           </div>
         </div>
       )}

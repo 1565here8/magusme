@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { clsx } from "clsx";
-import { Sparkles, BookOpen, Wand2, Clock, Menu, User, BookMarked, LayoutDashboard, Store } from "lucide-react";
+import { Sparkles, BookOpen, Wand2, Clock, Menu, User, BookMarked, LayoutDashboard, Store, Bell, MessageCircle } from "lucide-react";
 import { LoginModal } from "./LoginModal";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: Sparkles, exact: true },
@@ -62,6 +63,7 @@ export function MagusMeHeader() {
             <div className="ml-2 flex items-center gap-2 border-l border-white/10 pl-4">
               {isLoggedIn ? (
                 <div className="flex items-center gap-2">
+                  <NotificationDropdown />
                   <Link
                     to="/human-map"
                     className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-zinc-400 transition hover:border-white/20"

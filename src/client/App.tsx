@@ -24,6 +24,7 @@ import { MarketplaceCreateListing } from "./pages/MarketplaceCreateListing";
 import { MarketplaceOrders } from "./pages/MarketplaceOrders";
 import { MarketplaceOrderDetail } from "./pages/MarketplaceOrderDetail";
 import { MarketplacePayoutSetup } from "./pages/MarketplacePayoutSetup";
+import { MarketplaceAnalytics } from "./pages/MarketplaceAnalytics";
 import { AdminMarketplace } from "./pages/AdminMarketplace";
 
 // Generic divination system pages. one component handles all generic_llm systems
@@ -35,6 +36,7 @@ import { PlayingCardsPage } from "./pages/PlayingCardsPage";
 import AstroWatchPage from "./pages/AstroWatchPage";
 import { TarotPage } from "./pages/TarotPage";
 import { OracleCardsPage } from "./pages/OracleCardsPage";
+import { KipperPage } from "./pages/KipperPage";
 
 export default function App() {
   return (
@@ -66,6 +68,7 @@ export default function App() {
             <Route path="/marketplace/s/:handle" element={<MarketplaceSearch />} />
             <Route path="/marketplace/l/:slug" element={<MarketplaceListingDetail />} />
             <Route path="/marketplace/payments/payout" element={<MarketplacePayoutSetup />} />
+            <Route path="/marketplace/analytics" element={<MarketplaceAnalytics />} />
             <Route path="/marketplace/admin" element={<AdminMarketplace />} />
 
             {/* Specialized divination routes. custom pages */}
@@ -76,6 +79,7 @@ export default function App() {
             <Route path="/consult/iching" element={<IChingPage />} />
             <Route path="/consult/playing-cards" element={<PlayingCardsPage />} />
             <Route path="/consult/oracle-cards" element={<OracleCardsPage />} />
+            <Route path="/consult/kipper" element={<KipperPage />} />
             <Route path="/consult/astro-watch" element={<AstroWatchPage />} />
 
             {/* Generic divination routes. auto-generated from registry */}

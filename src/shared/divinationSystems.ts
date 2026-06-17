@@ -85,10 +85,10 @@ export const DIVINATION_SYSTEMS: DivinationSystemDef[] = [
     icon: "Sparkles",
     route: "/consult/kipper",
     category: "Cartomancy",
-    mode: "generic_llm",
+    mode: "card-draw",
     description: "19th-century Bavarian situational cards",
     tradition: "German Kipper",
-    generic: true,
+    generic: false,
   },
   {
     id: "mahjong_oracle",

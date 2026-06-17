@@ -347,7 +347,8 @@ CREATE TABLE IF NOT EXISTS service_listings (
   rating REAL NOT NULL DEFAULT 0,
   review_count INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
+  updated_at TEXT NOT NULL,
+  scheduled_at TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_svc_listings_provider ON service_listings(provider_id);
@@ -381,6 +382,7 @@ CREATE TABLE IF NOT EXISTS service_orders (
   buyer_instructions TEXT NOT NULL DEFAULT '',
   seller_notes TEXT NOT NULL DEFAULT '',
   delivery_notes TEXT NOT NULL DEFAULT '',
+  auto_release_at TEXT,
   created_at TEXT NOT NULL,
   confirmed_at TEXT,
   completed_at TEXT
@@ -448,4 +450,17 @@ CREATE INDEX IF NOT EXISTS idx_mkt_invoices_order ON marketplace_invoices(order_
 CREATE INDEX IF NOT EXISTS idx_mkt_invoices_buyer ON marketplace_invoices(buyer_id);
 CREATE INDEX IF NOT EXISTS idx_mkt_invoices_seller ON marketplace_invoices(seller_id);
 CREATE INDEX IF NOT EXISTS idx_mkt_invoices_status ON marketplace_invoices(status);
+
+-- Marketplace: user notifications
+CREATE TABLE IF NOT EXISTS marketplace_notifications (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL DEFAULT '',
+  link TEXT,
+  is_read INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_mkt_notif_user ON marketplace_notifications(user_id, is_read);
 `;
