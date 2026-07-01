@@ -1,0 +1,13 @@
+node_modules
+.git
+.gitignore
+.env
+.env.local
+.env.production
+dist
+.data
+magusmebackup
+worktrees
+.DS_Store
+*.tar.gz
+*.log
